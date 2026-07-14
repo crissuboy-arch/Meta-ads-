@@ -8,28 +8,15 @@ import urllib.parse
 from pathlib import Path
 
 from config import (
-    ACTION_BUTTONS,
-    BRANDING,
     CONFIG,
-    COLORS,
-    DASHBOARD_METRICS,
-    HERO,
-    IMPORT_TAGS,
-    IMPORTS,
     MODELS as APP_MODELS,
-    NICHES,
-    PLATFORM_PATTERNS,
-    PRODUCT_TYPE_KEYWORDS,
-    PROMPTS,
-    SIDEBAR_CATEGORIES,
-    SIDEBAR_ITEMS,
-    SYSTEM_PROMPTS,
-    TOOLS,
-    UPLOADS,
-    URL_TYPES,
-    load_config,
+    get_config,
     list_configs,
     reload_config,
+    PLATFORM_PATTERNS,
+    PRODUCT_TYPE_KEYWORDS,
+    SYSTEM_PROMPTS,
+    UPLOADS,
 )
 
 from dotenv import load_dotenv
@@ -170,6 +157,32 @@ def create_app():
             clients[key] = OpenAI(base_url=BASE_URL, api_key=key, timeout=REQUEST_TIMEOUT)
         return clients[key], params
 
+    def _sse_stream(client, model, messages, params):
+        start = time.monotonic()
+        first_token_at = None
+        try:
+            completion = client.chat.completions.create(
+                model=model, messages=messages, stream=True, **params,
+            )
+            for chunk in completion:
+                if not getattr(chunk, "choices", None):
+                    continue
+                choice = chunk.choices[0]
+                delta = getattr(choice, "delta", None)
+                if delta is None:
+                    continue
+                content = getattr(delta, "content", None)
+                if content:
+                    if first_token_at is None:
+                        first_token_at = time.monotonic()
+                        ttft_ms = int((first_token_at - start) * 1000)
+                        yield f"event: meta\ndata: {json.dumps({'ttft_ms': ttft_ms})}\n\n"
+                    yield f"data: {json.dumps({'content': content})}\n\n"
+            total_ms = int((time.monotonic() - start) * 1000)
+            yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
+        except Exception as exc:
+            yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
+
     def _stream_analysis(user_prompt: str, model_id: str = None):
         if model_id is None:
             model_id = CONFIG.get("app_id", "pro")
@@ -186,36 +199,7 @@ def create_app():
             {"role": "user", "content": user_prompt},
         ]
 
-        def event_stream():
-            start = time.monotonic()
-            first_token_at = None
-            try:
-                completion = client.chat.completions.create(
-                    model=underlying,
-                    messages=messages,
-                    stream=True,
-                    **params,
-                )
-                for chunk in completion:
-                    if not getattr(chunk, "choices", None):
-                        continue
-                    choice = chunk.choices[0]
-                    delta = getattr(choice, "delta", None)
-                    if delta is None:
-                        continue
-                    content = getattr(delta, "content", None)
-                    if content:
-                        if first_token_at is None:
-                            first_token_at = time.monotonic()
-                            ttft_ms = int((first_token_at - start) * 1000)
-                            yield f"event: meta\ndata: {json.dumps({'ttft_ms': ttft_ms})}\n\n"
-                        yield f"data: {json.dumps({'content': content})}\n\n"
-                total_ms = int((time.monotonic() - start) * 1000)
-                yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
-            except Exception as exc:
-                yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
-
-        return StreamingResponse(event_stream(), media_type="text/event-stream")
+        return StreamingResponse(_sse_stream(client, underlying, messages, params), media_type="text/event-stream")
 
     def _detect_platform(url: str) -> str:
         for pattern, name in PLATFORM_PATTERNS:
@@ -313,7 +297,14 @@ def create_app():
         return JSONResponse({"status": "ok", "models": list(model_registry.keys())})
 
     @app.get("/api/branding")
-    def branding():
+    def branding(app_id: str = None):
+        if app_id:
+            try:
+                cfg = get_config(app_id)
+                reload_config()
+                return JSONResponse(cfg)
+            except FileNotFoundError:
+                raise HTTPException(404, f"Aplicativo '{app_id}' nao encontrado.")
         return JSONResponse(CONFIG)
 
     @app.get("/api/configs")
@@ -334,36 +325,7 @@ def create_app():
         client, params = client_for(model)
         api_model = entry.get("underlying", model)
 
-        def event_stream():
-            start = time.monotonic()
-            first_token_at = None
-            try:
-                completion = client.chat.completions.create(
-                    model=api_model,
-                    messages=messages,
-                    stream=True,
-                    **params,
-                )
-                for chunk in completion:
-                    if not getattr(chunk, "choices", None):
-                        continue
-                    choice = chunk.choices[0]
-                    delta = getattr(choice, "delta", None)
-                    if delta is None:
-                        continue
-                    content = getattr(delta, "content", None)
-                    if content:
-                        if first_token_at is None:
-                            first_token_at = time.monotonic()
-                            ttft_ms = int((first_token_at - start) * 1000)
-                            yield f"event: meta\ndata: {json.dumps({'ttft_ms': ttft_ms})}\n\n"
-                        yield f"data: {json.dumps({'content': content})}\n\n"
-                total_ms = int((time.monotonic() - start) * 1000)
-                yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
-            except Exception as exc:
-                yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
-
-        return StreamingResponse(event_stream(), media_type="text/event-stream")
+        return StreamingResponse(_sse_stream(client, api_model, messages, params), media_type="text/event-stream")
 
     @app.post("/api/upload-image")
     async def upload_image(file: UploadFile = File(...)):
@@ -396,38 +358,8 @@ def create_app():
             ]},
         ]
 
-        def event_stream():
-            start = time.monotonic()
-            first_token_at = None
-            try:
-                completion = vision_client.chat.completions.create(
-                    model=vision_model,
-                    messages=messages,
-                    stream=True,
-                    temperature=0.7,
-                    top_p=0.95,
-                    max_tokens=2048,
-                )
-                for chunk in completion:
-                    if not getattr(chunk, "choices", None):
-                        continue
-                    choice = chunk.choices[0]
-                    delta = getattr(choice, "delta", None)
-                    if delta is None:
-                        continue
-                    content = getattr(delta, "content", None)
-                    if content:
-                        if first_token_at is None:
-                            first_token_at = time.monotonic()
-                            ttft_ms = int((first_token_at - start) * 1000)
-                            yield f"event: meta\ndata: {json.dumps({'ttft_ms': ttft_ms})}\n\n"
-                        yield f"data: {json.dumps({'content': content})}\n\n"
-                total_ms = int((time.monotonic() - start) * 1000)
-                yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
-            except Exception as exc:
-                yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
-
-        return StreamingResponse(event_stream(), media_type="text/event-stream")
+        vision_params = {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048}
+        return StreamingResponse(_sse_stream(vision_client, vision_model, messages, vision_params), media_type="text/event-stream")
 
     @app.post("/api/upload-pdf")
     async def upload_pdf(file: UploadFile = File(...)):
@@ -495,28 +427,8 @@ def create_app():
             ]},
         ]
 
-        def event_stream():
-            start = time.monotonic()
-            first_token_at = None
-            try:
-                completion = vision_client.chat.completions.create(
-                    model=vision_model, messages=messages, stream=True,
-                    temperature=0.7, top_p=0.95, max_tokens=2048,
-                )
-                for chunk in completion:
-                    if not getattr(chunk, "choices", None):
-                        continue
-                    delta = chunk.choices[0].delta
-                    if delta and delta.content:
-                        if first_token_at is None:
-                            first_token_at = time.monotonic()
-                            yield f"event: meta\ndata: {json.dumps({'ttft_ms': int((first_token_at - start) * 1000)})}\n\n"
-                        yield f"data: {json.dumps({'content': delta.content})}\n\n"
-                yield f"event: done\ndata: {json.dumps({'total_ms': int((time.monotonic() - start) * 1000)})}\n\n"
-            except Exception as exc:
-                yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
-
-        return StreamingResponse(event_stream(), media_type="text/event-stream")
+        vision_params = {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048}
+        return StreamingResponse(_sse_stream(vision_client, vision_model, messages, vision_params), media_type="text/event-stream")
 
     @app.post("/api/analyze-url")
     async def analyze_url(request: Request):

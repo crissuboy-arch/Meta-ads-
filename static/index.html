@@ -61,6 +61,10 @@
   .side-premium .txt{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.04em}
   .side-premium .sub{font-size:9.5px;color:var(--text-faint)}
 
+  .app-switcher{padding:6px 10px;border-bottom:1px solid var(--glass-border)}
+  .app-select{width:100%;padding:6px 8px;border-radius:var(--radius-sm);background:var(--glass);border:1px solid var(--glass-border);color:var(--text);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;outline:none;cursor:pointer;transition:border-color .2s}
+  .app-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+
   .main{overflow-y:auto;padding:0 28px 20px}
 
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px;position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg-deep),transparent)}
@@ -200,12 +204,6 @@
   @keyframes bar-rise{from{height:0!important}to{height:var(--h)}}
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
   @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes skeleton-pulse{0%,100%{opacity:.3}50%{opacity:.6}}
-  @keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
-
-  .skeleton{display:flex;flex-direction:column;gap:6px;padding:8px 0}
-  .skeleton-line{height:10px;border-radius:4px;background:var(--text-faint);animation:skeleton-pulse 1.2s ease infinite}
-  .skeleton-line:nth-child(1){width:100%}.skeleton-line:nth-child(2){width:85%}.skeleton-line:nth-child(3){width:70%}.skeleton-line:nth-child(4){width:92%}.skeleton-line:nth-child(5){width:60%}
   @keyframes spin{to{transform:rotate(360deg)}}
 
   .upload-thumb{max-width:140px;max-height:90px;border-radius:8px;border:1px solid var(--glass-border);object-fit:cover;margin:4px 0}
@@ -215,9 +213,6 @@
   .upload-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue-neon));border-radius:3px;transition:width .3s ease}
   .status-msg{font-size:13px;color:var(--text-dim);margin-bottom:4px;display:flex;align-items:center;gap:6px}
   .status-msg .spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--glass-border);border-top-color:var(--blue-neon);border-radius:50%;animation:spin .6s linear infinite}
-  .analysis-card{display:grid;grid-template-columns:1fr;gap:2px;margin:4px 0}
-  .analysis-item{padding:3px 0;font-size:13px;line-height:1.6}
-  .analysis-item .check{color:#22C55E;font-weight:700}
 
   .result-cards{display:flex;flex-direction:column;gap:4px;margin:6px 0;animation:fadeIn .35s ease both}
   .result-item{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;font-size:12.5px;line-height:1.5;transition:all .15s;animation:fadeIn .3s ease both}
@@ -239,7 +234,6 @@
   .result-item.warn .ri-icon{color:var(--gold)}
   .result-item.bad{background:rgba(239,68,68,0.03);border-left:2px solid rgba(239,68,68,0.25)}
   .result-item.bad .ri-icon{color:#EF4444}
-  .result-score-ring{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid var(--gold);font-size:18px;font-weight:900;color:var(--gold);flex-shrink:0}
 
   .action-bar{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 2px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--glass-border);border-radius:var(--radius-sm);animation:fadeInUp .4s ease both}
   .action-bar-title{width:100%;font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
@@ -269,8 +263,11 @@
 <body>
 <div class="app">
 
-  <aside class="side">
+    <aside class="side">
     <div class="side-logo"><span class="dot"></span><span id="logoText">ForgeHub AI</span></div>
+    <div class="app-switcher" id="appSwitcher">
+      <select id="appSelector" class="app-select"></select>
+    </div>
     <nav class="side-nav" id="sideNav"></nav>
     <div class="side-footer">
       <div class="side-premium">
@@ -332,7 +329,6 @@
       <span class="ch-t">&#x1F4AC; Assistente <span class="live">AO VIVO</span></span>
       <div class="ch-actions">
         <button class="ch-btn" id="clearBtn">&#x1F504; Novo</button>
-        <button class="ch-btn" id="exportBtn" style="display:none">&#x1F4E5;</button>
       </div>
     </div>
     <div class="log" id="log">
@@ -786,6 +782,51 @@ async function handleURLAnalysis(url,type){
   }finally{setBusy(false)}
 }
 
+async function selectApp(appId){
+  setStatus('busy','carregando '+appId);
+  try{
+    const r=await fetch('/api/branding?app_id='+appId);if(!r.ok)throw new Error();
+    config=await r.json();
+    applyConfig(config);
+    clearBtn.click();
+    setStatus('online','conectado');
+    document.getElementById('appSelector').value=appId;
+  }catch(e){setStatus('error','erro ao trocar app')}
+}
+
+function applyConfig(cfg){
+  branding=cfg.branding||{};
+  P=cfg.prompts||{};
+  actionButtons=cfg.action_buttons||[];
+  urlTypes=((cfg.url_analysis&&cfg.url_analysis.types)||[]);
+
+  document.title=branding.app_name||'ForgeHub AI';
+  const at=document.getElementById('appTitle');if(at)at.textContent=branding.app_name||'ForgeHub AI';
+  const lt=document.getElementById('logoText');if(lt)lt.textContent=branding.logo_text||'ForgeHub AI';
+  const ft=document.getElementById('footerText');if(ft)ft.innerHTML='Powered by <strong>'+(branding.company||'ForgeHub AI')+'</strong>';
+  const pb=document.getElementById('planBadge');if(pb)pb.innerHTML='<span class="gd"></span>'+(branding.plan_name||'Professional');
+  const pt=document.getElementById('planText');if(pt)pt.textContent='Plano '+(branding.plan_name||'Professional');
+
+  const ht=document.getElementById('heroTitle');
+  if(ht&&cfg.hero&&cfg.hero.title)ht.innerHTML=cfg.hero.title+'<br/><span class="hl">'+(cfg.hero.highlight||'')+'</span>';
+  const hs=document.getElementById('heroSubtitle');if(hs)hs.textContent=(cfg.hero&&cfg.hero.subtitle)||'';
+
+  setColors(cfg.colors||{});
+  renderSidebar(cfg);
+  renderHero(cfg.hero||{});
+  renderDashboardMetrics(cfg.dashboard_metrics||[]);
+
+  document.getElementById('toolsSection').style.display=(cfg.tools&&cfg.tools.length)?'block':'none';
+  if(cfg.tools&&cfg.tools.length)renderTools(cfg.tools);
+
+  document.getElementById('importsSection').style.display=(cfg.imports&&cfg.imports.length)?'block':'none';
+  if(cfg.imports&&cfg.imports.length)renderImports(cfg.imports);
+  renderTags(cfg.import_tags||[]);
+
+  document.getElementById('nichesSection').style.display=(cfg.niches&&cfg.niches.length)?'block':'none';
+  if(cfg.niches&&cfg.niches.length)renderNiches(cfg.niches);
+}
+
 async function boot(n){
   n=n||1;
   try{
@@ -797,33 +838,23 @@ async function boot(n){
   }catch(e){
     if(n<5){setStatus('busy','reconectando ('+n+')');setTimeout(()=>boot(n+1),1500*n)}else setStatus('error','offline')
   }
+
+  const sel=document.getElementById('appSelector');
+  sel.innerHTML='<option value="">Carregando...</option>';
+  try{
+    const cr=await fetch('/api/configs');if(cr.ok){
+      const apps=await cr.json();
+      sel.innerHTML=apps.map(a=>'<option value="'+a.app_id+'"'+(a.color?' style="--opt-color:'+a.color+'"':'')+'>'+a.app_name+'</option>').join('');
+      sel.addEventListener('change',function(){if(this.value)selectApp(this.value)});
+    }
+  }catch(e){}
+
   try{
     const b=await fetch('/api/branding');if(!b.ok)return;
     config=await b.json();
-    branding=config.branding||{};
-    P=config.prompts||{};
-    actionButtons=config.action_buttons||[];
-    urlTypes=((config.url_analysis&&config.url_analysis.types)||[]);
-    
-    document.title=branding.app_name||'ForgeHub AI';
-    const at=document.getElementById('appTitle');if(at)at.textContent=branding.app_name||'ForgeHub AI';
-    const lt=document.getElementById('logoText');if(lt)lt.textContent=branding.logo_text||'ForgeHub AI';
-    const ft=document.getElementById('footerText');if(ft)ft.innerHTML='Powered by <strong>'+(branding.company||'ForgeHub AI')+'</strong>';
-    const pb=document.getElementById('planBadge');if(pb)pb.innerHTML='<span class="gd"></span>'+(branding.plan_name||'Professional');
-    const pt=document.getElementById('planText');if(pt)pt.textContent='Plano '+(branding.plan_name||'Professional');
-    
-    const ht=document.getElementById('heroTitle');
-    if(ht&&config.hero&&config.hero.title)ht.innerHTML=config.hero.title+'<br/><span class="hl">'+(config.hero.highlight||'')+'</span>';
-    const hs=document.getElementById('heroSubtitle');if(hs)hs.textContent=(config.hero&&config.hero.subtitle)||'';
-    
-    setColors(config.colors||{});
-    renderSidebar(config);
-    renderHero(config.hero||{});
-    renderDashboardMetrics(config.dashboard_metrics||[]);
-    if(config.tools&&config.tools.length){document.getElementById('toolsSection').style.display='block';renderTools(config.tools)}
-    if(config.imports&&config.imports.length){document.getElementById('importsSection').style.display='block';renderImports(config.imports)}
-    renderTags(config.import_tags||[]);
-    if(config.niches&&config.niches.length){document.getElementById('nichesSection').style.display='block';renderNiches(config.niches)}
+    applyConfig(config);
+
+    if(sel&&branding.app_name)sel.value=config.app_id||'';
   }catch(e){console.error('boot config fail',e)}
 }
 
