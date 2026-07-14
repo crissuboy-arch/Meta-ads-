@@ -14,6 +14,8 @@ load_dotenv(ROOT / ".env")
 BASE_URL = "https://integrate.api.nvidia.com/v1"
 DEFAULT_MODEL = "meta/llama-3.1-70b-instruct"
 REQUEST_TIMEOUT = 60
+META_ADS_MODEL = "meta-ads-ai"
+META_ADS_PROMPT = (ROOT / "skills" / "meta-ads.md").read_text(encoding="utf-8")
 
 
 def _build_registry():
@@ -82,6 +84,15 @@ def _build_registry():
             "api_key": os.getenv("NVIDIA_API_KEY_VISION", default_key),
             "params": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048},
         },
+        # --- Custom personas ---
+        META_ADS_MODEL: {
+            "label": "Meta Ads AI",
+            "provider": "Custom",
+            "category": "llm",
+            "api_key": os.getenv("NVIDIA_API_KEY_META_ADS", default_key),
+            "params": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 4096},
+            "underlying": DEFAULT_MODEL,
+        },
     }
 
 
@@ -126,14 +137,20 @@ def create_app():
         body = await request.json()
         messages = body.get("messages", [])
         model = (body.get("model") or DEFAULT_MODEL).strip()
+
+        if model == META_ADS_MODEL:
+            messages = [{"role": "system", "content": META_ADS_PROMPT}] + messages
+
         client, params = client_for(model)
+        entry = model_registry.get(model, {})
+        api_model = entry.get("underlying", model)
 
         def event_stream():
             start = time.monotonic()
             first_token_at = None
             try:
                 completion = client.chat.completions.create(
-                    model=model,
+                    model=api_model,
                     messages=messages,
                     stream=True,
                     **params,
