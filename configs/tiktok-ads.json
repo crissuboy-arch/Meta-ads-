@@ -1,0 +1,157 @@
+{
+  "app_id": "tiktok-ads",
+  "branding": {
+    "app_name": "TikTok Ads Expert PRO",
+    "short_name": "TikTok PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Business",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\uD83D\uDCF9",
+    "assistant_name": "TikTok Ads AI"
+  },
+  "colors": {
+    "primary": "#EE1D52",
+    "secondary": "#C41442",
+    "accent": "#FF2E63",
+    "gold": "#F6C453",
+    "bg_deep": "#0A0A0A",
+    "bg": "#111111",
+    "bg_mid": "#1A1A1A",
+    "bg_light": "#282828"
+  },
+  "models": {
+    "default": "meta/llama-3.1-70b-instruct",
+    "vision": "meta/llama-3.2-90b-vision-instruct",
+    "expert_underlying": "meta/llama-3.1-70b-instruct"
+  },
+  "skill": "tiktok-ads.md",
+  "expert_name": "TikTok Ads Expert",
+  "hero": {
+    "title": "Viralize suas vendas com TikTok Ads",
+    "highlight": "impulsionado por IA",
+    "subtitle": "Crie campanhas de v\u00eddeo de alto impacto, otimize audi\u00eancias e escale seus resultados na plataforma que mais cresce no mundo.",
+    "floats": [
+      {"label": "CPV", "value": "R$0,08", "color": "gold"},
+      {"label": "CTR", "value": "6.7%"},
+      {"label": "Engajamento", "value": "4.2%", "color": "green"},
+      {"label": "ROAS", "value": "3.2x", "color": "green"},
+      {"label": "TikTok Ads", "value": "", "big": true, "icon": "\uD83D\uDCF9"},
+      {"label": "CPM", "value": "R$12,50"}
+    ]
+  },
+  "dashboard_metrics": [
+    {"label": "CPV", "value": "R$0,08", "color": "gold", "trend": "down", "trend_value": "5%"},
+    {"label": "CTR", "value": "6.7%", "trend": "up", "trend_value": "18%"},
+    {"label": "Engajamento", "value": "4.2%", "trend": "up", "trend_value": "9%"},
+    {"label": "ROAS", "value": "3.2x", "color": "green", "trend": "up", "trend_value": "11%"},
+    {"label": "Visualiza\u00e7\u00f5es", "value": "128K"},
+    {"label": "Seguidores", "value": "+2.4K"}
+  ],
+  "sidebar": {
+    "categories": [
+      {"label": "Menu", "key": "menu"},
+      {"label": "Campanhas", "key": "campanhas"},
+      {"label": "Criativos", "key": "criativos"},
+      {"label": "Otimiza\u00e7\u00e3o", "key": "otimizacao"}
+    ],
+    "items": {
+      "menu": [
+        {"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}
+      ],
+      "campanhas": [
+        {"id": "criar-campanha", "label": "Nova Campanha", "icon": "\uD83D\uDCF9"},
+        {"id": "criar-audiencia", "label": "Audi\u00eancia", "icon": "\uD83C\uDFAF"},
+        {"id": "criar-lead-gen", "label": "Lead Generation", "icon": "\uD83D\uDCE2"}
+      ],
+      "criativos": [
+        {"id": "criar-video", "label": "Criar V\u00eddeo", "icon": "\uD83C\uDFAC"},
+        {"id": "criar-script", "label": "Roteiro", "icon": "\u270D\uFE0F"},
+        {"id": "criar-musica", "label": "Trilha Sonora", "icon": "\uD83C\uDFB5"}
+      ],
+      "otimizacao": [
+        {"id": "auditoria", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+        {"id": "escalar", "label": "Escalar", "icon": "\uD83D\uDE80"},
+        {"id": "analytics", "label": "Analytics", "icon": "\uD83D\uDCCA"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "criar-campanha", "icon": "\uD83D\uDCF9", "label": "Nova Campanha", "desc": "Campanhas completas com objetivo, audi\u00eancia e or\u00e7amento otimizados."},
+    {"id": "criar-audiencia", "icon": "\uD83C\uDFAF", "label": "Audi\u00eancia", "desc": "Segmenta\u00e7\u00e3o avan\u00e7ada com interesses, comportamentos e audi\u00eancias personalizadas."},
+    {"id": "criar-video", "icon": "\uD83C\uDFAC", "label": "Criar V\u00eddeo", "desc": "Ideias de v\u00eddeos virais com roteiro, cenas e chamadas para a\u00e7\u00e3o."},
+    {"id": "criar-script", "icon": "\u270D\uFE0F", "label": "Roteiro", "desc": "Roteiros persuasivos para v\u00eddeos de at\u00e9 60 segundos."},
+    {"id": "auditoria", "icon": "\uD83D\uDD0D", "label": "Auditoria", "desc": "Auditoria completa de campanhas TikTok Ads com recomenda\u00e7\u00f5es."},
+    {"id": "escalar", "icon": "\uD83D\uDE80", "label": "Escalar", "desc": "Estrat\u00e9gia de escala com aumento de budget e expans\u00e3o de audi\u00eancia."}
+  ],
+  "imports": [
+    {"id": "import-imagem", "icon": "\uD83D\uDCF7", "label": "Upload de Imagem"},
+    {"id": "import-video", "icon": "\uD83C\uDFAC", "label": "Upload de V\u00eddeo"},
+    {"id": "import-lp", "icon": "\uD83C\uDF10", "label": "Landing Page"},
+    {"id": "import-loja", "icon": "\uD83D\uDED2", "label": "Loja TikTok"}
+  ],
+  "import_tags": ["Produto", "Audi\u00eancia", "Trend", "Formato", "CTA", "Trilha", "Roteiro"],
+  "niches": [
+    {"id": "nicho-moda", "icon": "\uD83D\uDC57", "label": "Moda"},
+    {"id": "nicho-beleza", "icon": "\u2728", "label": "Beleza"},
+    {"id": "nicho-comida", "icon": "\uD83C\uDF54", "label": "Comida"},
+    {"id": "nicho-viagem", "icon": "\u2708\uFE0F", "label": "Viagem"},
+    {"id": "nicho-fitness", "icon": "\uD83C\uDFCB\uFE0F", "label": "Fitness"},
+    {"id": "nicho-games", "icon": "\uD83C\uDFAE", "label": "Games"},
+    {"id": "nicho-musica", "icon": "\uD83C\uDFB5", "label": "M\u00fasica"},
+    {"id": "nicho-educacao", "icon": "\uD83C\uDF93", "label": "Educa\u00e7\u00e3o"}
+  ],
+  "action_buttons": [
+    {"id": "criar-campanha", "label": "Nova Campanha", "icon": "\uD83D\uDCF9"},
+    {"id": "criar-audiencia", "label": "Audi\u00eancia", "icon": "\uD83C\uDFAF"},
+    {"id": "criar-script", "label": "Roteiro", "icon": "\u270D\uFE0F"},
+    {"id": "auditoria", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+    {"id": "escalar", "label": "Escalar", "icon": "\uD83D\uDE80"}
+  ],
+  "uploads": {
+    "image": true,
+    "pdf": false,
+    "screenshot": false,
+    "url": true
+  },
+  "url_analysis": {
+    "types": [
+      {"id": "lp", "label": "Landing Page", "icon": "\uD83C\uDF10"},
+      {"id": "loja", "label": "Loja", "icon": "\uD83D\uDED2"},
+      {"id": "app", "label": "Aplicativo", "icon": "\uD83D\uDCF1"}
+    ],
+    "platform_patterns": [],
+    "product_type_keywords": {}
+  },
+  "system_prompts": {
+    "image": "Voc\u00ea \u00e9 um analista especialista em TikTok Ads.\nAnalise a imagem e identifique elementos visuais que funcionam no TikTok.\n\nFormato:\n\n\u2713 PRODUTO: [produto]\n\u2713 ANGULO VIRAL: [abordagem para viralizar]\n\u2713 P\u00daBLICO: [p\u00fablico-alvo no TikTok]\n\u2713 FORMATO DE V\u00cdDEO: [sugest\u00e3o de formato]\n\u2713 TREND SUGERIDA: [trend ou estilo]\n\nPergunte se deseja criar um roteiro de v\u00eddeo.",
+    "pdf": "",
+    "screenshot": "",
+    "url": {
+      "lp": "Voc\u00ea \u00e9 um especialista em TikTok Ads analisando uma Landing Page.\n\nIdentifique:\n\n\u2713 PRODUTO: [produto]\n\u2713 P\u00daBLICO: [p\u00fablico]\n\u2713 ANGULO CRIATIVO: [abordagem para TikTok]\n\u2713 CTA: [chamada para a\u00e7\u00e3o]\n\u2713 FORMATO RECOMENDADO: [In-feed, Spark Ads, Brand Takeover]\n\nPergunte se deseja criar campanha.",
+      "loja": "Voc\u00ea \u00e9 um especialista em TikTok Shop. Analise a loja e identifique produtos para campanhas no TikTok.",
+      "app": "Voc\u00ea \u00e9 um especialista em TikTok para apps. Analise o app e sugira campanhas de instala\u00e7\u00e3o."
+    }
+  },
+  "prompts": {
+    "criar-campanha": "Voc\u00ea \u00e9 um consultor de TikTok Ads. N\u00e3o gere respostas completas ainda. Pergunte uma de cada vez: Qual o produto? Qual o objetivo (tr\u00e1fego, convers\u00e3o, leads)? Qual o or\u00e7amento? Qual o p\u00fablico-alvo? Aguarde as respostas.",
+    "criar-audiencia": "Voc\u00ea \u00e9 um consultor de TikTok Ads para audi\u00eancia. Pergunte: Qual produto? Quais interesses do p\u00fablico? Faixa et\u00e1ria? G\u00eanero? Localiza\u00e7\u00e3o? Aguarde.",
+    "criar-video": "Voc\u00ea \u00e9 um criativo de TikTok. Pergunte: Qual produto? Qual estilo de v\u00eddeo? Tom humor\u00edstico ou s\u00e9rio? Tem refer\u00eancias? Aguarde.",
+    "criar-script": "Voc\u00ea \u00e9 roteirista para TikTok Ads. Pergunte: Qual produto? Dura\u00e7\u00e3o do v\u00eddeo? Gancho principal? CTA desejado? Aguarde.",
+    "criar-lead-gen": "Voc\u00ea \u00e9 consultor de Lead Gen no TikTok. Pergunte: Qual produto? Qual isca digital? Qual formul\u00e1rio? Aguarde.",
+    "criar-musica": "Voc\u00ea \u00e9 produtor musical para TikTok. Pergunte: Qual o tom do v\u00eddeo? Qual g\u00eanero? Precisa de som viral? Aguarde.",
+    "auditoria": "Voc\u00ea \u00e9 auditor de TikTok Ads. Pergunte dados um de cada vez: gasto, impress\u00f5es, CTR, CPV, convers\u00f5es. Depois analise.",
+    "escalar": "Voc\u00ea \u00e9 estrategista de escala no TikTok. Pergunte: ROAS atual? Or\u00e7amento di\u00e1rio? CPA? Dias estabilizado? Aguarde.",
+    "analytics": "Voc\u00ea \u00e9 analista de TikTok Ads. Pergunte quais m\u00e9tricas analisar e o per\u00edodo.",
+    "dashboard": "Voc\u00ea \u00e9 o assistente do TikTok Ads Expert PRO. Como posso ajudar hoje?",
+    "nicho-moda": "Consultor de TikTok para moda. Pergunte: Qual segmento? Qual p\u00fablico? Tem vitrine f\u00edsica?",
+    "nicho-beleza": "Consultor de TikTok para beleza. Pergunte: Qual produto? Antes/depois? Tutoriais?",
+    "nicho-fitness": "Consultor de TikTok para fitness. Pergunte: Qual modalidade? Presencial ou online?",
+    "nicho-games": "Consultor de TikTok para games. Pergunte: Qual jogo? Gameplay ou hist\u00f3ria?",
+    "nicho-educacao": "Consultor de TikTok para educa\u00e7\u00e3o. Pergunte: Qual curso? P\u00fablico? Formato?"
+  }
+}

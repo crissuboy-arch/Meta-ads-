@@ -1,0 +1,76 @@
+{
+  "app_id": "crm",
+  "branding": {
+    "app_name": "CRM & Vendas Expert PRO",
+    "short_name": "CRM PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Business",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\uD83D\uDC65",
+    "assistant_name": "CRM AI"
+  },
+  "colors": { "primary": "#0EA5E9", "secondary": "#0284C7", "accent": "#38BDF8", "gold": "#F6C453", "bg_deep": "#08202E", "bg": "#0C2A3E", "bg_mid": "#0F3550", "bg_light": "#184A6E" },
+  "models": { "default": "meta/llama-3.1-70b-instruct", "vision": "meta/llama-3.2-90b-vision-instruct", "expert_underlying": "meta/llama-3.1-70b-instruct" },
+  "skill": "crm.md",
+  "expert_name": "CRM Expert",
+  "hero": { "title": "Venda mais com um CRM", "highlight": "inteligente", "subtitle": "Automa\u00e7\u00e3o de vendas, funil, acompanhamento e an\u00e1lise de performance.", "floats": [] },
+  "dashboard_metrics": [],
+  "sidebar": {
+    "categories": [{"label": "Menu", "key": "menu"}, {"label": "Gest\u00e3o", "key": "gestao"}, {"label": "Automa\u00e7\u00e3o", "key": "automacao"}, {"label": "Relat\u00f3rios", "key": "relatorios"}],
+    "items": {
+      "menu": [{"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}],
+      "gestao": [
+        {"id": "criar-funil", "label": "Funil de Vendas", "icon": "\uD83D\uDD04"},
+        {"id": "gerenciar-leads", "label": "Leads", "icon": "\uD83C\uDFAF"},
+        {"id": "gerenciar-clientes", "label": "Clientes", "icon": "\uD83D\uDC65"}
+      ],
+      "automacao": [
+        {"id": "criar-sequencia", "label": "Sequ\u00eancias", "icon": "\uD83D\uDD04"},
+        {"id": "criar-regras", "label": "Regras", "icon": "\u2699\uFE0F"}
+      ],
+      "relatorios": [
+        {"id": "relatorio-vendas", "label": "Vendas", "icon": "\uD83D\uDCC8"},
+        {"id": "relatorio-conversao", "label": "Convers\u00e3o", "icon": "\uD83D\uDCCA"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "criar-funil", "icon": "\uD83D\uDD04", "label": "Funil de Vendas", "desc": "Estrutura completa de funil com etapas e a\u00e7\u00f5es."},
+    {"id": "gerenciar-leads", "icon": "\uD83C\uDFAF", "label": "Gest\u00e3o de Leads", "desc": "Organiza\u00e7\u00e3o e qualifica\u00e7\u00e3o de leads."},
+    {"id": "criar-sequencia", "icon": "\uD83D\uDD04", "label": "Sequ\u00eancias", "desc": "Automa\u00e7\u00e3o de follow-up por e-mail e WhatsApp."},
+    {"id": "criar-regras", "icon": "\u2699\uFE0F", "label": "Regras", "desc": "Regras de automa\u00e7\u00e3o e pontua\u00e7\u00e3o de leads."},
+    {"id": "relatorio-vendas", "icon": "\uD83D\uDCC8", "label": "Relat\u00f3rios", "desc": "Relat\u00f3rios de performance do time de vendas."},
+    {"id": "relatorio-conversao", "icon": "\uD83D\uDCCA", "label": "Convers\u00e3o", "desc": "An\u00e1lise de taxas de convers\u00e3o por etapa."}
+  ],
+  "imports": [{"id": "import-pdf", "icon": "\uD83D\uDCC4", "label": "Planilha/PDF"}, {"id": "import-imagem", "icon": "\uD83D\uDCF7", "label": "Print CRM"}],
+  "import_tags": ["Lead", "Funil", "Convers\u00e3o", "Automa\u00e7\u00e3o", "Pipeline"],
+  "niches": [],
+  "action_buttons": [
+    {"id": "criar-funil", "label": "Criar Funil", "icon": "\uD83D\uDD04"},
+    {"id": "gerenciar-leads", "label": "Leads", "icon": "\uD83C\uDFAF"},
+    {"id": "criar-sequencia", "label": "Sequ\u00eancias", "icon": "\uD83D\uDD04"},
+    {"id": "relatorio-vendas", "label": "Relat\u00f3rios", "icon": "\uD83D\uDCCA"}
+  ],
+  "uploads": { "image": true, "pdf": true, "screenshot": false, "url": false },
+  "url_analysis": { "types": [], "platform_patterns": [], "product_type_keywords": {} },
+  "system_prompts": {
+    "image": "Voc\u00ea \u00e9 consultor de CRM. Analise a imagem/print e identifique: fluxo de vendas, etapas do funil, oportunidades de automa\u00e7\u00e3o.",
+    "pdf": "Voc\u00ea \u00e9 consultor de CRM. Analise o documento e identifique: processo de vendas, leads, taxas de convers\u00e3o, gargalos.",
+    "screenshot": "", "url": {}
+  },
+  "prompts": {
+    "criar-funil": "Voc\u00ea \u00e9 consultor de CRM. N\u00e3o crie funil completo ainda. Pergunte: Qual o processo de venda? Quantas etapas? Qual o ticket? Ciclo de venda? Aguarde.",
+    "gerenciar-leads": "Voc\u00ea \u00e9 especialista em leads. Pergunte: Quantos leads por m\u00eas? Qual a fonte? Como qualifica hoje? Aguarde.",
+    "gerenciar-clientes": "Voc\u00ea \u00e9 consultor de CRM para gest\u00e3o de clientes. Pergunte: Quantos clientes ativos? Qual ticket m\u00e9dio? Taxa de churn? Aguarde.",
+    "criar-sequencia": "Voc\u00ea \u00e9 especialista em automa\u00e7\u00e3o. Pergunte: Qual o objetivo? E-mail ou WhatsApp? Quantos dias de sequ\u00eancia? Conte\u00fado? Aguarde.",
+    "criar-regras": "Voc\u00ea \u00e9 especialista em regras de CRM. Pergunte: Quais crit\u00e9rios de pontua\u00e7\u00e3o? Quais a\u00e7\u00f5es autom\u00e1ticas? Aguarde.",
+    "relatorio-vendas": "Voc\u00ea \u00e9 analista de vendas. Pergunte: Qual per\u00edodo? Quais m\u00e9tricas? Tem CRM com dados? Aguarde.",
+    "relatorio-conversao": "Voc\u00ea \u00e9 analista de convers\u00e3o. Pergunte: Qual funil? Etapas? Volumes? Taxas atuais? Aguarde.",
+    "dashboard": "Assistente de CRM Expert. Como posso ajudar?"
+  }
+}

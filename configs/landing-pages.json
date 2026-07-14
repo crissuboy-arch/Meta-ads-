@@ -1,0 +1,107 @@
+{
+  "app_id": "landing-pages",
+  "branding": {
+    "app_name": "Landing Pages Expert PRO",
+    "short_name": "LP PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Professional",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\uD83D\uDCE2",
+    "assistant_name": "LP Expert AI"
+  },
+  "colors": {
+    "primary": "#7C3AED",
+    "secondary": "#6D28D9",
+    "accent": "#8B5CF6",
+    "gold": "#F6C453",
+    "bg_deep": "#0F0720",
+    "bg": "#150B2E",
+    "bg_mid": "#1E1040",
+    "bg_light": "#2D1A5C"
+  },
+  "models": { "default": "meta/llama-3.1-70b-instruct", "vision": "meta/llama-3.2-90b-vision-instruct", "expert_underlying": "meta/llama-3.1-70b-instruct" },
+  "skill": "landing-pages.md",
+  "expert_name": "Landing Pages Expert",
+  "hero": { "title": "Crie Landing Pages que convertem", "highlight": "com IA", "subtitle": "Estrutura, copy, design e CTA otimizados para m\u00e1xima convers\u00e3o.", "floats": [] },
+  "dashboard_metrics": [
+    {"label": "Taxa Conv.", "value": "12.4%", "color": "green", "trend": "up", "trend_value": "2.1%"},
+    {"label": "Bounce", "value": "32%", "trend": "down", "trend_value": "5%"},
+    {"label": "Tempo M\u00e9dio", "value": "3m42s"},
+    {"label": "Leads", "value": "89", "color": "gold"}
+  ],
+  "sidebar": {
+    "categories": [
+      {"label": "Menu", "key": "menu"},
+      {"label": "Cria\u00e7\u00e3o", "key": "criacao"},
+      {"label": "Otimiza\u00e7\u00e3o", "key": "otimizacao"}
+    ],
+    "items": {
+      "menu": [{"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}],
+      "criacao": [
+        {"id": "criar-lp", "label": "Nova Landing Page", "icon": "\uD83D\uDCE2"},
+        {"id": "criar-section", "label": "Se\u00e7\u00f5es", "icon": "\uD83D\uDCD0"},
+        {"id": "criar-form", "label": "Formul\u00e1rio", "icon": "\uD83D\uDCFD"}
+      ],
+      "otimizacao": [
+        {"id": "auditoria-lp", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+        {"id": "teste-ab", "label": "Teste A/B", "icon": "\u2696\uFE0F"},
+        {"id": "seo-lp", "label": "SEO", "icon": "\uD83D\uDD0D"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "criar-lp", "icon": "\uD83D\uDCE2", "label": "Nova Landing Page", "desc": "Crie p\u00e1ginas completas com estrutura de alto conversion rate."},
+    {"id": "criar-section", "icon": "\uD83D\uDCD0", "label": "Se\u00e7\u00f5es", "desc": "Se\u00e7\u00f5es prontas: hero, benef\u00edcios, provas, FAQ, CTA."},
+    {"id": "criar-form", "icon": "\uD83D\uDCFD", "label": "Formul\u00e1rio", "desc": "Formul\u00e1rios otimizados com campos estrat\u00e9gicos."},
+    {"id": "auditoria-lp", "icon": "\uD83D\uDD0D", "label": "Auditoria", "desc": "Auditoria completa de convers\u00e3o com nota 0-100."},
+    {"id": "teste-ab", "icon": "\u2696\uFE0F", "label": "Teste A/B", "desc": "Planejamento e an\u00e1lise de testes A/B."},
+    {"id": "seo-lp", "icon": "\uD83D\uDD0D", "label": "SEO", "desc": "Otimiza\u00e7\u00e3o SEO para p\u00e1ginas de alta performance."}
+  ],
+  "imports": [
+    {"id": "import-imagem", "icon": "\uD83D\uDCF7", "label": "Upload de Imagem"},
+    {"id": "import-lp", "icon": "\uD83C\uDF10", "label": "Analisar LP"},
+    {"id": "import-pdf", "icon": "\uD83D\uDCC4", "label": "Briefing PDF"}
+  ],
+  "import_tags": ["Produto", "Oferta", "CTA", "Design", "Copy", "Prova Social"],
+  "niches": [
+    {"id": "nicho-vendas", "icon": "\uD83D\uDCC8", "label": "P\u00e1gina de Vendas"},
+    {"id": "nicho-captura", "icon": "\uD83D\uDCE2", "label": "P\u00e1gina de Captura"},
+    {"id": "nicho-webinar", "icon": "\uD83C\uDFAC", "label": "Webinar"},
+    {"id": "nicho-saas", "icon": "\uD83E\uDD16", "label": "SaaS"},
+    {"id": "nicho-evento", "icon": "\uD83D\uDD86", "label": "Evento"}
+  ],
+  "action_buttons": [
+    {"id": "criar-lp", "label": "Nova LP", "icon": "\uD83D\uDCE2"},
+    {"id": "criar-section", "label": "Se\u00e7\u00f5es", "icon": "\uD83D\uDCD0"},
+    {"id": "auditoria-lp", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+    {"id": "teste-ab", "label": "Teste A/B", "icon": "\u2696\uFE0F"}
+  ],
+  "uploads": { "image": true, "pdf": true, "screenshot": false, "url": true },
+  "url_analysis": {
+    "types": [{"id": "lp", "label": "Landing Page", "icon": "\uD83C\uDF10"}, {"id": "loja", "label": "Loja", "icon": "\uD83D\uDED2"}],
+    "platform_patterns": [], "product_type_keywords": {}
+  },
+  "system_prompts": {
+    "image": "Voc\u00ea \u00e9 um designer de Landing Pages. Analise a imagem e extraia elementos de design, layout e convers\u00e3o.\n\nFormato:\n\u2713 TIPO DE LP: [tipo de p\u00e1gina]\n\u2713 ESTRUTURA: [se\u00e7\u00f5es visuais]\n\u2713 CORES: [paleta identificada]\n\u2713 CTA: [chamada principal]\n\u2713 MELHORIAS: [otimiza\u00e7\u00f5es]",
+    "pdf": "Voc\u00ea \u00e9 um estrategista de Landing Pages. Analise o briefing e identifique:\n\n\u2713 PRODUTO: [produto]\n\u2713 OBJETIVO: [objetivo da p\u00e1gina]\n\u2713 P\u00daBLICO: [p\u00fablico-alvo]\n\u2713 TOM: [tom da comunica\u00e7\u00e3o]\n\u2713 ESTRUTURA SUGERIDA: [se\u00e7\u00f5es recomendadas]\n\u2713 CTA: [chamada principal]",
+    "screenshot": "",
+    "url": {
+      "lp": "Voc\u00ea \u00e9 um especialista em Landing Pages. Analise a URL e identifique estrutura, pontos fortes e fracos, e sugira melhorias de convers\u00e3o.",
+      "loja": "Voc\u00ea \u00e9 um especialista em Landing Pages para ecommerce. Analise a loja e sugira melhorias na p\u00e1gina de produto."
+    }
+  },
+  "prompts": {
+    "criar-lp": "Voc\u00ea \u00e9 um especialista em Landing Pages. N\u00e3o crie p\u00e1ginas completas ainda. Pergunte primeiro: Qual o produto? Qual o objetivo da p\u00e1gina? Qual o p\u00fablico-alvo? Qual o CTA desejado? Aguarde as respostas.",
+    "criar-section": "Voc\u00ea \u00e9 designer de Landing Pages. Pergunte: Qual se\u00e7\u00e3o precisa? Hero, benef\u00edcios, provas, FAQ, CTA? Qual o produto? Aguarde.",
+    "criar-form": "Voc\u00ea \u00e9 especialista em formul\u00e1rios. Pergunte: Qual o objetivo? Leads ou vendas? Quantos campos? Aguarde.",
+    "auditoria-lp": "Voc\u00ea \u00e9 auditor de Landing Pages. Pe\u00e7a a URL ou descri\u00e7\u00e3o. Analise: tempo de carregamento, layout, copy, CTA, prova social, responsividade. D\u00ea nota 0-100.",
+    "teste-ab": "Voc\u00ea \u00e9 especialista em testes A/B. Pergunte: Qual elemento testar? Headline, CTA, cor, layout? Qual a hip\u00f3tese? Aguarde.",
+    "seo-lp": "Voc\u00ea \u00e9 especialista em SEO para Landing Pages. Pergunte: Qual a palavra-chave principal? Qual o produto? J\u00e1 tem dom\u00ednio? Aguarde.",
+    "dashboard": "Assistente de Landing Pages Expert. Como posso ajudar hoje?"
+  }
+}

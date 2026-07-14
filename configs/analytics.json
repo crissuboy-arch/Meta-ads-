@@ -1,0 +1,76 @@
+{
+  "app_id": "analytics",
+  "branding": {
+    "app_name": "Analytics Expert PRO",
+    "short_name": "Analytics PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Business",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\uD83D\uDCCA",
+    "assistant_name": "Analytics AI"
+  },
+  "colors": { "primary": "#F59E0B", "secondary": "#D97706", "accent": "#FBBF24", "gold": "#F6C453", "bg_deep": "#1E1308", "bg": "#2A1A0C", "bg_mid": "#362410", "bg_light": "#4F351C" },
+  "models": { "default": "meta/llama-3.1-70b-instruct", "vision": "meta/llama-3.2-90b-vision-instruct", "expert_underlying": "meta/llama-3.1-70b-instruct" },
+  "skill": "analytics.md",
+  "expert_name": "Analytics Expert",
+  "hero": { "title": "Decis\u00f5es baseadas em", "highlight": "dados reais", "subtitle": "Dashboard, m\u00e9tricas, insights e recomenda\u00e7\u00f5es para otimizar seus resultados.", "floats": [] },
+  "dashboard_metrics": [],
+  "sidebar": {
+    "categories": [{"label": "Menu", "key": "menu"}, {"label": "An\u00e1lise", "key": "analise"}, {"label": "Relat\u00f3rios", "key": "relatorios"}],
+    "items": {
+      "menu": [{"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}],
+      "analise": [
+        {"id": "analisar-dados", "label": "Analisar Dados", "icon": "\uD83D\uDCCA"},
+        {"id": "analisar-trafego", "label": "Tr\u00e1fego", "icon": "\uD83C\uDF10"},
+        {"id": "analisar-conversoes", "label": "Convers\u00f5es", "icon": "\uD83C\uDFC6"},
+        {"id": "analisar-funil", "label": "Funil", "icon": "\uD83D\uDD04"}
+      ],
+      "relatorios": [
+        {"id": "gerar-relatorio", "label": "Gerar Relat\u00f3rio", "icon": "\uD83D\uDCC4"},
+        {"id": "exportar-dados", "label": "Exportar", "icon": "\uD83D\uDCE5"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "analisar-dados", "icon": "\uD83D\uDCCA", "label": "Analisar Dados", "desc": "Insights profundos sobre seus n\u00fameros de marketing."},
+    {"id": "analisar-trafego", "icon": "\uD83C\uDF10", "label": "An\u00e1lise Tr\u00e1fego", "desc": "An\u00e1lise de fontes, canais e performance de tr\u00e1fego."},
+    {"id": "analisar-conversoes", "icon": "\uD83C\uDFC6", "label": "Convers\u00f5es", "desc": "Taxas, caminhos e atribui\u00e7\u00e3o de convers\u00e3o."},
+    {"id": "analisar-funil", "icon": "\uD83D\uDD04", "label": "Funil", "desc": "An\u00e1lise de funil com gargalos e oportunidades."},
+    {"id": "gerar-relatorio", "icon": "\uD83D\uDCC4", "label": "Gerar Relat\u00f3rio", "desc": "Relat\u00f3rios completos em formato executivo."},
+    {"id": "exportar-dados", "icon": "\uD83D\uDCE5", "label": "Exportar", "desc": "Exporta\u00e7\u00e3o de dados e insights."}
+  ],
+  "imports": [
+    {"id": "import-pdf", "icon": "\uD83D\uDCC4", "label": "Upload PDF"},
+    {"id": "import-imagem", "icon": "\uD83D\uDCF7", "label": "Print Dashboard"},
+    {"id": "import-screenshot", "icon": "\uD83D\uDDBC\uFE0F", "label": "Screenshot"}
+  ],
+  "import_tags": ["M\u00e9trica", "KPI", "Per\u00edodo", "Fonte", "Convers\u00e3o", "Custo"],
+  "niches": [],
+  "action_buttons": [
+    {"id": "analisar-dados", "label": "Analisar", "icon": "\uD83D\uDCCA"},
+    {"id": "analisar-trafego", "label": "Tr\u00e1fego", "icon": "\uD83C\uDF10"},
+    {"id": "gerar-relatorio", "label": "Relat\u00f3rio", "icon": "\uD83D\uDCC4"}
+  ],
+  "uploads": { "image": true, "pdf": true, "screenshot": true, "url": false },
+  "url_analysis": { "types": [], "platform_patterns": [], "product_type_keywords": {} },
+  "system_prompts": {
+    "image": "Voc\u00ea \u00e9 analista de dados. Analise o print de dashboard e identifique: principais m\u00e9tricas, tend\u00eancias, anomalias, recomenda\u00e7\u00f5es.",
+    "pdf": "Voc\u00ea \u00e9 analista de dados. Analise o relat\u00f3rio e extraia: KPIs, metas, performance, insights, recomenda\u00e7\u00f5es.",
+    "screenshot": "Voc\u00ea \u00e9 analista de dados. Analise a captura de tela e identifique m\u00e9tricas, tend\u00eancias e oportunidades.",
+    "url": {}
+  },
+  "prompts": {
+    "analisar-dados": "Voc\u00ea \u00e9 analista de dados de marketing. Pergunte: Quais m\u00e9tricas analisar? Qual per\u00edodo? Quais fontes de dados? Tem metas definidas? Aguarde.",
+    "analisar-trafego": "Voc\u00ea \u00e9 analista de tr\u00e1fego. Pergunte: Quais canais? Per\u00edodo? M\u00e9tricas principais? Or\u00e7amento? Aguarde.",
+    "analisar-conversoes": "Voc\u00ea \u00e9 analista de convers\u00e3o. Pergunte: Qual a taxa atual? Qual funil? Onde quer melhorar? Aguarde.",
+    "analisar-funil": "Voc\u00ea \u00e9 analista de funil. Pergunte: Quantas etapas? Volumes em cada? Onde est\u00e1 o gargalo? Aguarde.",
+    "gerar-relatorio": "Voc\u00ea \u00e9 analista de relat\u00f3rios. Pergunte: Qual per\u00edodo? Quais m\u00e9tricas? Formato? P\u00fablico do relat\u00f3rio? Aguarde.",
+    "exportar-dados": "Voc\u00ea \u00e9 analista de dados. Pergunte: Quais dados exportar? Qual formato? Per\u00edodo? Filtros? Aguarde.",
+    "dashboard": "Assistente de Analytics Expert. Como posso ajudar?"
+  }
+}

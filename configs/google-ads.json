@@ -1,0 +1,168 @@
+{
+  "app_id": "google-ads",
+  "branding": {
+    "app_name": "Google Ads Expert PRO",
+    "short_name": "Google PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Business",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\uD83C\uDF10",
+    "assistant_name": "Google Ads AI"
+  },
+  "colors": {
+    "primary": "#4285F4",
+    "secondary": "#1967D2",
+    "accent": "#669DF6",
+    "gold": "#FBBC04",
+    "bg_deep": "#08142E",
+    "bg": "#0B1E3C",
+    "bg_mid": "#0F2447",
+    "bg_light": "#1A3359"
+  },
+  "models": {
+    "default": "meta/llama-3.1-70b-instruct",
+    "vision": "meta/llama-3.2-90b-vision-instruct",
+    "expert_underlying": "meta/llama-3.1-70b-instruct"
+  },
+  "skill": "google-ads.md",
+  "expert_name": "Google Ads Expert",
+  "hero": {
+    "title": "Domine o Google Ads com",
+    "highlight": "intelig\u00eancia artificial",
+    "subtitle": "Crie campanhas de Search, Display, Shopping e YouTube com IA. Otimize lances, palavras-chave e extens\u00f5es automaticamente.",
+    "floats": [
+      {"label": "CPC", "value": "R$1,20", "color": "gold"},
+      {"label": "CTR", "value": "5.2%"},
+      {"label": "Qualidade", "value": "9/10", "color": "green"},
+      {"label": "Conv.", "value": "+38%", "color": "green"},
+      {"label": "Google Ads", "value": "", "big": true, "icon": "\uD83D\uDCE3"},
+      {"label": "ROAS", "value": "3.8x", "color": "gold"}
+    ]
+  },
+  "dashboard_metrics": [
+    {"label": "CPC", "value": "R$1,20", "color": "gold", "trend": "down", "trend_value": "8%"},
+    {"label": "CTR", "value": "5.2%", "trend": "up", "trend_value": "12%"},
+    {"label": "QS M\u00e9dio", "value": "8.4", "trend": "up", "trend_value": "0.3"},
+    {"label": "ROAS", "value": "3.8x", "color": "green", "trend": "up", "trend_value": "15%"},
+    {"label": "Convers\u00f5es", "value": "231"},
+    {"label": "Impression Share", "value": "86%"}
+  ],
+  "sidebar": {
+    "categories": [
+      {"label": "Menu", "key": "menu"},
+      {"label": "Campanhas", "key": "campanhas"},
+      {"label": "Palavras", "key": "palavras"},
+      {"label": "Otimiza\u00e7\u00e3o", "key": "otimizacao"},
+      {"label": "Relat\u00f3rios", "key": "relatorios"}
+    ],
+    "items": {
+      "menu": [
+        {"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}
+      ],
+      "campanhas": [
+        {"id": "criar-search", "label": "Campanha Search", "icon": "\uD83D\uDD0D"},
+        {"id": "criar-shopping", "label": "Campanha Shopping", "icon": "\uD83D\uDED2"},
+        {"id": "criar-display", "label": "Campanha Display", "icon": "\uD83D\uDDBC"},
+        {"id": "criar-video", "label": "Campanha V\u00eddeo", "icon": "\uD83C\uDFAC"}
+      ],
+      "palavras": [
+        {"id": "pesquisar-palavras", "label": "Pesquisa Palavras", "icon": "\uD83D\uDD0D"},
+        {"id": "palavras-negativas", "label": "Palavras Negativas", "icon": "\u274C"}
+      ],
+      "otimizacao": [
+        {"id": "auditoria-google", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+        {"id": "lances", "label": "Estrat\u00e9gia de Lances", "icon": "\uD83C\uDFC6"},
+        {"id": "extensoes", "label": "Extens\u00f5es", "icon": "\uD83D\uDCCC"}
+      ],
+      "relatorios": [
+        {"id": "analytics-google", "label": "Analytics", "icon": "\uD83D\uDCCA"},
+        {"id": "concorrentes", "label": "Concorrentes", "icon": "\uD83D\uDC65"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "criar-search", "icon": "\uD83D\uDD0D", "label": "Campanha Search", "desc": "Campanhas de pesquisa com palavras-chave, extens\u00f5es e lances otimizados."},
+    {"id": "criar-shopping", "icon": "\uD83D\uDED2", "label": "Campanha Shopping", "desc": "Campanhas de produto com feed e otimiza\u00e7\u00e3o de lances."},
+    {"id": "criar-display", "icon": "\uD83D\uDDBC", "label": "Campanha Display", "desc": "An\u00fancios visuais com segmenta\u00e7\u00e3o por audi\u00eancia e contexto."},
+    {"id": "pesquisar-palavras", "icon": "\uD83D\uDD0D", "label": "Pesquisa Palavras", "desc": "Pesquisa de palavras-chave com volume, concorr\u00eancia e CPC."},
+    {"id": "auditoria-google", "icon": "\uD83D\uDD0D", "label": "Auditoria", "desc": "Auditoria completa da conta Google Ads com recomenda\u00e7\u00f5es."},
+    {"id": "lances", "icon": "\uD83C\uDFC6", "label": "Lances Inteligentes", "desc": "Estrat\u00e9gia de lances automatizada baseada em objetivos."}
+  ],
+  "imports": [
+    {"id": "import-imagem", "icon": "\uD83D\uDCF7", "label": "Upload de Imagem"},
+    {"id": "import-pdf", "icon": "\uD83D\uDCC4", "label": "Upload de PDF"},
+    {"id": "import-lp", "icon": "\uD83C\uDF10", "label": "Landing Page"},
+    {"id": "import-loja", "icon": "\uD83D\uDED2", "label": "Loja"}
+  ],
+  "import_tags": ["Produto", "Palavra-chave", "Concorrente", "CPC", "P\u00fablico", "Oferta", "Landing Page"],
+  "niches": [
+    {"id": "nicho-loja", "icon": "\uD83C\uDFCD\uFE0F", "label": "Ecommerce"},
+    {"id": "nicho-saas", "icon": "\uD83E\uDD16", "label": "SaaS"},
+    {"id": "nicho-consultoria", "icon": "\uD83D\uDCBC", "label": "Consultoria"},
+    {"id": "nicho-clinica", "icon": "\uD83C\uDFE5", "label": "Cl\u00ednicas"},
+    {"id": "nicho-advocacia", "icon": "\u2696\uFE0F", "label": "Advocacia"},
+    {"id": "nicho-local", "icon": "\uD83C\uDFE0", "label": "Neg\u00f3cio Local"},
+    {"id": "nicho-educacao", "icon": "\uD83C\uDF93", "label": "Educa\u00e7\u00e3o"},
+    {"id": "nicho-imobiliaria", "icon": "\uD83C\uDFE2", "label": "Imobili\u00e1ria"}
+  ],
+  "action_buttons": [
+    {"id": "criar-search", "label": "Criar Search", "icon": "\uD83D\uDD0D"},
+    {"id": "criar-shopping", "label": "Criar Shopping", "icon": "\uD83D\uDED2"},
+    {"id": "pesquisar-palavras", "label": "Palavras-chave", "icon": "\uD83D\uDD0D"},
+    {"id": "auditoria-google", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+    {"id": "lances", "label": "Lances", "icon": "\uD83C\uDFC6"},
+    {"id": "extensoes", "label": "Extens\u00f5es", "icon": "\uD83D\uDCCC"}
+  ],
+  "uploads": {
+    "image": true,
+    "pdf": true,
+    "screenshot": false,
+    "url": true
+  },
+  "url_analysis": {
+    "types": [
+      {"id": "lp", "label": "Landing Page", "icon": "\uD83C\uDF10"},
+      {"id": "loja", "label": "Loja Virtual", "icon": "\uD83D\uDED2"},
+      {"id": "app", "label": "Aplicativo", "icon": "\uD83D\uDCF1"}
+    ],
+    "platform_patterns": [],
+    "product_type_keywords": {}
+  },
+  "system_prompts": {
+    "image": "Voc\u00ea \u00e9 um analista especialista em Google Ads.\nAnalise a imagem enviada e extraia informa\u00e7\u00f5es para campanhas de Search, Display e Shopping.\n\nApresente sua an\u00e1lise neste formato:\n\n\u2713 PRODUTO: [qual produto ou servi\u00e7o]\n\u2713 PALAVRAS-CHAVE: [poss\u00edveis palavras-chave]\n\u2713 P\u00daBLICO: [qual o p\u00fablico-alvo]\n\u2713 OFERTA: [qual a oferta principal]\n\u2713 LANDING PAGE: [sugest\u00e3o de LP]\n\u2713 CAMPANHA RECOMENDADA: [Search, Shopping, Display]\n\nAp\u00f3s a lista, pergunte ao usu\u00e1rio:\n\"Deseja que eu crie a campanha completa baseada nessa an\u00e1lise?\"",
+    "pdf": "Voce e um especialista em Google Ads analisando um documento PDF.\n\nAnalise o conteudo extraido e identifique:\n\n\u2713 PRODUTO: [nome do produto]\n\u2713 NICHO: [nicho de mercado]\n\u2713 PALAVRAS-CHAVE: [principais termos de busca]\n\u2713 OFERTA: [oferta principal]\n\u2713 P\u00daBLICO: [publico-alvo]\n\u2713 CPC SUGERIDO: [valor estimado]\n\u2713 ESTRATEGIA: [estrategia de campanha]\n\nApos a lista, pergunte ao usuario:\n\"Deseja criar a campanha no Google Ads com base nesta analise?\"",
+    "screenshot": "",
+    "url": {
+      "lp": "Voce e um especialista em Google Ads analisando uma LANDING PAGE para campanhas de Search.\n\nIdentifique:\n\n\u2713 PRODUTO: [produto ou servico]\n\u2713 PALAVRAS-CHAVE PRINCIPAIS: [termos de busca]\n\u2713 OFERTA: [oferta principal]\n\u2713 P\u00daBLICO: [publico-alvo]\n\u2713 CTA: [chamada para acao]\n\u2713 QUALIDADE DA LP: [otimizacao para Quality Score]\n\u2713 CAMPANHA RECOMENDADA: [Search, Display, Shopping]\n\nApos analisar, pergunte ao usuario:\n\"Deseja criar a campanha no Google Ads com base nesta analise?\"",
+      "loja": "Voce e um especialista em Google Ads analisando uma LOJA VIRTUAL para campanhas de Shopping.\n\nIdentifique:\n\n\u2713 PRODUTOS: [produtos principais]\n\u2713 FAIXA DE PRECO: [valores]\n\u2713 CATEGORIA: [categoria dos produtos]\n\u2713 CONCORRENCIA: [nivel de concorrencia]\n\u2713 CAMPANHA RECOMENDADA: [Shopping, Search, Display]\n\nApos analisar, pergunte ao usuario:\n\"Deseja criar a campanha de Shopping com base nesta analise?\"",
+      "app": "Voce e um especialista em Google Ads analisando um APLICATIVO para campanhas de App campaigns.\n\nIdentifique:\n\n\u2713 PRODUTO: [nome do app]\n\u2713 CATEGORIA: [categoria]\n\u2713 PUBLICO: [publico-alvo]\n\u2713 PROPOSTA DE VALOR: [valor principal]\n\u2713 ACAO RECOMENDADA: [instalar, engajar, converter]\n\nApos analisar, pergunte ao usuario:\n\"Deseja criar a campanha de App com base nesta analise?\""
+    }
+  },
+  "prompts": {
+    "criar-search": "Voc\u00ea \u00e9 um consultor de Google Ads especialista em Search. N\u00e3o gere respostas completas ainda. Primeiro fa\u00e7a perguntas uma de cada vez: Qual o produto ou servi\u00e7o? Qual o pa\u00eds? Quais s\u00e3o as principais palavras-chave? Qual o or\u00e7amento di\u00e1rio? Qual a p\u00e1gina de destino? Aguarde as respostas antes de avan\u00e7ar.",
+    "criar-shopping": "Voc\u00ea \u00e9 um consultor de Google Ads especialista em Shopping. N\u00e3o gere campanhas completas ainda. Pergunte primeiro: Qual o produto? Tem feed configurado? Qual a margem? Qual o pa\u00eds? Aguarde as respostas.",
+    "criar-display": "Voc\u00ea \u00e9 um consultor de Google Ads especialista em Display. N\u00e3o gere campanhas completas ainda. Pergunte primeiro: Qual o produto? Qual o p\u00fablico-alvo? J\u00e1 tem criativos? Qual o or\u00e7amento? Aguarde as respostas.",
+    "criar-video": "Voc\u00ea \u00e9 um consultor de Google Ads especialista em YouTube. Pergunte primeiro: Qual o produto? J\u00e1 tem v\u00eddeo? Qual o p\u00fablico? Qual o objetivo? Aguarde as respostas.",
+    "pesquisar-palavras": "Voc\u00ea \u00e9 um especialista em pesquisa de palavras-chave para Google Ads. Pergunte primeiro: Qual o nicho? Qual o produto? Qual o pa\u00eds? Quais concorrentes? Aguarde as respostas antes de sugerir keywords.",
+    "palavras-negativas": "Voc\u00ea \u00e9 um especialista em palavras negativas para Google Ads. Pergunte primeiro: Qual o nicho? Quais termos N\u00c3O s\u00e3o relevantes? Quais campanhas est\u00e3o ativas? Aguarde as respostas.",
+    "auditoria-google": "Voc\u00ea \u00e9 um consultor de Google Ads especializado em auditoria. Pergunte um dado de cada vez: or\u00e7amento mensal, CPC m\u00e9dio, CTR, Quality Score, impress\u00f5es, convers\u00f5es. Ap\u00f3s receber tudo, apresente a an\u00e1lise.",
+    "lances": "Voc\u00ea \u00e9 um estrategista de lances para Google Ads. Pergunte primeiro: Qual o objetivo (m\u00e1x convers\u00f5es, ROAS, CPA)? Qual o or\u00e7amento? Qual o hist\u00f3rico de dados? Aguarde as respostas.",
+    "extensoes": "Voc\u00ea \u00e9 um consultor de Google Ads para extens\u00f5es. Pergunte primeiro: Quais campanhas est\u00e3o ativas? Qual o produto? J\u00e1 usa sitelinks? Aguarde as respostas.",
+    "analytics-google": "Voc\u00ea \u00e9 um analista de dados para Google Ads. Pergunte primeiro: Quais m\u00e9tricas analisar? Qual o per\u00edodo? Tem Google Analytics integrado? Aguarde.",
+    "concorrentes": "Voc\u00ea \u00e9 um analista de concorr\u00eancia para Google Ads. Pergunte primeiro: Qual o nicho? Qual o pa\u00eds? Quais s\u00e3o os principais concorrentes? Aguarde as respostas.",
+    "dashboard": "Voc\u00ea \u00e9 o assistente do Google Ads Expert PRO. Como posso ajudar hoje?",
+    "nicho-loja": "Voc\u00ea \u00e9 um consultor de Google Ads para ecommerce. Pergunte: Qual o nicho? Qual o ticket m\u00e9dio? Usa feed? Qual plataforma?",
+    "nicho-saas": "Voc\u00ea \u00e9 um consultor de Google Ads para SaaS. Pergunte: Qual o problema resolvido? Qual o plano? Tem trial? Qual o CAC ideal?",
+    "nicho-consultoria": "Voc\u00ea \u00e9 um consultor de Google Ads para consultores. Pergunte: Qual a \u00e1rea? Qual a regi\u00e3o? Busca leads diretos?",
+    "nicho-clinica": "Voc\u00ea \u00e9 um consultor de Google Ads para cl\u00ednicas. Pergunte: Qual especialidade? Qual localiza\u00e7\u00e3o? Conv\u00eanio ou particular?",
+    "nicho-advocacia": "Voc\u00ea \u00e9 um consultor de Google Ads para advocacia. Pergunte: Qual \u00e1rea? Qual regi\u00e3o? Leads ou reconhecimento?",
+    "nicho-local": "Voc\u00ea \u00e9 um consultor de Google Ads para neg\u00f3cios locais. Pergunte: Qual tipo de neg\u00f3cio? Qual cidade? Busca liga\u00e7\u00f5es ou visitas?",
+    "nicho-educacao": "Voc\u00ea \u00e9 um consultor de Google Ads para educa\u00e7\u00e3o. Pergunte: Qual curso? Online ou presencial? Qual ticket?",
+    "nicho-imobiliaria": "Voc\u00ea \u00e9 um consultor de Google Ads para imobili\u00e1rias. Pergunte: Qual cidade? Venda ou aluguel? Qual perfil de im\u00f3veis?"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "app_id": "seo",
+  "branding": {
+    "app_name": "SEO Expert PRO",
+    "short_name": "SEO PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Professional",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\uD83D\uDD0D",
+    "assistant_name": "SEO AI"
+  },
+  "colors": { "primary": "#059669", "secondary": "#047857", "accent": "#34D399", "gold": "#F6C453", "bg_deep": "#052014", "bg": "#072E1C", "bg_mid": "#0A3D26", "bg_light": "#105936" },
+  "models": { "default": "meta/llama-3.1-70b-instruct", "vision": "meta/llama-3.2-90b-vision-instruct", "expert_underlying": "meta/llama-3.1-70b-instruct" },
+  "skill": "seo.md",
+  "expert_name": "SEO Expert",
+  "hero": { "title": "Domine os mecanismos de busca", "highlight": "com SEO inteligente", "subtitle": "Pesquisa de palavras-chave, otimiza\u00e7\u00e3o on-page, t\u00e9cnicas avan\u00e7adas e an\u00e1lise de concorr\u00eancia.", "floats": [] },
+  "dashboard_metrics": [],
+  "sidebar": {
+    "categories": [{"label": "Menu", "key": "menu"}, {"label": "Pesquisa", "key": "pesquisa"}, {"label": "Otimiza\u00e7\u00e3o", "key": "otimizacao"}, {"label": "An\u00e1lise", "key": "analise"}],
+    "items": {
+      "menu": [{"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}],
+      "pesquisa": [
+        {"id": "pesquisar-kw", "label": "Palavras-chave", "icon": "\uD83D\uDD0D"},
+        {"id": "analisar-concorrentes", "label": "Concorrentes", "icon": "\uD83D\uDC65"}
+      ],
+      "otimizacao": [
+        {"id": "otimizar-pagina", "label": "On-Page SEO", "icon": "\uD83D\uDCC4"},
+        {"id": "otimizar-tecnico", "label": "SEO T\u00e9cnico", "icon": "\u2699\uFE0F"},
+        {"id": "otimizar-conteudo", "label": "Conte\u00fado SEO", "icon": "\u270D\uFE0F"},
+        {"id": "link-building", "label": "Link Building", "icon": "\uD83D\uDD17"}
+      ],
+      "analise": [
+        {"id": "auditoria-seo", "label": "Auditoria", "icon": "\uD83D\uDD0D"},
+        {"id": "relatorio-seo", "label": "Relat\u00f3rios", "icon": "\uD83D\uDCCA"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "pesquisar-kw", "icon": "\uD83D\uDD0D", "label": "Palavras-chave", "desc": "Pesquisa avan\u00e7ada com volume, dificuldade e inten\u00e7\u00e3o."},
+    {"id": "otimizar-pagina", "icon": "\uD83D\uDCC4", "label": "On-Page SEO", "desc": "Otimiza\u00e7\u00e3o de t\u00edtulo, meta, headings e conte\u00fado."},
+    {"id": "otimizar-tecnico", "icon": "\u2699\uFE0F", "label": "SEO T\u00e9cnico", "desc": "Core Web Vitals, sitemap, robots, schema, canonical."},
+    {"id": "otimizar-conteudo", "icon": "\u270D\uFE0F", "label": "Conte\u00fado SEO", "desc": "Artigos e textos otimizados para ranqueamento."},
+    {"id": "auditoria-seo", "icon": "\uD83D\uDD0D", "label": "Auditoria", "desc": "Auditoria completa com nota 0-100 e recomenda\u00e7\u00f5es."},
+    {"id": "link-building", "icon": "\uD83D\uDD17", "label": "Link Building", "desc": "Estrat\u00e9gias de backlinks e autoridade de dom\u00ednio."}
+  ],
+  "imports": [
+    {"id": "import-lp", "icon": "\uD83C\uDF10", "label": "Analisar URL"},
+    {"id": "import-pdf", "icon": "\uD83D\uDCC4", "label": "Briefing PDF"}
+  ],
+  "import_tags": ["Palavra-chave", "Concorrente", "Backlink", "Tr\u00e1fego", "Dom\u00ednio"],
+  "niches": [],
+  "action_buttons": [
+    {"id": "pesquisar-kw", "label": "Palavras-chave", "icon": "\uD83D\uDD0D"},
+    {"id": "otimizar-pagina", "label": "On-Page", "icon": "\uD83D\uDCC4"},
+    {"id": "auditoria-seo", "label": "Auditoria", "icon": "\uD83D\uDD0D"}
+  ],
+  "uploads": { "image": false, "pdf": true, "screenshot": false, "url": true },
+  "url_analysis": { "types": [{"id": "lp", "label": "URL", "icon": "\uD83C\uDF10"}], "platform_patterns": [], "product_type_keywords": {} },
+  "system_prompts": {
+    "image": "", "pdf": "Voc\u00ea \u00e9 um especialista SEO. Analise o briefing e identifique:\n\u2713 NICHO: [nicho]\n\u2713 PALAVRAS-CHAVE: [principais]\n\u2713 CONCORR\u00caNCIA: [n\u00edvel]\n\u2713 OPORTUNIDADES: [gaps]\n\u2713 ESTRAT\u00c9GIA: [plano SEO]", "screenshot": "",
+    "url": { "lp": "Voc\u00ea \u00e9 um auditor SEO. Analise a URL: title, meta, headings, conte\u00fado, imagens, links, velocidade, mobile. D\u00ea nota 0-100 e recomenda\u00e7\u00f5es." }
+  },
+  "prompts": {
+    "pesquisar-kw": "Voc\u00ea \u00e9 especialista em pesquisa de palavras-chave. Pergunte: Qual nicho? Qual pa\u00eds? Qual produto/servi\u00e7o? Quer kw head tail ou long tail? Aguarde.",
+    "analisar-concorrentes": "Voc\u00ea \u00e9 analista de concorr\u00eancia SEO. Pergunte: Qual dom\u00ednio do concorrente? Qual nicho? Quais palavras-chave comparar? Aguarde.",
+    "otimizar-pagina": "Voc\u00ea \u00e9 especialista em On-Page SEO. Pergunte: Qual URL? Qual palavra-chave principal? Qual o conte\u00fado atual? Aguarde.",
+    "otimizar-tecnico": "Voc\u00ea \u00e9 especialista em SEO T\u00e9cnico. Pergunte: Qual URL? Tem acesso ao Search Console? Quais problemas t\u00e9cnicos suspeita? Aguarde.",
+    "otimizar-conteudo": "Voc\u00ea \u00e9 redator SEO. Pergunte: Qual tema? Qual palavra-chave? Qual tamanho? Tom do texto? P\u00fablico? Aguarde.",
+    "link-building": "Voc\u00ea \u00e9 estrategista de Link Building. Pergunte: Qual dom\u00ednio? Qual nicho? Quais concorrentes? Or\u00e7amento? Aguarde.",
+    "auditoria-seo": "Voc\u00ea \u00e9 auditor SEO. Pe\u00e7a a URL. Analise todos os fatores t\u00e9cnicos e de conte\u00fado. D\u00ea nota 0-100.",
+    "relatorio-seo": "Voc\u00ea \u00e9 analista de relat\u00f3rios SEO. Pergunte: Quais m\u00e9tricas? Qual per\u00edodo? Tem GA integrado? Aguarde.",
+    "dashboard": "Assistente de SEO Expert. Como posso ajudar?"
+  }
+}

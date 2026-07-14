@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title id="headTitle">Meta Ads Expert PRO</title>
+<title id="headTitle">ForgeHub AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -42,10 +42,8 @@
   ::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:2px}
   #modelSelect{display:none}
 
-  /* ─── LAYOUT ─── */
   .app{display:grid;grid-template-columns:var(--sidebar-w) 1fr var(--chat-w);height:100vh;max-width:1600px;margin:0 auto}
 
-  /* ─── SIDEBAR ─── */
   .side{background:var(--glass);border-right:1px solid var(--glass-border);backdrop-filter:blur(20px);display:flex;flex-direction:column;padding:0;overflow:hidden}
   .side-logo{display:flex;align-items:center;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--glass-border)}
   .side-logo .dot{width:9px;height:9px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px var(--blue-glow)}
@@ -63,10 +61,8 @@
   .side-premium .txt{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.04em}
   .side-premium .sub{font-size:9.5px;color:var(--text-faint)}
 
-  /* ─── MAIN ─── */
   .main{overflow-y:auto;padding:0 28px 20px}
 
-  /* ─── TOP BAR ─── */
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px;position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg-deep),transparent)}
   .topbar-left{display:flex;align-items:center;gap:16px}
   .topbar-left h1{font-size:18px;font-weight:800;letter-spacing:-.03em;color:var(--white)}
@@ -80,7 +76,6 @@
   .status.busy .dot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
   .status.error .dot{background:#EF4444;box-shadow:0 0 0 3px rgba(239,68,68,0.2)}
 
-  /* ─── HERO ─── */
   .hero{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:28px 0 20px;position:relative}
   .hero-left{display:flex;flex-direction:column;justify-content:center}
   .hero-left h2{font-size:clamp(26px,3.2vw,40px);font-weight:900;letter-spacing:-.04em;line-height:1.15;color:var(--white);margin-bottom:14px}
@@ -92,20 +87,12 @@
   .btn-p:hover{background:var(--blue-dark);box-shadow:0 6px 28px -4px var(--blue);transform:translateY(-1px)}
   .btn-s{background:var(--glass);color:var(--text);border:1px solid var(--glass-border);backdrop-filter:blur(8px)}
   .btn-s:hover{background:var(--glass-hover);border-color:rgba(255,255,255,0.12);transform:translateY(-1px)}
-
   .hero-right{position:relative;display:flex;align-items:center;justify-content:center;min-height:260px}
   .hero-right::before{content:'';position:absolute;width:380px;height:380px;background:radial-gradient(circle,var(--blue-glow) 0%,transparent 70%);pointer-events:none;animation:hero-pulse 4s ease-in-out infinite}
   .hero-float{position:absolute;display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(12px);font-size:11px;font-weight:600;color:var(--white);animation:float-up 4s ease-in-out infinite;white-space:nowrap}
   .hero-float .v{color:var(--gold);font-weight:700}
   .hero-float .vl{color:#22C55E}
-  .hero-float:nth-child(1){top:8%;left:5%;animation-delay:0s}
-  .hero-float:nth-child(2){top:20%;right:8%;animation-delay:.6s}
-  .hero-float:nth-child(3){bottom:25%;left:0%;animation-delay:1.2s}
-  .hero-float:nth-child(4){bottom:15%;right:5%;animation-delay:.3s}
-  .hero-float:nth-child(5){top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:.9s;font-size:13px;padding:10px 20px}
-  .hero-float .ico-big{font-size:32px;margin-right:4px}
 
-  /* ─── DASHBOARD METRICS ─── */
   .dash-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:28px}
   .dash-card{padding:14px 14px 12px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);backdrop-filter:blur(8px)}
   .dash-card .d-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -115,23 +102,13 @@
   .dash-card .d-val.green{color:#22C55E}
   .dash-card .d-bar{display:flex;align-items:flex-end;gap:2px;height:24px;margin-top:6px}
   .dash-card .d-bar span{width:100%;border-radius:2px 2px 0 0;background:var(--blue-glow-sm);animation:bar-rise .6s ease both}
-  .dash-card .d-bar span:nth-child(1){height:40%;animation-delay:.05s}
-  .dash-card .d-bar span:nth-child(2){height:65%;animation-delay:.1s}
-  .dash-card .d-bar span:nth-child(3){height:45%;animation-delay:.15s}
-  .dash-card .d-bar span:nth-child(4){height:80%;animation-delay:.2s}
-  .dash-card .d-bar span:nth-child(5){height:55%;animation-delay:.25s}
-  .dash-card .d-bar span:nth-child(6){height:90%;animation-delay:.3s}
-  .dash-card .d-bar span:nth-child(7){height:60%;animation-delay:.35s}
-  .dash-card .d-bar span:nth-child(8){height:75%;animation-delay:.4s}
 
-  /* ─── SECTION ─── */
   .sec{margin-bottom:30px}
   .sec-h{display:flex;align-items:center;gap:12px;margin-bottom:16px}
   .sec-h h3{font-size:17px;font-weight:700;color:var(--white);letter-spacing:-.02em}
   .sec-h .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--glass-border),transparent)}
   .sec-h .gd{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px 2px var(--gold-glow)}
 
-  /* ─── TOOL CARDS ─── */
   .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .t-card{display:flex;flex-direction:column;gap:8px;padding:18px 16px 14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);cursor:pointer;transition:all .22s;font-family:'Inter',sans-serif;text-align:left;backdrop-filter:blur(12px);position:relative;overflow:hidden}
   .t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue-neon),transparent);opacity:0;transition:opacity .22s}
@@ -145,7 +122,6 @@
   .t-card .action{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--blue-neon);margin-top:2px;transition:gap .15s}
   .t-card:hover .action{gap:7px}
 
-  /* ─── IMPORT ─── */
   .import-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
   .i-card{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;font-family:'Inter',sans-serif;text-align:left;backdrop-filter:blur(8px)}
   .i-card:hover{border-color:rgba(246,196,83,0.2);background:var(--glass-hover);transform:translateY(-1px)}
@@ -156,7 +132,6 @@
   .import-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
   .import-tags span{display:inline-block;padding:2px 10px;border-radius:9999px;background:var(--glass);border:1px solid var(--glass-border);font-size:10.5px;color:var(--text-dim);font-weight:500}
 
-  /* ─── NICHES ─── */
   .niche-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
   .n-card{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);cursor:pointer;transition:all .16s;font-family:'Inter',sans-serif;text-align:left;backdrop-filter:blur(8px)}
   .n-card:hover{border-color:rgba(37,99,235,0.15);background:var(--glass-hover);transform:translateY(-2px)}
@@ -165,7 +140,6 @@
   .n-card .ico{font-size:15px}
   .n-card .lbl{font-size:12px;font-weight:550;color:var(--text);letter-spacing:-.01em}
 
-  /* ─── CHAT PANEL ─── */
   .chat-panel{background:var(--glass);border-left:1px solid var(--glass-border);backdrop-filter:blur(20px);display:flex;flex-direction:column;overflow:hidden}
   .chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--glass-border);flex-shrink:0}
   .chat-head .ch-t{font-size:12px;font-weight:600;color:var(--text-dim);display:flex;align-items:center;gap:8px}
@@ -241,12 +215,10 @@
   .upload-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue-neon));border-radius:3px;transition:width .3s ease}
   .status-msg{font-size:13px;color:var(--text-dim);margin-bottom:4px;display:flex;align-items:center;gap:6px}
   .status-msg .spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--glass-border);border-top-color:var(--blue-neon);border-radius:50%;animation:spin .6s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
   .analysis-card{display:grid;grid-template-columns:1fr;gap:2px;margin:4px 0}
   .analysis-item{padding:3px 0;font-size:13px;line-height:1.6}
   .analysis-item .check{color:#22C55E;font-weight:700}
 
-  /* ─── ANALYSIS RESULT CARDS ─── */
   .result-cards{display:flex;flex-direction:column;gap:4px;margin:6px 0;animation:fadeIn .35s ease both}
   .result-item{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;font-size:12.5px;line-height:1.5;transition:all .15s;animation:fadeIn .3s ease both}
   .result-item:nth-child(2){animation-delay:.04s}.result-item:nth-child(3){animation-delay:.08s}.result-item:nth-child(4){animation-delay:.12s}.result-item:nth-child(5){animation-delay:.16s}.result-item:nth-child(6){animation-delay:.20s}.result-item:nth-child(7){animation-delay:.24s}.result-item:nth-child(8){animation-delay:.28s}.result-item:nth-child(9){animation-delay:.32s}.result-item:nth-child(10){animation-delay:.36s}.result-item:nth-child(11){animation-delay:.40s}.result-item:nth-child(12){animation-delay:.44s}.result-item:nth-child(13){animation-delay:.48s}.result-item:nth-child(14){animation-delay:.52s}.result-item:nth-child(15){animation-delay:.56s}
@@ -269,14 +241,12 @@
   .result-item.bad .ri-icon{color:#EF4444}
   .result-score-ring{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid var(--gold);font-size:18px;font-weight:900;color:var(--gold);flex-shrink:0}
 
-  /* ─── ACTION BUTTONS ─── */
   .action-bar{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 2px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--glass-border);border-radius:var(--radius-sm);animation:fadeInUp .4s ease both}
   .action-bar-title{width:100%;font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
   .action-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-dim);font-family:'Inter',sans-serif;font-size:11px;font-weight:550;cursor:pointer;transition:all .12s}
   .action-btn:hover{background:var(--blue-glow-sm);border-color:rgba(59,130,246,0.2);color:var(--blue-neon);transform:translateY(-1px)}
   .action-btn:active{transform:translateY(0)}
 
-  /* ─── URL MODAL ─── */
   .url-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;align-items:center;justify-content:center}
   .url-modal-bg{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px)}
   .url-modal-box{position:relative;width:480px;max-width:92vw;background:var(--bg);border:1px solid var(--glass-border);border-radius:var(--radius-lg);box-shadow:0 24px 80px -12px rgba(0,0,0,0.6);overflow:hidden}
@@ -297,433 +267,381 @@
 </style>
 </head>
 <body>
-  <!-- LAYOUT -->
-  <div class="app">
+<div class="app">
 
-    <!-- SIDEBAR -->
-    <aside class="side">
-      <div class="side-logo"><span class="dot"></span><span id="logoText">ForgeHub AI</span></div>
-      <nav class="side-nav" id="sideNav">
-        <div class="side-label">Menu</div>
-        <button class="side-item active"><span class="ico">&#x1F4CA;</span>Dashboard</button>
-        <button class="side-item" data-id="criar-campanha"><span class="ico">&#x1F4C8;</span>Criar Campanha</button>
-        <button class="side-item" data-id="criar-publico"><span class="ico">&#x1F3AF;</span>Criar P&uacute;blico</button>
-        <button class="side-item" data-id="criar-copy"><span class="ico">&#x270D;&#xFE0F;</span>Criar Copy</button>
-        <button class="side-item" data-id="criar-criativos"><span class="ico">&#x1F3A8;</span>Criar Criativos</button>
-        <button class="side-item" data-id="auditoria"><span class="ico">&#x1F50D;</span>Auditoria</button>
-        <button class="side-item" data-id="escalar"><span class="ico">&#x1F680;</span>Escalar</button>
-
-        <div class="side-label">Especialistas</div>
-        <button class="side-item active"><span class="ico">&#x1F4F1;</span>Meta Ads Expert</button>
-        <button class="side-item"><span class="ico">&#x1F310;</span>Google Ads</button>
-        <button class="side-item"><span class="ico">&#x1F4F9;</span>TikTok Ads</button>
-        <button class="side-item"><span class="ico">&#x270D;&#xFE0F;</span>Copywriter</button>
-        <button class="side-item"><span class="ico">&#x1F4E2;</span>Landing Pages</button>
-      </nav>
-      <div class="side-footer">
-        <div class="side-premium">
-          <div class="ico">&#x2B50;</div>
-          <div><div class="txt">Plano Professional</div><div class="sub">Recursos ilimitados</div></div>
-        </div>
+  <aside class="side">
+    <div class="side-logo"><span class="dot"></span><span id="logoText">ForgeHub AI</span></div>
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="side-footer">
+      <div class="side-premium">
+        <div class="ico">&#x2B50;</div>
+        <div><div class="txt" id="planText">Plano Professional</div><div class="sub">Recursos ilimitados</div></div>
       </div>
-    </aside>
+    </div>
+  </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main">
-
-      <!-- TOP BAR -->
-      <div class="topbar">
-        <div class="topbar-left">
-          <h1 id="appTitle">Meta Ads Expert PRO</h1>
-          <span class="sub" id="appSubtitle"></span>
-        </div>
-        <div class="topbar-right">
-          <span class="badge" id="planBadge"><span class="gd"></span>Professional</span>
-          <div class="status" id="status"><span class="dot"></span><span id="statusText">conectando</span></div>
-        </div>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="appTitle">ForgeHub AI</h1>
+        <span class="sub" id="appSubtitle"></span>
       </div>
-
-      <!-- HERO -->
-      <section class="hero">
-        <div class="hero-left">
-          <h2>Transforme qualquer produto em uma campanha<br/><span class="hl">altamente lucrativa</span></h2>
-          <p>Envie seu produto, p&aacute;gina, imagem ou oferta. A intelig&ecirc;ncia artificial cria campanha, p&uacute;blico, copy, criativos e plano de escala automaticamente.</p>
-          <div class="hero-actions">
-            <button class="btn-p" id="heroStart">&#x26A1; Come&ccedil;ar agora</button>
-            <button class="btn-s" id="heroImport">&#x1F4E5; Importar Produto</button>
-          </div>
-        </div>
-        <div class="hero-right">
-          <div class="hero-float" style="top:6%;left:3%"><span class="v">ROAS</span> <span class="vl">4.5x</span></div>
-          <div class="hero-float" style="top:18%;right:5%"><span class="v">CPA</span> R$12,40</div>
-          <div class="hero-float" style="bottom:30%;left:0%"><span class="v">CTR</span> 3.8%</div>
-          <div class="hero-float" style="bottom:12%;right:3%"><span class="v">ROI</span> <span class="vl">320%</span></div>
-          <div class="hero-float" style="top:42%;left:42%;font-size:14px;padding:12px 24px"><span class="ico-big">&#x1F4E3;</span> Meta Ads</div>
-          <div class="hero-float" style="top:68%;left:55%"><span class="v">CPM</span> R$18,20</div>
-        </div>
-      </section>
-
-      <!-- DASHBOARD METRICS -->
-      <section class="sec">
-        <div class="dash-grid">
-          <div class="dash-card"><div class="d-top"><span class="d-lbl">ROAS</span><span style="color:#22C55E;font-size:10px">&#x25B2; 12%</span></div><div class="d-val gold">4.5x</div><div class="d-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-          <div class="dash-card"><div class="d-top"><span class="d-lbl">CTR</span><span style="color:#22C55E;font-size:10px">&#x25B2; 8%</span></div><div class="d-val">3.8%</div><div class="d-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-          <div class="dash-card"><div class="d-top"><span class="d-lbl">CPM</span><span style="color:#EF4444;font-size:10px">&#x25BC; 3%</span></div><div class="d-val">R$18</div><div class="d-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-          <div class="dash-card"><div class="d-top"><span class="d-lbl">CPA</span><span style="color:#22C55E;font-size:10px">&#x25B2; 5%</span></div><div class="d-val green">R$12</div><div class="d-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-          <div class="dash-card"><div class="d-top"><span class="d-lbl">Convers&otilde;es</span></div><div class="d-val">147</div><div class="d-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-          <div class="dash-card"><div class="d-top"><span class="d-lbl">Impress&otilde;es</span></div><div class="d-val">42.5K</div><div class="d-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
-        </div>
-      </section>
-
-      <!-- FERRAMENTAS -->
-      <section class="sec">
-        <div class="sec-h"><span class="gd"></span><h3>Ferramentas Principais</h3><span class="ln"></span></div>
-        <div class="tool-grid">
-          <button class="t-card" data-id="criar-campanha"><span class="ico">&#x1F4C8;</span><span class="lbl">Criar Campanha</span><span class="desc">Campanhas completas com objetivo, segmenta&ccedil;&atilde;o e or&ccedil;amento otimizados.</span><span class="action">Abrir ferramenta &rarr;</span></button>
-          <button class="t-card" data-id="criar-publico"><span class="ico">&#x1F3AF;</span><span class="lbl">Criar P&uacute;blico</span><span class="desc">P&uacute;blicos personalizados, lookalike e remarketing de alta convers&atilde;o.</span><span class="action">Abrir ferramenta &rarr;</span></button>
-          <button class="t-card" data-id="criar-copy"><span class="ico">&#x270D;&#xFE0F;</span><span class="lbl">Criar Copy</span><span class="desc">Copies persuasivas com gatilhos mentais, prova social e CTAs fortes.</span><span class="action">Abrir ferramenta &rarr;</span></button>
-          <button class="t-card" data-id="criar-criativos"><span class="ico">&#x1F3A8;</span><span class="lbl">Criar Criativos</span><span class="desc">Criativos de alto impacto com headlines e descri&ccedil;&otilde;es que convertem.</span><span class="action">Abrir ferramenta &rarr;</span></button>
-          <button class="t-card" data-id="auditoria"><span class="ico">&#x1F50D;</span><span class="lbl">Auditor de Campanhas</span><span class="desc">Auditoria completa com nota 0-100, diagn&oacute;stico e plano de otimiza&ccedil;&atilde;o.</span><span class="action">Abrir ferramenta &rarr;</span></button>
-          <button class="t-card" data-id="escalar"><span class="ico">&#x1F680;</span><span class="lbl">Escalar Campanhas</span><span class="desc">Estrat&eacute;gia de escala com aumento de budget e expans&atilde;o de p&uacute;blicos.</span><span class="action">Abrir ferramenta &rarr;</span></button>
-        </div>
-      </section>
-
-      <!-- IMPORTAR -->
-      <section class="sec">
-        <div class="sec-h"><span class="gd"></span><h3>Importe seu Produto</h3><span class="ln"></span></div>
-        <div class="import-grid">
-          <button class="i-card" data-id="import-imagem"><span class="ico">&#x1F4F7;</span><span class="lbl">Upload de Imagem</span></button>
-          <button class="i-card" data-id="import-pdf"><span class="ico">&#x1F4C4;</span><span class="lbl">Upload de PDF</span></button>
-          <button class="i-card" data-id="import-screenshot"><span class="ico">&#x1F5BC;&#xFE0F;</span><span class="lbl">Screenshot</span></button>
-          <button class="i-card" data-id="import-lp"><span class="ico">&#x1F310;</span><span class="lbl">Landing Page</span></button>
-          <button class="i-card" data-id="import-loja"><span class="ico">&#x1F6D2;</span><span class="lbl">Loja</span></button>
-          <button class="i-card" data-id="import-app"><span class="ico">&#x1F4F1;</span><span class="lbl">Aplicativo</span></button>
-        </div>
-        <div style="padding:0 2px;font-size:12px;color:var(--text-faint);line-height:1.7">
-          A IA identifica automaticamente:
-          <div class="import-tags">
-            <span>Produto</span><span>Oferta</span><span>Avatar</span><span>Promessa</span><span>Pre&ccedil;o</span>
-            <span>P&uacute;blico</span><span>Funil</span><span>Criativos</span><span>Headline</span><span>CTA</span><span>Estrat&eacute;gia</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- NICHOS -->
-      <section class="sec">
-        <div class="sec-h"><span class="gd"></span><h3>Estrat&eacute;gias por Nicho</h3><span class="ln"></span></div>
-        <div class="niche-grid">
-          <button class="n-card" data-id="nicho-loja"><span class="ico">&#x1F6CD;&#xFE0F;</span><span class="lbl">Loja Virtual</span></button>
-          <button class="n-card" data-id="nicho-infoproduto"><span class="ico">&#x1F4E6;</span><span class="lbl">Infoprodutos</span></button>
-          <button class="n-card" data-id="nicho-advocacia"><span class="ico">&#x2696;&#xFE0F;</span><span class="lbl">Advocacia</span></button>
-          <button class="n-card" data-id="nicho-clinica"><span class="ico">&#x1F3E5;</span><span class="lbl">Cl&iacute;nica</span></button>
-          <button class="n-card" data-id="nicho-odontologia"><span class="ico">&#x1F9B7;</span><span class="lbl">Odontologia</span></button>
-          <button class="n-card" data-id="nicho-estetica"><span class="ico">&#x2728;</span><span class="lbl">Est&eacute;tica</span></button>
-          <button class="n-card" data-id="nicho-academia"><span class="ico">&#x1F3CB;&#xFE0F;</span><span class="lbl">Academia</span></button>
-          <button class="n-card" data-id="nicho-restaurante"><span class="ico">&#x1F354;</span><span class="lbl">Restaurante</span></button>
-          <button class="n-card" data-id="nicho-cursos"><span class="ico">&#x1F393;</span><span class="lbl">Cursos</span></button>
-          <button class="n-card" data-id="nicho-apps"><span class="ico">&#x1F4F1;</span><span class="lbl">Aplicativos</span></button>
-          <button class="n-card" data-id="nicho-saas"><span class="ico">&#x1F916;</span><span class="lbl">Micro SaaS</span></button>
-          <button class="n-card" data-id="nicho-consultoria"><span class="ico">&#x1F4BC;</span><span class="lbl">Consultoria</span></button>
-          <button class="n-card" data-id="nicho-imobiliaria"><span class="ico">&#x1F3E2;</span><span class="lbl">Imobili&aacute;ria</span></button>
-          <button class="n-card" data-id="nicho-automotivo"><span class="ico">&#x1F697;</span><span class="lbl">Autom&oacute;veis</span></button>
-          <button class="n-card" data-id="nicho-ebook"><span class="ico">&#x1F4D6;</span><span class="lbl">Ebook</span></button>
-          <button class="n-card" data-id="nicho-pv"><span class="ico">&#x1F4E2;</span><span class="lbl">P&aacute;gina de Vendas</span></button>
-        </div>
-      </section>
-
-      <footer><p id="footerText">Powered by <strong>ForgeHub AI</strong></p></footer>
-    </main>
-
-    <!-- CHAT PANEL -->
-    <div class="chat-panel">
-      <div class="chat-head">
-        <span class="ch-t">&#x1F4AC; Assistente <span class="live">AO VIVO</span></span>
-        <div class="ch-actions">
-          <button class="ch-btn" id="clearBtn">&#x1F504; Novo</button>
-          <button class="ch-btn" id="exportBtn" style="display:none">&#x1F4E5;</button>
-        </div>
-      </div>
-      <div class="log" id="log">
-        <div class="empty-state" id="emptyState">
-          <div class="glyph">&#x2728;</div>
-          <div class="title">Pronto para criar</div>
-          <div class="sub">Clique em uma ferramenta ou digite abaixo.</div>
-        </div>
-      </div>
-      <div class="composer-wrap">
-        <div class="composer">
-          <textarea id="input" rows="1" placeholder="Digite sua mensagem..."></textarea>
-          <button class="send" id="sendBtn">Enviar</button>
-        </div>
-        <div class="chat-foot">
-          <div class="hint"><kbd>Enter</kbd> enviar</div>
-        </div>
+      <div class="topbar-right">
+        <span class="badge" id="planBadge"><span class="gd"></span>Professional</span>
+        <div class="status" id="status"><span class="dot"></span><span id="statusText">conectando</span></div>
       </div>
     </div>
 
-  </div>
-
-  <select id="modelSelect"></select>
-  <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none">
-  <input type="file" id="pdfInput" accept=".pdf" style="display:none">
-  <input type="file" id="screenshotInput" accept=".jpg,.jpeg,.png,.webp" style="display:none">
-
-  <div class="url-modal" id="urlModal">
-    <div class="url-modal-bg" id="urlModalBg"></div>
-    <div class="url-modal-box">
-      <div class="url-modal-head">
-        <span id="urlModalTitle">Analisar Landing Page</span>
-        <button class="url-modal-x" id="urlModalClose">&times;</button>
+    <section class="hero" id="heroSection">
+      <div class="hero-left">
+        <h2 id="heroTitle">Transforme qualquer produto em uma campanha<br/><span class="hl" id="heroHighlight">altamente lucrativa</span></h2>
+        <p id="heroSubtitle">Carregando...</p>
+        <div class="hero-actions">
+          <button class="btn-p" id="heroStart">&#x26A1; Come&ccedil;ar agora</button>
+          <button class="btn-s" id="heroImport">&#x1F4E5; Importar Produto</button>
+        </div>
       </div>
-      <div class="url-modal-body">
-        <input type="url" id="urlInput" class="url-input" placeholder="https://www.exemplo.com/pagina" autofocus>
-        <div class="url-error" id="urlError"></div>
+      <div class="hero-right" id="heroRight"></div>
+    </section>
+
+    <section class="sec" id="dashSection" style="display:none">
+      <div class="dash-grid" id="dashGrid"></div>
+    </section>
+
+    <section class="sec" id="toolsSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3>Ferramentas Principais</h3><span class="ln"></span></div>
+      <div class="tool-grid" id="toolsGrid"></div>
+    </section>
+
+    <section class="sec" id="importsSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3>Importe seu Produto</h3><span class="ln"></span></div>
+      <div class="import-grid" id="importsGrid"></div>
+      <div style="padding:0 2px;font-size:12px;color:var(--text-faint);line-height:1.7" id="importsDesc"></div>
+    </section>
+
+    <section class="sec" id="nichesSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3>Estrat&eacute;gias por Nicho</h3><span class="ln"></span></div>
+      <div class="niche-grid" id="nichesGrid"></div>
+    </section>
+
+    <footer><p id="footerText">Powered by <strong>ForgeHub AI</strong></p></footer>
+  </main>
+
+  <div class="chat-panel">
+    <div class="chat-head">
+      <span class="ch-t">&#x1F4AC; Assistente <span class="live">AO VIVO</span></span>
+      <div class="ch-actions">
+        <button class="ch-btn" id="clearBtn">&#x1F504; Novo</button>
+        <button class="ch-btn" id="exportBtn" style="display:none">&#x1F4E5;</button>
       </div>
-      <div class="url-modal-foot">
-        <button class="btn-s" id="urlModalCancel">Cancelar</button>
-        <button class="btn-p" id="urlModalSubmit">Analisar</button>
+    </div>
+    <div class="log" id="log">
+      <div class="empty-state" id="emptyState">
+        <div class="glyph">&#x2728;</div>
+        <div class="title">Pronto para criar</div>
+        <div class="sub">Clique em uma ferramenta ou digite abaixo.</div>
+      </div>
+    </div>
+    <div class="composer-wrap">
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="Digite sua mensagem..."></textarea>
+        <button class="send" id="sendBtn">Enviar</button>
+      </div>
+      <div class="chat-foot">
+        <div class="hint"><kbd>Enter</kbd> enviar</div>
       </div>
     </div>
   </div>
+</div>
+
+<select id="modelSelect"></select>
+<input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none">
+<input type="file" id="pdfInput" accept=".pdf" style="display:none">
+<input type="file" id="screenshotInput" accept=".jpg,.jpeg,.png,.webp" style="display:none">
+
+<div class="url-modal" id="urlModal">
+  <div class="url-modal-bg" id="urlModalBg"></div>
+  <div class="url-modal-box">
+    <div class="url-modal-head">
+      <span id="urlModalTitle">Analisar URL</span>
+      <button class="url-modal-x" id="urlModalClose">&times;</button>
+    </div>
+    <div class="url-modal-body">
+      <input type="url" id="urlInput" class="url-input" placeholder="https://www.exemplo.com/pagina" autofocus>
+      <div class="url-error" id="urlError"></div>
+    </div>
+    <div class="url-modal-foot">
+      <button class="btn-s" id="urlModalCancel">Cancelar</button>
+      <button class="btn-p" id="urlModalSubmit">Analisar</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  const log=document.getElementById('log'),emptyState=document.getElementById('emptyState'),
-        input=document.getElementById('input'),sendBtn=document.getElementById('sendBtn'),
-        clearBtn=document.getElementById('clearBtn'),modelSelect=document.getElementById('modelSelect'),
-        statusEl=document.getElementById('status'),statusText=document.getElementById('statusText');
-  let messages=[],busy=false,models=[],currentModel=null,currentURLType='lp',actionButtons=[],branding={};
+const log=document.getElementById('log'),emptyState=document.getElementById('emptyState'),
+      input=document.getElementById('input'),sendBtn=document.getElementById('sendBtn'),
+      clearBtn=document.getElementById('clearBtn'),modelSelect=document.getElementById('modelSelect'),
+      statusEl=document.getElementById('status'),statusText=document.getElementById('statusText');
+let messages=[],busy=false,models=[],currentModel=null,currentURLType='lp',
+    actionButtons=[],branding={},config={},P={},urlTypes=[];
 
-  function setStatus(m,l){statusEl.className='status '+m;statusText.textContent=l}
-  function autoResize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,100)+'px'}
-  input.addEventListener('input',autoResize);
+function setStatus(m,l){statusEl.className='status '+m;statusText.textContent=l}
+function autoResize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,100)+'px'}
+input.addEventListener('input',autoResize);
 
-  function setBusy(v){
-    busy=v;sendBtn.disabled=v;input.disabled=v;
-    document.querySelectorAll('.t-card,.i-card,.n-card').forEach(b=>b.disabled=v)
+function setBusy(v){
+  busy=v;sendBtn.disabled=v;input.disabled=v;
+  document.querySelectorAll('.t-card,.i-card,.n-card').forEach(b=>b.disabled=v)
+}
+
+function renderResultCards(text){
+  if(!text)return null;
+  const lines=text.split('\n');const items=[];let score=null,hasChecks=false;
+  for(const line of lines){
+    const sc=line.match(/(?:S|s)core|(?:N|n)ota|(\d{1,3})\s*\/\s*100/);
+    if(sc){const m=line.match(/(\d{1,3})\s*\/\s*100/);if(m)score=m[1];continue}
+    const ci=line.match(/^(\u2713|\u2705|\u26A0|\u274C|\u2717|\u2B55)\s*([A-Z\u00C0-\u00FF][A-Z\u00C0-\u00FF\s]+?):\s*(.+)/i);
+    if(ci){hasChecks=true;items.push({icon:ci[1],label:ci[2].trim(),value:ci[3].trim()});continue}
+    const cs=line.match(/^(\u2713|\u2705|\u26A0|\u274C|\u2717|\u2B55)\s*([A-Z\u00C0-\u00FF][A-Z\u00C0-\u00FF\s]+)/i);
+    if(cs){hasChecks=true;items.push({icon:cs[1],label:cs[2].trim(),value:''})}
   }
+  if(!hasChecks&&!score)return null;
+  const map={'good':['\u2713','\u2705'],'warn':['\u26A0'],'bad':['\u274C','\u2717']};
+  let cls=i=>{for(const[k,v]of Object.entries(map))if(v.includes(i.icon))return k;return'good'};
+  let html='<div class="result-cards">';
+  if(score)html+='<div class="result-item score"><span class="ri-icon">\uD83C\uDFAF</span><span class="ri-label">Score Geral</span><span class="ri-value">'+score+'/100</span></div>';
+  for(const i of items)html+='<div class="result-item '+cls(i)+'"><span class="ri-icon">'+i.icon+'</span><span class="ri-label">'+i.label+'</span><span class="ri-value">'+(i.value||'')+'</span><button class="ri-btn" onclick="alert(\''+i.label+': '+i.value.replace(/'/g,"\\'")+'\')">Ver detalhes</button></div>';
+  html+='</div>';
+  return html
+}
 
-  function renderResultCards(text){
-    if(!text)return null;
-    const lines=text.split('\n');const items=[];let score=null,hasChecks=false;
-    for(const line of lines){
-      const sc=line.match(/(?:S|s)core|(?:N|n)ota|(\d{1,3})\s*\/\s*100/);
-      if(sc){const m=line.match(/(\d{1,3})\s*\/\s*100/);if(m)score=m[1];continue}
-      const ci=line.match(/^(\u2713|\u2705|\u26A0|\u274C|\u2717|\u2B55)\s*([A-Z\u00C0-\u00FF][A-Z\u00C0-\u00FF\s]+?):\s*(.+)/i);
-      if(ci){hasChecks=true;items.push({icon:ci[1],label:ci[2].trim(),value:ci[3].trim()});continue}
-      const cs=line.match(/^(\u2713|\u2705|\u26A0|\u274C|\u2717|\u2B55)\s*([A-Z\u00C0-\u00FF][A-Z\u00C0-\u00FF\s]+)/i);
-      if(cs){hasChecks=true;items.push({icon:cs[1],label:cs[2].trim(),value:''})}
+function addActionButtons(target){
+  if(!actionButtons.length)return;
+  const bar=document.createElement('div');bar.className='action-bar';
+  const title=document.createElement('div');title.className='action-bar-title';title.textContent='O que deseja fazer agora?';
+  bar.appendChild(title);
+  for(const btn of actionButtons){
+    const b=document.createElement('button');b.className='action-btn';
+    b.innerHTML=btn.icon+' '+btn.label;
+    b.onclick=async()=>{if(P[btn.id])await sendChat(P[btn.id])};
+    bar.appendChild(b)
+  }
+  target.parentNode.insertBefore(bar,target.nextSibling)
+}
+
+async function streamChat(model,msgs,h){
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,model})});
+  if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
+  if((r.headers.get('content-type')||'').includes('application/json')){const d=await r.json();if(d.error) throw new Error(d.error);d.content&&h.onChunk&&h.onChunk(d.content);h.onDone&&h.onDone();return}
+  const rd=r.body.getReader(),dc=new TextDecoder();let buf='';
+  while(true){const{done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});
+  const ps=buf.split('\n\n');buf=ps.pop();
+  for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='done')h.onDone&&h.onDone();else if(e==='error')throw new Error(o.message||'erro');else if(o.content)h.onChunk&&h.onChunk(o.content)}}
+}
+
+function scrollToEnd(){log.scrollTop=log.scrollHeight}
+
+function addMessage(role,text,noCards){
+  if(emptyState)emptyState.remove();
+  const w=document.createElement('div');w.className='msg '+role;
+  const t=document.createElement('div');t.className='tag';
+  t.textContent=role==='user'?'Voc\u00ea':role==='error'?'Erro':(branding.assistant_name||branding.short_name||'Expert AI');
+  const b=document.createElement('div');b.className='bubble';
+  if(role==='assistant'&&!noCards){
+    const cardsHTML=renderResultCards(text);
+    if(cardsHTML){b.innerHTML=cardsHTML}else{b.textContent=text}
+  }else{b.textContent=text}
+  w.appendChild(t);w.appendChild(b);
+  if(role==='assistant'&&!noCards){const c=document.createElement('button');c.className='copy-btn';c.textContent='Copiar';c.onclick=()=>{navigator.clipboard.writeText(text);c.textContent='Copiado!';setTimeout(()=>{c.textContent='Copiar'},2000)};w.appendChild(c);if(!renderResultCards(text))addActionButtons(w)}
+  else if(role==='assistant'){const c=document.createElement('button');c.className='copy-btn';c.textContent='Copiar';c.onclick=()=>{navigator.clipboard.writeText(text);c.textContent='Copiado!';setTimeout(()=>{c.textContent='Copiar'},2000)};w.appendChild(c)}
+  log.appendChild(w);scrollToEnd();return b
+}
+
+async function sendChat(text){
+  addMessage('user',text);messages.push({role:'user',content:text});
+  setBusy(true);setStatus('busy','gerando');
+  const b=addMessage('assistant',''),c=document.createElement('span');c.className='cursor';b.appendChild(c);let at='';
+  try{
+    await streamChat(currentModel||modelSelect.value,messages,{onChunk:x=>{at+=x;b.textContent=at;b.appendChild(c);scrollToEnd()},onDone:()=>{}});
+    c.remove();messages.push({role:'assistant',content:at});
+    const cards=renderResultCards(at);
+    if(cards){b.innerHTML=cards;b.parentElement.querySelector('.copy-btn')&&b.parentElement.removeChild(b.parentElement.querySelector('.copy-btn'));const cc=document.createElement('button');cc.className='copy-btn';cc.textContent='Copiar';cc.onclick=()=>{navigator.clipboard.writeText(at);cc.textContent='Copiado!';setTimeout(()=>cc.textContent='Copiar',2000)};b.parentElement.appendChild(cc)}
+    addActionButtons(b.parentElement);setStatus('online','conectado')
+  }catch(e){c.remove();b.parentElement.classList.add('error');b.textContent='Falha: '+e.message;setStatus('error','erro')
+  }finally{setBusy(false);input.focus()}
+}
+
+async function send(){const t=input.value.trim();if(!t||busy)return;input.value='';autoResize();await sendChat(t)}
+sendBtn.addEventListener('click',send);
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+
+document.querySelector('.app').addEventListener('click',async e=>{
+  const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
+  if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p)await sendChat(p);return}
+  const id=btn.dataset.id;if(!id)return;
+  if(id==='import-imagem'){document.getElementById('fileInput').click();return}
+  if(id==='import-pdf'){document.getElementById('pdfInput').click();return}
+  if(id==='import-screenshot'){document.getElementById('screenshotInput').click();return}
+  const urlType=urlTypes.find(u=>id==='import-'+u.id);
+  if(urlType){openURLModal(urlType.id);return}
+  const p=P[id];if(!p)return;await sendChat(p)
+});
+document.getElementById('fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handleImageUpload(f)});
+document.getElementById('pdfInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handlePDFUpload(f)});
+document.getElementById('screenshotInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handleScreenshotUpload(f)});
+
+document.getElementById('heroStart').addEventListener('click',()=>{document.querySelector('.chat-panel').scrollIntoView({behavior:'smooth'});setTimeout(()=>input.focus(),400)});
+document.getElementById('heroImport').addEventListener('click',()=>{const g=document.getElementById('importsGrid');if(g)g.scrollIntoView({behavior:'smooth'})});
+
+clearBtn.addEventListener('click',()=>{
+  messages=[];log.innerHTML='';const e=document.createElement('div');e.className='empty-state';e.id='emptyState';
+  e.innerHTML='<div class="glyph">&#x2728;</div><div class="title">Pronto para criar</div><div class="sub">Clique em uma ferramenta ou digite abaixo.</div>';
+  log.appendChild(e);setStatus('online','conectado')
+});
+
+function openURLModal(type){
+  currentURLType=type;
+  const t=urlTypes.find(u=>u.id===type);
+  document.getElementById('urlModalTitle').textContent=(t?'Analisar '+t.label:'Analisar URL');
+  document.getElementById('urlInput').value='';document.getElementById('urlError').style.display='none';document.getElementById('urlModal').style.display='flex';setTimeout(()=>document.getElementById('urlInput').focus(),100)
+}
+function closeURLModal(){document.getElementById('urlModal').style.display='none'}
+document.getElementById('urlModalBg').addEventListener('click',closeURLModal);
+document.getElementById('urlModalClose').addEventListener('click',closeURLModal);
+document.getElementById('urlModalCancel').addEventListener('click',closeURLModal);
+document.getElementById('urlModalSubmit').addEventListener('click',async()=>{const url=document.getElementById('urlInput').value.trim();if(!url.startsWith('http://')&&!url.startsWith('https://')){const e=document.getElementById('urlError');e.textContent='URL deve come\u00e7ar com http:// ou https://';e.style.display='block';return}closeURLModal();await handleURLAnalysis(url,currentURLType)});
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('urlModalSubmit').click()}});
+
+function renderSidebar(cfg){
+  const nav=document.getElementById('sideNav');nav.innerHTML='';
+  const cats=cfg.sidebar&&cfg.sidebar.categories||[];
+  const items=cfg.sidebar&&cfg.sidebar.items||{};
+  for(const cat of cats){
+    const label=document.createElement('div');label.className='side-label';label.textContent=cat.label;
+    nav.appendChild(label);
+    const catItems=items[cat.key]||[];
+    for(const item of catItems){
+      const btn=document.createElement('button');btn.className='side-item';
+      if(item.id==='dashboard')btn.classList.add('active');
+      if(item.id){btn.dataset.id=item.id}
+      btn.innerHTML='<span class="ico">'+(item.icon||'')+'</span>'+item.label;
+      nav.appendChild(btn)
     }
-    if(!hasChecks&&!score)return null;
-    const map={'good':['\u2713','\u2705'],'warn':['\u26A0'],'bad':['\u274C','\u2717']};
-    let cls=i=>{for(const[k,v]of Object.entries(map))if(v.includes(i.icon))return k;return'good'};
-    let html='<div class="result-cards">';
-    if(score)html+='<div class="result-item score"><span class="ri-icon">\uD83C\uDFAF</span><span class="ri-label">Score Geral</span><span class="ri-value">'+score+'/100</span></div>';
-    for(const i of items)html+='<div class="result-item '+cls(i)+'"><span class="ri-icon">'+i.icon+'</span><span class="ri-label">'+i.label+'</span><span class="ri-value">'+(i.value||'')+'</span><button class="ri-btn" onclick="alert(\''+i.label+': '+i.value.replace(/'/g,"\\'")+'\')">Ver detalhes</button></div>';
-    html+='</div>';
-    return html
   }
+}
 
-  function addActionButtons(target){
-    if(!actionButtons.length)return;
-    const bar=document.createElement('div');bar.className='action-bar';
-    const title=document.createElement('div');title.className='action-bar-title';title.textContent='O que deseja fazer agora?';
-    bar.appendChild(title);
-    for(const btn of actionButtons){
-      const b=document.createElement('button');b.className='action-btn';
-      b.innerHTML=btn.icon+' '+btn.label;
-      b.onclick=async()=>{if(P[btn.id])await sendChat(P[btn.id])};
-      bar.appendChild(b)
-    }
-    target.parentNode.insertBefore(bar,target.nextSibling)
+function renderTools(tools){
+  const grid=document.getElementById('toolsGrid');grid.innerHTML='';
+  for(const t of tools){
+    const btn=document.createElement('button');btn.className='t-card';btn.dataset.id=t.id;
+    btn.innerHTML='<span class="ico">'+t.icon+'</span><span class="lbl">'+t.label+'</span><span class="desc">'+t.desc+'</span><span class="action">Abrir ferramenta &rarr;</span>';
+    grid.appendChild(btn)
   }
+}
 
-  async function streamChat(model,msgs,h){
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,model})});
-    if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
-    if((r.headers.get('content-type')||'').includes('application/json')){const d=await r.json();if(d.error) throw new Error(d.error);d.content&&h.onChunk&&h.onChunk(d.content);h.onDone&&h.onDone();return}
-    const rd=r.body.getReader(),dc=new TextDecoder();let buf='';
-    while(true){const{done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});
-    const ps=buf.split('\n\n');buf=ps.pop();
-    for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='done')h.onDone&&h.onDone();else if(e==='error')throw new Error(o.message||'erro');else if(o.content)h.onChunk&&h.onChunk(o.content)}}
+function renderImports(imports){
+  const grid=document.getElementById('importsGrid');grid.innerHTML='';
+  for(const i of imports){
+    const btn=document.createElement('button');btn.className='i-card';btn.dataset.id=i.id;
+    btn.innerHTML='<span class="ico">'+i.icon+'</span><span class="lbl">'+i.label+'</span>';
+    grid.appendChild(btn)
   }
+}
 
-  function scrollToEnd(){log.scrollTop=log.scrollHeight}
-
-  function addMessage(role,text,noCards){
-    if(emptyState)emptyState.remove();
-    const w=document.createElement('div');w.className='msg '+role;
-    const t=document.createElement('div');t.className='tag';
-    t.textContent=role==='user'?'Voc\u00ea':role==='error'?'Erro':(branding.short_name||'Expert AI');
-    const b=document.createElement('div');b.className='bubble';
-    if(role==='assistant'&&!noCards){
-      const cardsHTML=renderResultCards(text);
-      if(cardsHTML){b.innerHTML=cardsHTML}else{b.textContent=text}
-    }else{b.textContent=text}
-    w.appendChild(t);w.appendChild(b);
-    if(role==='assistant'&&!noCards){const c=document.createElement('button');c.className='copy-btn';c.textContent='Copiar';c.onclick=()=>{navigator.clipboard.writeText(text);c.textContent='Copiado!';setTimeout(()=>{c.textContent='Copiar'},2000)};w.appendChild(c);if(!renderResultCards(text))addActionButtons(w)}
-    else if(role==='assistant'){const c=document.createElement('button');c.className='copy-btn';c.textContent='Copiar';c.onclick=()=>{navigator.clipboard.writeText(text);c.textContent='Copiado!';setTimeout(()=>{c.textContent='Copiar'},2000)};w.appendChild(c)}
-    log.appendChild(w);scrollToEnd();return b
+function renderNiches(niches){
+  const grid=document.getElementById('nichesGrid');grid.innerHTML='';
+  for(const n of niches){
+    const btn=document.createElement('button');btn.className='n-card';btn.dataset.id=n.id;
+    btn.innerHTML='<span class="ico">'+n.icon+'</span><span class="lbl">'+n.label+'</span>';
+    grid.appendChild(btn)
   }
+}
 
-  async function sendChat(text){
-    addMessage('user',text);messages.push({role:'user',content:text});
-    setBusy(true);setStatus('busy','gerando');
-    const b=addMessage('assistant',''),c=document.createElement('span');c.className='cursor';b.appendChild(c);let at='';
-    try{
-      await streamChat(currentModel||modelSelect.value,messages,{onChunk:x=>{at+=x;b.textContent=at;b.appendChild(c);scrollToEnd()},onDone:()=>{}});
-      c.remove();messages.push({role:'assistant',content:at});
-      const cards=renderResultCards(at);
-      if(cards){b.innerHTML=cards;b.parentElement.querySelector('.copy-btn')&&b.parentElement.removeChild(b.parentElement.querySelector('.copy-btn'));const cc=document.createElement('button');cc.className='copy-btn';cc.textContent='Copiar';cc.onclick=()=>{navigator.clipboard.writeText(at);cc.textContent='Copiado!';setTimeout(()=>cc.textContent='Copiar',2000)};b.parentElement.appendChild(cc)}
-      addActionButtons(b.parentElement);setStatus('online','conectado')
-    }catch(e){c.remove();b.parentElement.classList.add('error');b.textContent='Falha: '+e.message;setStatus('error','erro')
-    }finally{setBusy(false);input.focus()}
+function renderHero(hero){
+  const el=document.getElementById('heroRight');el.innerHTML='';
+  const floats=hero.floats||[];
+  if(!floats.length){el.style.display='none';return}
+  el.style.display='flex';
+  const positions=[
+    {top:'6%',left:'3%'},{top:'18%',right:'5%'},{bottom:'30%',left:'0%'},
+    {bottom:'12%',right:'3%'},{top:'42%',left:'42%'},{top:'68%',left:'55%'}
+  ];
+  floats.forEach((f,i)=>{
+    const d=document.createElement('div');d.className='hero-float';
+    const p=positions[i]||{top:(10+i*10)+'%',left:((i%2===0)?'5%':'60%')};
+    Object.assign(d.style,p);
+    d.style.animationDelay=(i*0.3)+'s';
+    if(f.big){d.style.fontSize='14px';d.style.padding='12px 24px'}
+    let html='';
+    if(f.icon)html+=f.icon+' ';
+    if(f.label)html+='<span class="v">'+f.label+'</span> ';
+    if(f.value)html+='<span class="'+(f.color==='gold'?'v':f.color==='green'?'vl':'')+'">'+f.value+'</span>';
+    d.innerHTML=html;el.appendChild(d)
+  })
+}
+
+function renderDashboardMetrics(metrics){
+  const section=document.getElementById('dashSection');
+  const grid=document.getElementById('dashGrid');grid.innerHTML='';
+  if(!metrics||!metrics.length){section.style.display='none';return}
+  section.style.display='block';
+  for(const m of metrics){
+    const card=document.createElement('div');card.className='dash-card';
+    let trendHtml='';
+    if(m.trend==='up')trendHtml='<span style="color:#22C55E;font-size:10px">\u25B2 '+m.trend_value+'</span>';
+    else if(m.trend==='down')trendHtml='<span style="color:#EF4444;font-size:10px">\u25BC '+m.trend_value+'</span>';
+    const colorClass=m.color==='gold'?'gold':m.color==='green'?'green':'';
+    card.innerHTML='<div class="d-top"><span class="d-lbl">'+m.label+'</span>'+trendHtml+'</div><div class="d-val '+colorClass+'">'+m.value+'</div><div class="d-bar">'+'<span></span>'.repeat(8)+'</div>';
+    grid.appendChild(card)
   }
+}
 
-  async function send(){const t=input.value.trim();if(!t||busy)return;input.value='';autoResize();await sendChat(t)}
-  sendBtn.addEventListener('click',send);
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+function setColors(colors){
+  if(!colors)return;
+  const root=document.documentElement;
+  const map={primary:'--blue','secondary':'--blue-dark',accent:'--blue-neon',gold:'--gold','bg_deep':'--bg-deep',bg:'--bg','bg_mid':'--bg-mid','bg_light':'--bg-light'};
+  for(const[k,v]of Object.entries(map)){if(colors[k])root.style.setProperty(v,colors[k])}
+  if(colors.primary){root.style.setProperty('--blue-glow',colors.primary+'4D');root.style.setProperty('--blue-glow-sm',colors.primary+'26')}
+}
 
-  document.querySelector('.app').addEventListener('click',async e=>{
-    const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
-    if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p)await sendChat(p);return}
-    const id=btn.dataset.id;if(!id)return;
-    if(id==='import-imagem'){document.getElementById('fileInput').click();return}
-    if(id==='import-pdf'){document.getElementById('pdfInput').click();return}
-    if(id==='import-screenshot'){document.getElementById('screenshotInput').click();return}
-    if(id==='import-lp'||id==='import-loja'||id==='import-app'){openURLModal(id);return}
-    const p=P[id];if(!p)return;await sendChat(p)
-  });
-  document.getElementById('fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handleImageUpload(f)});
-  document.getElementById('pdfInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handlePDFUpload(f)});
-  document.getElementById('screenshotInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handleScreenshotUpload(f)});
+function renderTags(tags){
+  const el=document.getElementById('importsDesc');
+  if(!tags||!tags.length){el.innerHTML='';return}
+  el.innerHTML='A IA identifica automaticamente: <div class="import-tags">'+tags.map(t=>'<span>'+t+'</span>').join('')+'</div>'
+}
 
-  document.getElementById('heroStart').addEventListener('click',()=>{document.querySelector('.chat-panel').scrollIntoView({behavior:'smooth'});setTimeout(()=>input.focus(),400)});
-  document.getElementById('heroImport').addEventListener('click',()=>{document.querySelector('.import-grid').scrollIntoView({behavior:'smooth'})});
-
-  clearBtn.addEventListener('click',()=>{
-    messages=[];log.innerHTML='';const e=document.createElement('div');e.className='empty-state';e.id='emptyState';
-    e.innerHTML='<div class="glyph">&#x2728;</div><div class="title">Pronto para criar</div><div class="sub">Clique em uma ferramenta ou digite abaixo.</div>';
-    log.appendChild(e);setStatus('online','conectado')
-  });
-
-  const urlModalLabels={'lp':'Analisar Landing Page','loja':'Analisar Loja Virtual','app':'Analisar Aplicativo'};
-  function openURLModal(type){currentURLType=type;document.getElementById('urlModalTitle').textContent=urlModalLabels[type]||'Analisar URL';document.getElementById('urlInput').value='';document.getElementById('urlError').style.display='none';document.getElementById('urlModal').style.display='flex';setTimeout(()=>document.getElementById('urlInput').focus(),100)}
-  function closeURLModal(){document.getElementById('urlModal').style.display='none'}
-  document.getElementById('urlModalBg').addEventListener('click',closeURLModal);
-  document.getElementById('urlModalClose').addEventListener('click',closeURLModal);
-  document.getElementById('urlModalCancel').addEventListener('click',closeURLModal);
-  document.getElementById('urlModalSubmit').addEventListener('click',async()=>{const url=document.getElementById('urlInput').value.trim();if(!url.startsWith('http://')&&!url.startsWith('https://')){const e=document.getElementById('urlError');e.textContent='URL deve come\u00e7ar com http:// ou https://';e.style.display='block';return}closeURLModal();await handleURLAnalysis(url,currentURLType)});
-  document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('urlModalSubmit').click()}});
-
-  const P={
-    'criar-campanha':'Voc\u00ea \u00e9 um consultor de Meta Ads. N\u00e3o gere respostas completas ainda. Primeiro fa\u00e7a perguntas essenciais ao usu\u00e1rio uma de cada vez: Qual o produto ou servi\u00e7o? Qual o pa\u00eds? Qual o objetivo da campanha (convers\u00e3o, leads, tr\u00e1fego)? Qual o or\u00e7amento di\u00e1rio? O pixel do Meta Ads j\u00e1 est\u00e1 instalado? Aguarde as respostas antes de avan\u00e7ar. Seja direto e consultivo.',
-    'criar-publico':'Voc\u00ea \u00e9 um consultor de Meta Ads. N\u00e3o gere respostas completas ainda. Primeiro fa\u00e7a perguntas ao usu\u00e1rio uma de cada vez: Qual o produto ou servi\u00e7o? Qual o pa\u00eds? Qual a faixa et\u00e1ria do p\u00fablico? Qual o ticket m\u00e9dio? Ele j\u00e1 tem uma base de clientes para criar p\u00fablico personalizado? Aguarde as respostas antes de avan\u00e7ar.',
-    'criar-copy':'Voc\u00ea \u00e9 um consultor de Meta Ads. N\u00e3o gere copies completas ainda. Primeiro fa\u00e7a perguntas ao usu\u00e1rio uma de cada vez: Qual o produto? Qual a oferta principal? Quem \u00e9 o p\u00fablico-alvo? Qual o tom da marca? Qual o principal diferencial do produto? Aguarde as respostas antes de produzir qualquer copy.',
-    'criar-criativos':'Voc\u00ea \u00e9 um consultor de Meta Ads. N\u00e3o gere criativos completos ainda. Primeiro fa\u00e7a perguntas ao usu\u00e1rio uma de cada vez: Qual o produto? Qual o objetivo da campanha? Qual a plataforma (Feed, Stories, Reels)? O usu\u00e1rio j\u00e1 tem imagens ou precisa criar do zero? Aguarde as respostas antes de sugerir criativos.',
-    'auditoria':'Voc\u00ea \u00e9 um consultor de Meta Ads especializado em auditoria. Primeiro pergunte ao usu\u00e1rio quais dados ele tem dispon\u00edveis da campanha. Pe\u00e7a um de cada vez: dias de campanha, objetivo, valor gasto, convers\u00f5es, CPM, CTR, CPC, CPA, frequ\u00eancia, alcance, impress\u00f5es, ROAS, ticket m\u00e9dio, or\u00e7amento di\u00e1rio, p\u00fablico utilizado, criativos. Ap\u00f3s receber todos os dados, apresente a an\u00e1lise em etapas: primeiro os pontos cr\u00edticos, depois a nota geral, depois o plano. N\u00e3o despeje tudo de uma vez.',
-    'escalar':'Voc\u00ea \u00e9 um consultor de Meta Ads para escala. N\u00e3o crie planos completos ainda. Primeiro pergunte ao usu\u00e1rio uma de cada vez: Qual o produto? Qual o ROAS atual? Qual o or\u00e7amento di\u00e1rio atual? Qual o CPA atual? A campanha j\u00e1 est\u00e1 estabilizada h\u00e1 quantos dias? Quantos conjuntos de an\u00fancios est\u00e3o ativos? Aguarde as respostas antes de recomendar qualquer aumento.',
-    'import-imagem':'Pe\u00e7a ao usu\u00e1rio para descrever a imagem em detalhes. Ap\u00f3s receber a descri\u00e7\u00e3o, apresente uma an\u00e1lise em cart\u00f5es resumidos: \u2713 Produto, \u2713 Oferta, \u2713 Avatar, \u2713 P\u00fablico, \u2713 Promessa, \u2713 Gancho, \u2713 CTA, \u2713 Emo\u00e7\u00e3o, \u2713 Estrat\u00e9gia. Depois pergunte: "Deseja que eu crie a campanha completa baseada nessa an\u00e1lise?" S\u00f3 ent\u00e3o gere o relat\u00f3rio completo.',
-    'import-pdf':'Pe\u00e7a ao usu\u00e1rio para descrever o conte\u00fado do PDF. Ap\u00f3s receber a descri\u00e7\u00e3o, apresente cart\u00f5es resumidos: \u2713 Produto, \u2713 Oferta, \u2713 Avatar, \u2713 P\u00fablico, \u2713 Promessa, \u2713 Gancho, \u2713 CTA, \u2713 Estrat\u00e9gia. Depois pergunte se deseja a campanha completa.',
-    'import-lp':'Pe\u00e7a ao usu\u00e1rio o URL ou descri\u00e7\u00e3o da landing page. Ap\u00f3s receber, apresente cart\u00f5es resumidos: \u2713 Produto, \u2713 Oferta, \u2713 Avatar, \u2713 P\u00fablico, \u2713 Promessa, \u2713 Gancho, \u2713 CTA, \u2713 Estrat\u00e9gia. Depois pergunte se deseja a campanha completa.',
-    'import-loja':'Pe\u00e7a ao usu\u00e1rio o URL ou descri\u00e7\u00e3o da loja. Ap\u00f3s receber, apresente cart\u00f5es resumidos: \u2713 Produto, \u2713 Oferta, \u2713 Avatar, \u2713 P\u00fablico, \u2713 Promessa, \u2713 Gancho, \u2713 CTA, \u2713 Estrat\u00e9gia. Depois pergunte se deseja a campanha completa.',
-    'import-app':'Pe\u00e7a ao usu\u00e1rio o URL ou descri\u00e7\u00e3o do aplicativo. Ap\u00f3s receber, apresente cart\u00f5es resumidos: \u2713 Produto, \u2713 Oferta, \u2713 Avatar, \u2713 P\u00fablico, \u2713 Estrat\u00e9gia. Depois pergunte se deseja a campanha completa.',
-    'import-screenshot':'Pe\u00e7a ao usu\u00e1rio para descrever o screenshot. Ap\u00f3s receber, apresente cart\u00f5es resumidos: \u2713 Produto, \u2713 Oferta, \u2713 Avatar, \u2713 P\u00fablico, \u2713 Promessa, \u2713 Gancho, \u2713 CTA, \u2713 Estrat\u00e9gia. Depois pergunte se deseja a campanha completa.',
-    'nicho-loja':'Voc\u00ea \u00e9 um consultor de Meta Ads para ecommerce. N\u00e3o crie estrat\u00e9gias completas ainda. Pergunte primeiro: Qual o nicho da loja? Qual o ticket m\u00e9dio? J\u00e1 tem cat\u00e1logo configurado? Usa Shopify, Nuvemshop ou outra plataforma?',
-    'nicho-infoproduto':'Voc\u00ea \u00e9 um consultor de Meta Ads para infoprodutos. Pergunte primeiro: Qual o tema do infoproduto? Qual o pre\u00e7o? J\u00e1 tem lan\u00e7amento marcado? Tem lista de e-mails?',
-    'nicho-advocacia':'Voc\u00ea \u00e9 um consultor de Meta Ads para advocacia. Pergunte primeiro: Qual a \u00e1rea de atua\u00e7\u00e3o? Qual a regi\u00e3o? O escrit\u00f3rio busca leads ou reconhecimento?',
-    'nicho-clinica':'Voc\u00ea \u00e9 um consultor de Meta Ads para cl\u00ednicas. Pergunte primeiro: Qual a especialidade? Qual a localiza\u00e7\u00e3o? Atende conv\u00eanio ou particular?',
-    'nicho-odontologia':'Voc\u00ea \u00e9 um consultor de Meta Ads para dentistas. Pergunte primeiro: Qual a especialidade? Qual a localiza\u00e7\u00e3o? Busca agendamento ou reconhecimento?',
-    'nicho-estetica':'Voc\u00ea \u00e9 um consultor de Meta Ads para est\u00e9tica. Pergunte primeiro: Quais procedimentos s\u00e3o destaque? Qual a localiza\u00e7\u00e3o? J\u00e1 tem banco de fotos antes/depois?',
-    'nicho-academia':'Voc\u00ea \u00e9 um consultor de Meta Ads para academias. Pergunte primeiro: Qual o tipo de academia? Qual a cidade? Busca matr\u00edculas ou personal?',
-    'nicho-restaurante':'Voc\u00ea \u00e9 um consultor de Meta Ads para restaurantes. Pergunte primeiro: Qual o tipo de cozinha? Faz delivery? Qual a regi\u00e3o de entrega?',
-    'nicho-cursos':'Voc\u00ea \u00e9 um consultor de Meta Ads para cursos. Pergunte primeiro: Qual o tema? Qual o formato (presencial/online)? Qual o ticket?',
-    'nicho-apps':'Voc\u00ea \u00e9 um consultor de Meta Ads para aplicativos. Pergunte primeiro: Qual o tipo de app? Qual o modelo de receita? J\u00e1 tem eventos configurados?',
-    'nicho-saas':'Voc\u00ea \u00e9 um consultor de Meta Ads para SaaS. Pergunte primeiro: Qual o problema que resolve? Qual o plano de pre\u00e7os? Tem trial gratuito?',
-    'nicho-consultoria':'Voc\u00ea \u00e9 um consultor de Meta Ads para consultores. Pergunte primeiro: Qual a \u00e1rea de consultoria? Qual o ticket? Qual o p\u00fablico ideal?',
-    'nicho-imobiliaria':'Voc\u00ea \u00e9 um consultor de Meta Ads para imobili\u00e1rias. Pergunte primeiro: Qual a cidade/bairro? Venda ou loca\u00e7\u00e3o? Qual o perfil de im\u00f3veis?',
-    'nicho-automotivo':'Voc\u00ea \u00e9 um consultor de Meta Ads para automotivo. Pergunte primeiro: Qual o tipo de ve\u00edculo? Venda direta ou test drive? Qual a regi\u00e3o?',
-    'nicho-ebook':'Voc\u00ea \u00e9 um consultor de Meta Ads para ebooks. Pergunte primeiro: Qual o tema? Qual o pre\u00e7o? J\u00e1 tem p\u00e1gina de vendas?',
-    'nicho-pv':'Voc\u00ea \u00e9 um consultor de Meta Ads para p\u00e1ginas de venda. Pergunte primeiro: Qual o produto? Qual o pre\u00e7o? J\u00e1 tem p\u00e1gina criada?'
-  };
-
-  async function handleImageUpload(file){
-    setBusy(true);
-    if(file.size>20*1024*1024){addMessage('error','Arquivo muito grande. M\u00e1ximo: 20MB. Por favor, selecione uma imagem menor.');setBusy(false);return}
-    const reader=new FileReader();
-    reader.onload=async ev=>{
-      if(emptyState)emptyState.remove();
-      const tag=document.createElement('div');tag.className='tag';tag.textContent='Voc\u00ea';
-      const ub=document.createElement('div');ub.className='bubble';
-      ub.innerHTML='<div class="upload-info">\uD83D\uDCE4 <strong>'+file.name+'</strong></div><img class="upload-thumb" src="'+ev.target.result+'">';
-      const u=document.createElement('div');u.className='msg user';u.appendChild(tag);u.appendChild(ub);
-      log.appendChild(u);scrollToEnd();
-      messages.push({role:'user',content:'[Upload de imagem: '+file.name+']'});
-      setStatus('busy','analisando');
-      const atag=document.createElement('div');atag.className='tag';atag.textContent='Meta Ads AI';
-      const ab=document.createElement('div');ab.className='bubble';
-      ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Enviando imagem...</div><div class="upload-progress"><div class="upload-progress-bar" id="progressBar"></div></div>';
-      const a=document.createElement('div');a.className='msg assistant';a.appendChild(atag);a.appendChild(ab);
-      log.appendChild(a);scrollToEnd();
-      let pct=0,pi=setInterval(()=>{pct+=Math.random()*10;if(pct>90)pct=90;const pb=document.getElementById('progressBar');if(pb)pb.style.width=Math.min(pct,90)+'%'},200);
-      try{
-        const fd=new FormData();fd.append('file',file);
-        const r=await fetch('/api/upload-image',{method:'POST',body:fd});
-        if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status)}
-        clearInterval(pi);pct=100;const pb=document.getElementById('progressBar');if(pb)pb.style.width='100%';
-        ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando imagem...</div><span id="streamContent"></span><span class="cursor" id="uploadCursor"></span>';
-        let at='',buf='',rd=r.body.getReader(),dc=new TextDecoder();
-        while(true){const{done,value}=await rd.read();if(done)break;
-          buf+=dc.decode(value,{stream:true});const ps=buf.split('\n\n');buf=ps.pop();
-          for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('streamContent');if(sc){sc.textContent=at;const uc=document.getElementById('uploadCursor');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
-        }
-        const uc=document.getElementById('uploadCursor');if(uc)uc.remove();
-        const sc=document.getElementById('streamContent');if(sc)sc.textContent=at;
-        const cards=renderResultCards(at);
-        a.removeChild(ab);const nb=document.createElement('div');nb.className='bubble';
-        if(cards)nb.innerHTML=cards;else nb.textContent=at;
-        a.insertBefore(nb,a.firstChild.nextSibling);
-        const cb=document.createElement('button');cb.className='copy-btn';cb.textContent='Copiar';cb.onclick=()=>{navigator.clipboard.writeText(at);cb.textContent='Copiado!';setTimeout(()=>cb.textContent='Copiar',2000)};a.appendChild(cb);
-        if(!cards)addActionButtons(a);
-        messages.push({role:'assistant',content:at});setStatus('online','conectado')
-      }catch(e){
-        clearInterval(pi);const pb=document.getElementById('progressBar');if(pb)pb.style.width='100%';
-        ab.innerHTML='<div class="status-msg" style="color:#fca5a5">\u274C '+e.message+'</div>';setStatus('error','erro')
-      }finally{setBusy(false)}
-    };
-    reader.readAsDataURL(file)
-  }
-
-  async function handlePDFUpload(file){
-    setBusy(true);
-    if(file.size>20*1024*1024){addMessage('error','Arquivo muito grande. M\u00e1ximo: 20MB.');setBusy(false);return}
+async function handleImageUpload(file){
+  setBusy(true);
+  if(file.size>20*1024*1024){addMessage('error','Arquivo muito grande. Maximo: 20MB.');setBusy(false);return}
+  const reader=new FileReader();
+  reader.onload=async ev=>{
     if(emptyState)emptyState.remove();
     const tag=document.createElement('div');tag.className='tag';tag.textContent='Voc\u00ea';
     const ub=document.createElement('div');ub.className='bubble';
-    const sizeMB=(file.size/(1024*1024)).toFixed(1);
-    ub.innerHTML='<div class="upload-info">\uD83D\uDCC4 <strong>'+file.name+'</strong> <span style="color:var(--text-faint)">('+sizeMB+' MB)</span></div>';
+    ub.innerHTML='<div class="upload-info">\uD83D\uDCE4 <strong>'+file.name+'</strong></div><img class="upload-thumb" src="'+ev.target.result+'">';
     const u=document.createElement('div');u.className='msg user';u.appendChild(tag);u.appendChild(ub);
     log.appendChild(u);scrollToEnd();
-    messages.push({role:'user',content:'[Upload de PDF: '+file.name+']'});
+    messages.push({role:'user',content:'[Upload de imagem: '+file.name+']'});
     setStatus('busy','analisando');
-    const atag=document.createElement('div');atag.className='tag';atag.textContent='Meta Ads AI';
+    const atag=document.createElement('div');atag.className='tag';atag.textContent=branding.assistant_name||branding.short_name||'AI';
     const ab=document.createElement('div');ab.className='bubble';
-    ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Enviando PDF...</div><div class="upload-progress"><div class="upload-progress-bar" id="pdfProgressBar"></div></div>';
+    ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Enviando imagem...</div><div class="upload-progress"><div class="upload-progress-bar" id="progressBar"></div></div>';
     const a=document.createElement('div');a.className='msg assistant';a.appendChild(atag);a.appendChild(ab);
     log.appendChild(a);scrollToEnd();
-    let pct=0,pi=setInterval(()=>{pct+=Math.random()*10;if(pct>90)pct=90;const pb=document.getElementById('pdfProgressBar');if(pb)pb.style.width=Math.min(pct,90)+'%'},200);
+    let pct=0,pi=setInterval(()=>{pct+=Math.random()*10;if(pct>90)pct=90;const pb=document.getElementById('progressBar');if(pb)pb.style.width=Math.min(pct,90)+'%'},200);
     try{
       const fd=new FormData();fd.append('file',file);
-      const r=await fetch('/api/upload-pdf',{method:'POST',body:fd});
-      if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||e.error||'HTTP '+r.status)}
-      clearInterval(pi);pct=100;const pb=document.getElementById('pdfProgressBar');if(pb)pb.style.width='100%';
-      ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando PDF...</div><span id="pdfStreamContent"></span><span class="cursor" id="pdfCursor"></span>';
+      const r=await fetch('/api/upload-image',{method:'POST',body:fd});
+      if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status)}
+      clearInterval(pi);pct=100;const pb=document.getElementById('progressBar');if(pb)pb.style.width='100%';
+      ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando imagem...</div><span id="streamContent"></span><span class="cursor" id="uploadCursor"></span>';
       let at='',buf='',rd=r.body.getReader(),dc=new TextDecoder();
       while(true){const{done,value}=await rd.read();if(done)break;
         buf+=dc.decode(value,{stream:true});const ps=buf.split('\n\n');buf=ps.pop();
-        for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('pdfStreamContent');if(sc){sc.textContent=at;const uc=document.getElementById('pdfCursor');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
+        for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('streamContent');if(sc){sc.textContent=at;const uc=document.getElementById('uploadCursor');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
       }
-      const uc=document.getElementById('pdfCursor');if(uc)uc.remove();
-      const sc=document.getElementById('pdfStreamContent');if(sc)sc.textContent=at;
+      const uc=document.getElementById('uploadCursor');if(uc)uc.remove();
+      const sc=document.getElementById('streamContent');if(sc)sc.textContent=at;
       const cards=renderResultCards(at);
       a.removeChild(ab);const nb=document.createElement('div');nb.className='bubble';
       if(cards)nb.innerHTML=cards;else nb.textContent=at;
@@ -732,84 +650,89 @@
       if(!cards)addActionButtons(a);
       messages.push({role:'assistant',content:at});setStatus('online','conectado')
     }catch(e){
-      clearInterval(pi);const pb=document.getElementById('pdfProgressBar');if(pb)pb.style.width='100%';
+      clearInterval(pi);const pb=document.getElementById('progressBar');if(pb)pb.style.width='100%';
       ab.innerHTML='<div class="status-msg" style="color:#fca5a5">\u274C '+e.message+'</div>';setStatus('error','erro')
     }finally{setBusy(false)}
-  }
+  };
+  reader.readAsDataURL(file)
+}
 
-  async function handleScreenshotUpload(file){
-    setBusy(true);
-    if(file.size>10*1024*1024){addMessage('error','Arquivo muito grande. M\u00e1ximo: 10MB.');setBusy(false);return}
-    const reader=new FileReader();
-    reader.onload=async ev=>{
-      if(emptyState)emptyState.remove();
-      const tag=document.createElement('div');tag.className='tag';tag.textContent='Voc\u00ea';
-      const ub=document.createElement('div');ub.className='bubble';
-      ub.innerHTML='<div class="upload-info">\uD83D\uDDBC\uFE0F <strong>'+file.name+'</strong></div><img class="upload-thumb" src="'+ev.target.result+'">';
-      const u=document.createElement('div');u.className='msg user';u.appendChild(tag);u.appendChild(ub);
-      log.appendChild(u);scrollToEnd();
-      messages.push({role:'user',content:'[Upload de screenshot: '+file.name+']'});
-      setStatus('busy','analisando');
-      const atag=document.createElement('div');atag.className='tag';atag.textContent='Meta Ads AI';
-      const ab=document.createElement('div');ab.className='bubble';
-      ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Enviando screenshot...</div><div class="upload-progress"><div class="upload-progress-bar" id="ssProgressBar"></div></div>';
-      const a=document.createElement('div');a.className='msg assistant';a.appendChild(atag);a.appendChild(ab);
-      log.appendChild(a);scrollToEnd();
-      let pct=0,pi=setInterval(()=>{pct+=Math.random()*10;if(pct>90)pct=90;const pb=document.getElementById('ssProgressBar');if(pb)pb.style.width=Math.min(pct,90)+'%'},200);
-      try{
-        const fd=new FormData();fd.append('file',file);
-        const r=await fetch('/api/upload-screenshot',{method:'POST',body:fd});
-        if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||e.error||'HTTP '+r.status)}
-        clearInterval(pi);pct=100;const pb=document.getElementById('ssProgressBar');if(pb)pb.style.width='100%';
-        ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando screenshot...</div><span id="ssStreamContent"></span><span class="cursor" id="ssCursor"></span>';
-        let at='',buf='',rd=r.body.getReader(),dc=new TextDecoder();
-        while(true){const{done,value}=await rd.read();if(done)break;
-          buf+=dc.decode(value,{stream:true});const ps=buf.split('\n\n');buf=ps.pop();
-          for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('ssStreamContent');if(sc){sc.textContent=at;const uc=document.getElementById('ssCursor');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
-        }
-        const uc=document.getElementById('ssCursor');if(uc)uc.remove();
-        const sc=document.getElementById('ssStreamContent');if(sc)sc.textContent=at;
-        const cards=renderResultCards(at);
-        a.removeChild(ab);const nb=document.createElement('div');nb.className='bubble';
-        if(cards)nb.innerHTML=cards;else nb.textContent=at;
-        a.insertBefore(nb,a.firstChild.nextSibling);
-        const cb=document.createElement('button');cb.className='copy-btn';cb.textContent='Copiar';cb.onclick=()=>{navigator.clipboard.writeText(at);cb.textContent='Copiado!';setTimeout(()=>cb.textContent='Copiar',2000)};a.appendChild(cb);
-        if(!cards)addActionButtons(a);
-        messages.push({role:'assistant',content:at});setStatus('online','conectado')
-      }catch(e){
-        clearInterval(pi);const pb=document.getElementById('ssProgressBar');if(pb)pb.style.width='100%';
-        ab.innerHTML='<div class="status-msg" style="color:#fca5a5">\u274C '+e.message+'</div>';setStatus('error','erro')
-      }finally{setBusy(false)}
-    };
-    reader.readAsDataURL(file)
-  }
+async function handlePDFUpload(file){
+  setBusy(true);
+  if(file.size>20*1024*1024){addMessage('error','Arquivo muito grande. Maximo: 20MB.');setBusy(false);return}
+  if(emptyState)emptyState.remove();
+  const tag=document.createElement('div');tag.className='tag';tag.textContent='Voc\u00ea';
+  const ub=document.createElement('div');ub.className='bubble';
+  const sizeMB=(file.size/(1024*1024)).toFixed(1);
+  ub.innerHTML='<div class="upload-info">\uD83D\uDCC4 <strong>'+file.name+'</strong> <span style="color:var(--text-faint)">('+sizeMB+' MB)</span></div>';
+  const u=document.createElement('div');u.className='msg user';u.appendChild(tag);u.appendChild(ub);
+  log.appendChild(u);scrollToEnd();
+  messages.push({role:'user',content:'[Upload de PDF: '+file.name+']'});
+  setStatus('busy','analisando');
+  const atag=document.createElement('div');atag.className='tag';atag.textContent=branding.assistant_name||branding.short_name||'AI';
+  const ab=document.createElement('div');ab.className='bubble';
+  ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Enviando PDF...</div><div class="upload-progress"><div class="upload-progress-bar" id="pdfProgressBar"></div></div>';
+  const a=document.createElement('div');a.className='msg assistant';a.appendChild(atag);a.appendChild(ab);
+  log.appendChild(a);scrollToEnd();
+  let pct=0,pi=setInterval(()=>{pct+=Math.random()*10;if(pct>90)pct=90;const pb=document.getElementById('pdfProgressBar');if(pb)pb.style.width=Math.min(pct,90)+'%'},200);
+  try{
+    const fd=new FormData();fd.append('file',file);
+    const r=await fetch('/api/upload-pdf',{method:'POST',body:fd});
+    if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||e.error||'HTTP '+r.status)}
+    clearInterval(pi);pct=100;const pb=document.getElementById('pdfProgressBar');if(pb)pb.style.width='100%';
+    ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando PDF...</div><span id="pdfStreamContent"></span><span class="cursor" id="pdfCursor"></span>';
+    let at='',buf='',rd=r.body.getReader(),dc=new TextDecoder();
+    while(true){const{done,value}=await rd.read();if(done)break;
+      buf+=dc.decode(value,{stream:true});const ps=buf.split('\n\n');buf=ps.pop();
+      for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('pdfStreamContent');if(sc){sc.textContent=at;const uc=document.getElementById('pdfCursor');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
+    }
+    const uc=document.getElementById('pdfCursor');if(uc)uc.remove();
+    const sc=document.getElementById('pdfStreamContent');if(sc)sc.textContent=at;
+    const cards=renderResultCards(at);
+    a.removeChild(ab);const nb=document.createElement('div');nb.className='bubble';
+    if(cards)nb.innerHTML=cards;else nb.textContent=at;
+    a.insertBefore(nb,a.firstChild.nextSibling);
+    const cb=document.createElement('button');cb.className='copy-btn';cb.textContent='Copiar';cb.onclick=()=>{navigator.clipboard.writeText(at);cb.textContent='Copiado!';setTimeout(()=>cb.textContent='Copiar',2000)};a.appendChild(cb);
+    if(!cards)addActionButtons(a);
+    messages.push({role:'assistant',content:at});setStatus('online','conectado')
+  }catch(e){
+    clearInterval(pi);const pb=document.getElementById('pdfProgressBar');if(pb)pb.style.width='100%';
+    ab.innerHTML='<div class="status-msg" style="color:#fca5a5">\u274C '+e.message+'</div>';setStatus('error','erro')
+  }finally{setBusy(false)}
+}
 
-  async function handleURLAnalysis(url,type){
-    setBusy(true);
+async function handleScreenshotUpload(file){
+  setBusy(true);
+  if(file.size>10*1024*1024){addMessage('error','Arquivo muito grande. Maximo: 10MB.');setBusy(false);return}
+  const reader=new FileReader();
+  reader.onload=async ev=>{
     if(emptyState)emptyState.remove();
     const tag=document.createElement('div');tag.className='tag';tag.textContent='Voc\u00ea';
     const ub=document.createElement('div');ub.className='bubble';
-    ub.innerHTML='<div class="upload-info">\uD83D\uDD17 <strong>'+url+'</strong></div>';
+    ub.innerHTML='<div class="upload-info">\uD83D\uDDBC\uFE0F <strong>'+file.name+'</strong></div><img class="upload-thumb" src="'+ev.target.result+'">';
     const u=document.createElement('div');u.className='msg user';u.appendChild(tag);u.appendChild(ub);
     log.appendChild(u);scrollToEnd();
-    messages.push({role:'user',content:'[Analise de URL: '+url+']'});
+    messages.push({role:'user',content:'[Upload de screenshot: '+file.name+']'});
     setStatus('busy','analisando');
-    const atag=document.createElement('div');atag.className='tag';atag.textContent='Meta Ads AI';
+    const atag=document.createElement('div');atag.className='tag';atag.textContent=branding.assistant_name||branding.short_name||'AI';
     const ab=document.createElement('div');ab.className='bubble';
-    ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Buscando pagina e analisando...</div><span id="urlStreamContent"></span><span class="cursor" id="urlCursor"></span>';
+    ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Enviando screenshot...</div><div class="upload-progress"><div class="upload-progress-bar" id="ssProgressBar"></div></div>';
     const a=document.createElement('div');a.className='msg assistant';a.appendChild(atag);a.appendChild(ab);
     log.appendChild(a);scrollToEnd();
+    let pct=0,pi=setInterval(()=>{pct+=Math.random()*10;if(pct>90)pct=90;const pb=document.getElementById('ssProgressBar');if(pb)pb.style.width=Math.min(pct,90)+'%'},200);
     try{
-      const r=await fetch('/api/analyze-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,type})});
-      if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status)}
-      ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando pagina...</div><span id="urlStreamContent2"></span><span class="cursor" id="urlCursor2"></span>';
+      const fd=new FormData();fd.append('file',file);
+      const r=await fetch('/api/upload-screenshot',{method:'POST',body:fd});
+      if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||e.error||'HTTP '+r.status)}
+      clearInterval(pi);pct=100;const pb=document.getElementById('ssProgressBar');if(pb)pb.style.width='100%';
+      ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando screenshot...</div><span id="ssStreamContent"></span><span class="cursor" id="ssCursor"></span>';
       let at='',buf='',rd=r.body.getReader(),dc=new TextDecoder();
       while(true){const{done,value}=await rd.read();if(done)break;
         buf+=dc.decode(value,{stream:true});const ps=buf.split('\n\n');buf=ps.pop();
-        for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('urlStreamContent2');if(sc){sc.textContent=at;const uc=document.getElementById('urlCursor2');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
+        for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('ssStreamContent');if(sc){sc.textContent=at;const uc=document.getElementById('ssCursor');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
       }
-      const uc=document.getElementById('urlCursor2');if(uc)uc.remove();
-      const sc=document.getElementById('urlStreamContent2');if(sc)sc.textContent=at;
+      const uc=document.getElementById('ssCursor');if(uc)uc.remove();
+      const sc=document.getElementById('ssStreamContent');if(sc)sc.textContent=at;
       const cards=renderResultCards(at);
       a.removeChild(ab);const nb=document.createElement('div');nb.className='bubble';
       if(cards)nb.innerHTML=cards;else nb.textContent=at;
@@ -818,27 +741,93 @@
       if(!cards)addActionButtons(a);
       messages.push({role:'assistant',content:at});setStatus('online','conectado')
     }catch(e){
+      clearInterval(pi);const pb=document.getElementById('ssProgressBar');if(pb)pb.style.width='100%';
       ab.innerHTML='<div class="status-msg" style="color:#fca5a5">\u274C '+e.message+'</div>';setStatus('error','erro')
     }finally{setBusy(false)}
-  }
+  };
+  reader.readAsDataURL(file)
+}
 
-  async function boot(n){
-    n=n||1;try{const r=await fetch('/api/models');if(!r.ok)throw new Error('HTTP '+r.status);
+async function handleURLAnalysis(url,type){
+  setBusy(true);
+  if(emptyState)emptyState.remove();
+  const tag=document.createElement('div');tag.className='tag';tag.textContent='Voc\u00ea';
+  const ub=document.createElement('div');ub.className='bubble';
+  ub.innerHTML='<div class="upload-info">\uD83D\uDD17 <strong>'+url+'</strong></div>';
+  const u=document.createElement('div');u.className='msg user';u.appendChild(tag);u.appendChild(ub);
+  log.appendChild(u);scrollToEnd();
+  messages.push({role:'user',content:'[Analise de URL: '+url+']'});
+  setStatus('busy','analisando');
+  const atag=document.createElement('div');atag.className='tag';atag.textContent=branding.assistant_name||branding.short_name||'AI';
+  const ab=document.createElement('div');ab.className='bubble';
+  ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Buscando pagina e analisando...</div><span id="urlStreamContent"></span><span class="cursor" id="urlCursor"></span>';
+  const a=document.createElement('div');a.className='msg assistant';a.appendChild(atag);a.appendChild(ab);
+  log.appendChild(a);scrollToEnd();
+  try{
+    const r=await fetch('/api/analyze-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,type})});
+    if(!r.ok||!r.body){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status)}
+    ab.innerHTML='<div class="status-msg"><span class="spinner"></span>Analisando pagina...</div><span id="urlStreamContent2"></span><span class="cursor" id="urlCursor2"></span>';
+    let at='',buf='',rd=r.body.getReader(),dc=new TextDecoder();
+    while(true){const{done,value}=await rd.read();if(done)break;
+      buf+=dc.decode(value,{stream:true});const ps=buf.split('\n\n');buf=ps.pop();
+      for(const p of ps){if(!p.trim())continue;let e='message',d='';for(const l of p.split('\n')){if(l.startsWith('event:'))e=l.slice(6).trim();else if(l.startsWith('data:'))d+=l.slice(5).trim()}if(!d)continue;let o;try{o=JSON.parse(d)}catch(x){continue}if(e==='error')throw new Error(o.message||'erro');if(o.content){at+=o.content;const sc=document.getElementById('urlStreamContent2');if(sc){sc.textContent=at;const uc=document.getElementById('urlCursor2');if(uc)sc.parentNode.appendChild(uc)}scrollToEnd()}}
+    }
+    const uc=document.getElementById('urlCursor2');if(uc)uc.remove();
+    const sc=document.getElementById('urlStreamContent2');if(sc)sc.textContent=at;
+    const cards=renderResultCards(at);
+    a.removeChild(ab);const nb=document.createElement('div');nb.className='bubble';
+    if(cards)nb.innerHTML=cards;else nb.textContent=at;
+    a.insertBefore(nb,a.firstChild.nextSibling);
+    const cb=document.createElement('button');cb.className='copy-btn';cb.textContent='Copiar';cb.onclick=()=>{navigator.clipboard.writeText(at);cb.textContent='Copiado!';setTimeout(()=>cb.textContent='Copiar',2000)};a.appendChild(cb);
+    if(!cards)addActionButtons(a);
+    messages.push({role:'assistant',content:at});setStatus('online','conectado')
+  }catch(e){
+    ab.innerHTML='<div class="status-msg" style="color:#fca5a5">\u274C '+e.message+'</div>';setStatus('error','erro')
+  }finally{setBusy(false)}
+}
+
+async function boot(n){
+  n=n||1;
+  try{
+    const r=await fetch('/api/models');if(!r.ok)throw new Error('HTTP '+r.status);
     const m=await r.json();if(!m.length)throw new Error('vazio');
     currentModel=(m.find(x=>!x.id.includes('/'))||m[0]).id;
     modelSelect.innerHTML=m.map(x=>'<option value="'+x.id+'">'+x.label+'</option>').join('');
     modelSelect.value=currentModel;setStatus('online','conectado')
-    }catch(e){if(n<5){setStatus('busy','reconectando ('+n+')');setTimeout(()=>boot(n+1),1500*n)}else setStatus('error','offline')}
-    try{const b=await fetch('/api/branding');if(b.ok){const d=await b.json();
-      branding=d.branding||{};actionButtons=d.action_buttons||[];
-      if(branding.app_name){document.title=branding.app_name;const at=document.getElementById('appTitle');if(at)at.textContent=branding.app_name}
-      const lt=document.getElementById('logoText');if(lt)lt.textContent=branding.logo_text||'ForgeHub AI';
-      const ft=document.getElementById('footerText');if(ft)ft.innerHTML='Powered by <strong>'+(branding.company||'ForgeHub AI')+'</strong>';
-      const pb=document.getElementById('planBadge');if(pb)pb.innerHTML='<span class="gd"></span>'+(branding.plan_name||'Professional')
-    }}catch(e){}
+  }catch(e){
+    if(n<5){setStatus('busy','reconectando ('+n+')');setTimeout(()=>boot(n+1),1500*n)}else setStatus('error','offline')
   }
+  try{
+    const b=await fetch('/api/branding');if(!b.ok)return;
+    config=await b.json();
+    branding=config.branding||{};
+    P=config.prompts||{};
+    actionButtons=config.action_buttons||[];
+    urlTypes=((config.url_analysis&&config.url_analysis.types)||[]);
+    
+    document.title=branding.app_name||'ForgeHub AI';
+    const at=document.getElementById('appTitle');if(at)at.textContent=branding.app_name||'ForgeHub AI';
+    const lt=document.getElementById('logoText');if(lt)lt.textContent=branding.logo_text||'ForgeHub AI';
+    const ft=document.getElementById('footerText');if(ft)ft.innerHTML='Powered by <strong>'+(branding.company||'ForgeHub AI')+'</strong>';
+    const pb=document.getElementById('planBadge');if(pb)pb.innerHTML='<span class="gd"></span>'+(branding.plan_name||'Professional');
+    const pt=document.getElementById('planText');if(pt)pt.textContent='Plano '+(branding.plan_name||'Professional');
+    
+    const ht=document.getElementById('heroTitle');
+    if(ht&&config.hero&&config.hero.title)ht.innerHTML=config.hero.title+'<br/><span class="hl">'+(config.hero.highlight||'')+'</span>';
+    const hs=document.getElementById('heroSubtitle');if(hs)hs.textContent=(config.hero&&config.hero.subtitle)||'';
+    
+    setColors(config.colors||{});
+    renderSidebar(config);
+    renderHero(config.hero||{});
+    renderDashboardMetrics(config.dashboard_metrics||[]);
+    if(config.tools&&config.tools.length){document.getElementById('toolsSection').style.display='block';renderTools(config.tools)}
+    if(config.imports&&config.imports.length){document.getElementById('importsSection').style.display='block';renderImports(config.imports)}
+    renderTags(config.import_tags||[]);
+    if(config.niches&&config.niches.length){document.getElementById('nichesSection').style.display='block';renderNiches(config.niches)}
+  }catch(e){console.error('boot config fail',e)}
+}
 
-  boot();input.focus();
+boot();input.focus();
 </script>
 </body>
 </html>

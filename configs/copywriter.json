@@ -1,0 +1,81 @@
+{
+  "app_id": "copywriter",
+  "branding": {
+    "app_name": "Copywriter Expert PRO",
+    "short_name": "Copy PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "suporte@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Professional",
+    "plan_badge": "PRO",
+    "favicon_emoji": "\u270D",
+    "assistant_name": "Copywriter AI"
+  },
+  "colors": { "primary": "#D946EF", "secondary": "#A21CAF", "accent": "#E879F9", "gold": "#F6C453", "bg_deep": "#14061E", "bg": "#1C0A2E", "bg_mid": "#24103E", "bg_light": "#341C54" },
+  "models": { "default": "meta/llama-3.1-70b-instruct", "vision": "meta/llama-3.2-90b-vision-instruct", "expert_underlying": "meta/llama-3.1-70b-instruct" },
+  "skill": "copywriter.md",
+  "expert_name": "Copywriter Expert",
+  "hero": { "title": "Copies que vendem como", "highlight": "os melhores copywriters", "subtitle": "Headlines, an\u00fancios, e-mails, sequ\u00eancias e p\u00e1ginas de venda com gatilhos mentais e persuas\u00e3o.", "floats": [] },
+  "dashboard_metrics": [],
+  "sidebar": {
+    "categories": [{"label": "Menu", "key": "menu"}, {"label": "Formatos", "key": "formatos"}, {"label": "Gatilhos", "key": "gatilhos"}],
+    "items": {
+      "menu": [{"id": "dashboard", "label": "Dashboard", "icon": "\uD83D\uDCCA"}],
+      "formatos": [
+        {"id": "criar-headline", "label": "Headlines", "icon": "\uD83D\uDCDD"},
+        {"id": "criar-anuncio", "label": "An\u00fancios", "icon": "\uD83D\uDCE2"},
+        {"id": "criar-email", "label": "E-mails", "icon": "\u2709\uFE0F"},
+        {"id": "criar-lp-copy", "label": "LP Copy", "icon": "\uD83D\uDCC4"},
+        {"id": "criar-vsl", "label": "Roteiro VSL", "icon": "\uD83C\uDFAC"}
+      ],
+      "gatilhos": [
+        {"id": "revisar-copy", "label": "Revisar Copy", "icon": "\uD83D\uDD0D"},
+        {"id": "gatilhos-mentais", "label": "Gatilhos Mentais", "icon": "\uD83E\uDDE0"}
+      ]
+    }
+  },
+  "tools": [
+    {"id": "criar-headline", "icon": "\uD83D\uDCDD", "label": "Headlines", "desc": "Headlines irresist\u00edveis com f\u00f3rmulas comprovadas."},
+    {"id": "criar-anuncio", "icon": "\uD83D\uDCE2", "label": "An\u00fancios", "desc": "Copies para Facebook, Instagram, Google e TikTok."},
+    {"id": "criar-email", "icon": "\u2709\uFE0F", "label": "E-mails", "desc": "Sequ\u00eancias de e-mail persuasivas."},
+    {"id": "criar-vsl", "icon": "\uD83C\uDFAC", "label": "Roteiro VSL", "desc": "Roteiros de VSL com gancho, desenvolvimento e CTA."},
+    {"id": "revisar-copy", "icon": "\uD83D\uDD0D", "label": "Revisar Copy", "desc": "Revis\u00e3o com an\u00e1lise de persuas\u00e3o e clareza."},
+    {"id": "gatilhos-mentais", "icon": "\uD83E\uDDE0", "label": "Gatilhos Mentais", "desc": "Aplica\u00e7\u00e3o dos 7 gatilhos mentais."}
+  ],
+  "imports": [{"id": "import-pdf", "icon": "\uD83D\uDCC4", "label": "Briefing PDF"}],
+  "import_tags": ["Produto", "P\u00fablico", "Tom", "Gatilho", "Formato"],
+  "niches": [
+    {"id": "nicho-vendas", "icon": "\uD83D\uDCC8", "label": "Vendas Diretas"},
+    {"id": "nicho-lancamento", "icon": "\uD83D\uDE80", "label": "Lan\u00e7amentos"},
+    {"id": "nicho-infoproduto", "icon": "\uD83D\uDCE6", "label": "Infoprodutos"},
+    {"id": "nicho-saas", "icon": "\uD83E\uDD16", "label": "SaaS"},
+    {"id": "nicho-local", "icon": "\uD83C\uDFE0", "label": "Neg\u00f3cio Local"}
+  ],
+  "action_buttons": [
+    {"id": "criar-headline", "label": "Headline", "icon": "\uD83D\uDCDD"},
+    {"id": "criar-anuncio", "label": "An\u00fancio", "icon": "\uD83D\uDCE2"},
+    {"id": "criar-email", "label": "E-mail", "icon": "\u2709\uFE0F"},
+    {"id": "revisar-copy", "label": "Revisar", "icon": "\uD83D\uDD0D"},
+    {"id": "gatilhos-mentais", "label": "Gatilhos", "icon": "\uD83E\uDDE0"}
+  ],
+  "uploads": { "image": false, "pdf": true, "screenshot": false, "url": false },
+  "url_analysis": { "types": [{"id": "lp", "label": "Landing Page", "icon": "\uD83C\uDF10"}], "platform_patterns": [], "product_type_keywords": {} },
+  "system_prompts": {
+    "image": "", "pdf": "Voc\u00ea \u00e9 um copywriter analisando um briefing. Identifique:\n\n\u2713 PRODUTO: [produto]\n\u2713 P\u00daBLICO: [p\u00fablico]\n\u2713 TOM: [tom da marca]\n\u2713 GATILHOS: [gatilhos mentais sugeridos]\n\u2713 FORMATO: [headline, an\u00fancio, email]\n\u2713 CTA: [chamada para a\u00e7\u00e3o]",
+    "screenshot": "",
+    "url": { "lp": "Voc\u00ea \u00e9 copywriter analisando uma Landing Page. Avalie a copy: headline, sub, CTA, prova social, obje\u00e7\u00f5es. Sugira melhorias." }
+  },
+  "prompts": {
+    "criar-headline": "Voc\u00ea \u00e9 copywriter especialista em headlines. N\u00e3o crie ainda. Pergunte: Qual o produto? Qual o principal benef\u00edcio? Qual o p\u00fablico? Qual o gatilho principal? Aguarde.",
+    "criar-anuncio": "Voc\u00ea \u00e9 copywriter para an\u00fancios. Pergunte: Qual plataforma? Qual produto? Qual a oferta? Tom da marca? CTA desejado? Aguarde.",
+    "criar-email": "Voc\u00ea \u00e9 copywriter para e-mail marketing. Pergunte: Objetivo do e-mail? P\u00fablico? Tom? Assunto? Sequ\u00eancia ou \u00fanico? Aguarde.",
+    "criar-vsl": "Voc\u00ea \u00e9 roteirista de VSL. Pergunte: Produto? Dura\u00e7\u00e3o? Tom? Gancho? CTA? Aguarde.",
+    "criar-lp-copy": "Voc\u00ea \u00e9 copywriter para Landing Pages. Pergunte: Produto? Se\u00e7\u00f5es? P\u00fablico? CTA? Aguarde.",
+    "revisar-copy": "Voc\u00ea \u00e9 revisor de copy. Pe\u00e7a a copy existente. Analise: clareza, persuas\u00e3o, CTA, obje\u00e7\u00f5es, tom. Sugira melhorias.",
+    "gatilhos-mentais": "Voc\u00ea \u00e9 especialista em gatilhos mentais. Pergunte: Qual o produto? Qual o p\u00fablico? Qual emo\u00e7\u00e3o ativar? Aguarde.",
+    "dashboard": "Assistente de Copywriter Expert. Como posso ajudar?"
+  }
+}
