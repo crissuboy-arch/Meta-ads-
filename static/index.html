@@ -413,7 +413,7 @@ function renderResultCards(text){
 
 function addActionButtons(target){
   try{
-    if(!actionButtons.length||!target||!target.parentNode)return;
+    if(!actionButtons.length)return;
     const bar=document.createElement('div');bar.className='action-bar';
     const title=document.createElement('div');title.className='action-bar-title';title.textContent='O que deseja fazer agora?';
     bar.appendChild(title);
@@ -423,7 +423,11 @@ function addActionButtons(target){
       b.onclick=async()=>{if(P[btn.id])await sendChat(P[btn.id])};
       bar.appendChild(b)
     }
-    target.parentNode.insertBefore(bar,target.nextSibling)
+    if(target&&target.parentNode){
+      target.parentNode.insertBefore(bar,target.nextSibling)
+    }else{
+      log.appendChild(bar)
+    }
   }catch(e){console.warn('addActionButtons:',e.message)}
 }
 
