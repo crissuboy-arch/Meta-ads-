@@ -379,7 +379,7 @@ const log=document.getElementById('log'),emptyState=document.getElementById('emp
       clearBtn=document.getElementById('clearBtn'),modelSelect=document.getElementById('modelSelect'),
       statusEl=document.getElementById('status'),statusText=document.getElementById('statusText');
 let messages=[],busy=false,models=[],currentModel=null,currentURLType='lp',
-    actionButtons=[],branding={},config={},P={},urlTypes=[];
+    actionButtons=[],branding={},config={},P={},urlTypes=[],currentSystemPrompt='';
 
 function setStatus(m,l){statusEl.className='status '+m;statusText.textContent=l}
 function autoResize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,100)+'px'}
@@ -420,7 +420,7 @@ function addActionButtons(target){
     for(const btn of actionButtons){
       const b=document.createElement('button');b.className='action-btn';
       b.innerHTML=btn.icon+' '+btn.label;
-      b.onclick=async()=>{if(P[btn.id])await sendChat(P[btn.id])};
+      b.onclick=async()=>{if(P[btn.id]){currentSystemPrompt=P[btn.id];await sendChat(btn.label)}};
       bar.appendChild(b)
     }
     if(target&&target.parentNode){
@@ -465,7 +465,8 @@ async function sendChat(text){
   setBusy(true);setStatus('busy','gerando');
   const b=addMessage('assistant',''),c=document.createElement('span');c.className='cursor';b.appendChild(c);let at='';
   try{
-    await streamChat(currentModel||modelSelect.value,messages,{onChunk:x=>{at+=x;b.textContent=at;b.appendChild(c);scrollToEnd()},onDone:()=>{}});
+    const apiMessages=currentSystemPrompt?[{role:'system',content:currentSystemPrompt},...messages]:messages;
+    await streamChat(currentModel||modelSelect.value,apiMessages,{onChunk:x=>{at+=x;b.textContent=at;b.appendChild(c);scrollToEnd()},onDone:()=>{}});
     c.remove();messages.push({role:'assistant',content:at});
     const cards=renderResultCards(at);
     if(cards){b.innerHTML=cards;b.parentElement.querySelector('.copy-btn')&&b.parentElement.removeChild(b.parentElement.querySelector('.copy-btn'));const cc=document.createElement('button');cc.className='copy-btn';cc.textContent='Copiar';cc.onclick=()=>{navigator.clipboard.writeText(at);cc.textContent='Copiado!';setTimeout(()=>cc.textContent='Copiar',2000)};b.parentElement.appendChild(cc)}
@@ -480,14 +481,14 @@ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventD
 
 document.querySelector('.app').addEventListener('click',async e=>{
   const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
-  if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p)await sendChat(p);return}
+  if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentSystemPrompt=p;await sendChat(btn.dataset.label||btn.dataset.id)}return}
   const id=btn.dataset.id;if(!id)return;
   if(id==='import-imagem'){document.getElementById('fileInput').click();return}
   if(id==='import-pdf'){document.getElementById('pdfInput').click();return}
   if(id==='import-screenshot'){document.getElementById('screenshotInput').click();return}
   const urlType=urlTypes.find(u=>id==='import-'+u.id);
   if(urlType){openURLModal(urlType.id);return}
-  const p=P[id];if(!p)return;await sendChat(p)
+  const p=P[id];if(!p)return;currentSystemPrompt=p;await sendChat(btn.dataset.label||id)
 });
 document.getElementById('fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handleImageUpload(f)});
 document.getElementById('pdfInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handlePDFUpload(f)});
@@ -497,7 +498,7 @@ document.getElementById('heroStart').addEventListener('click',()=>{document.quer
 document.getElementById('heroImport').addEventListener('click',()=>{const g=document.getElementById('importsGrid');if(g)g.scrollIntoView({behavior:'smooth'})});
 
 clearBtn.addEventListener('click',()=>{
-  messages=[];log.innerHTML='';const e=document.createElement('div');e.className='empty-state';e.id='emptyState';
+  messages=[];currentSystemPrompt='';log.innerHTML='';const e=document.createElement('div');e.className='empty-state';e.id='emptyState';
   e.innerHTML='<div class="glyph">&#x2728;</div><div class="title">Pronto para criar</div><div class="sub">Clique em uma ferramenta ou digite abaixo.</div>';
   log.appendChild(e);setStatus('online','conectado')
 });
@@ -526,7 +527,7 @@ function renderSidebar(cfg){
     for(const item of catItems){
       const btn=document.createElement('button');btn.className='side-item';
       if(item.id==='dashboard')btn.classList.add('active');
-      if(item.id){btn.dataset.id=item.id}
+      if(item.id){btn.dataset.id=item.id;btn.dataset.label=item.label}
       btn.innerHTML='<span class="ico">'+(item.icon||'')+'</span>'+item.label;
       nav.appendChild(btn)
     }
@@ -536,7 +537,7 @@ function renderSidebar(cfg){
 function renderTools(tools){
   const grid=document.getElementById('toolsGrid');grid.innerHTML='';
   for(const t of tools){
-    const btn=document.createElement('button');btn.className='t-card';btn.dataset.id=t.id;
+    const btn=document.createElement('button');btn.className='t-card';btn.dataset.id=t.id;btn.dataset.label=t.label;
     btn.innerHTML='<span class="ico">'+t.icon+'</span><span class="lbl">'+t.label+'</span><span class="desc">'+t.desc+'</span><span class="action">Abrir ferramenta &rarr;</span>';
     grid.appendChild(btn)
   }
@@ -554,7 +555,7 @@ function renderImports(imports){
 function renderNiches(niches){
   const grid=document.getElementById('nichesGrid');grid.innerHTML='';
   for(const n of niches){
-    const btn=document.createElement('button');btn.className='n-card';btn.dataset.id=n.id;
+    const btn=document.createElement('button');btn.className='n-card';btn.dataset.id=n.id;btn.dataset.label=n.label;
     btn.innerHTML='<span class="ico">'+n.icon+'</span><span class="lbl">'+n.label+'</span>';
     grid.appendChild(btn)
   }
