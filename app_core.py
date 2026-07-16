@@ -183,6 +183,17 @@ def create_app():
         except Exception as exc:
             yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
 
+    def _sse_response(stream_gen):
+        return StreamingResponse(
+            stream_gen,
+            media_type="text/event-stream",
+            headers={
+                "X-Accel-Buffering": "no",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+            },
+        )
+
     def _stream_analysis(user_prompt: str, model_id: str = None):
         if model_id is None:
             model_id = CONFIG.get("app_id", "pro")
@@ -199,7 +210,7 @@ def create_app():
             {"role": "user", "content": user_prompt},
         ]
 
-        return StreamingResponse(_sse_stream(client, underlying, messages, params), media_type="text/event-stream")
+        return _sse_response(_sse_stream(client, underlying, messages, params))
 
     def _detect_platform(url: str) -> str:
         for pattern, name in PLATFORM_PATTERNS:
@@ -325,7 +336,7 @@ def create_app():
         client, params = client_for(model)
         api_model = entry.get("underlying", model)
 
-        return StreamingResponse(_sse_stream(client, api_model, messages, params), media_type="text/event-stream")
+        return _sse_response(_sse_stream(client, api_model, messages, params))
 
     @app.post("/api/upload-image")
     async def upload_image(file: UploadFile = File(...)):
@@ -359,7 +370,7 @@ def create_app():
         ]
 
         vision_params = {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048}
-        return StreamingResponse(_sse_stream(vision_client, vision_model, messages, vision_params), media_type="text/event-stream")
+        return _sse_response(_sse_stream(vision_client, vision_model, messages, vision_params))
 
     @app.post("/api/upload-pdf")
     async def upload_pdf(file: UploadFile = File(...)):
@@ -428,7 +439,7 @@ def create_app():
         ]
 
         vision_params = {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048}
-        return StreamingResponse(_sse_stream(vision_client, vision_model, messages, vision_params), media_type="text/event-stream")
+        return _sse_response(_sse_stream(vision_client, vision_model, messages, vision_params))
 
     @app.post("/api/analyze-url")
     async def analyze_url(request: Request):

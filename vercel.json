@@ -4,7 +4,7 @@
       "maxDuration": 60
     }
   },
-  "routes": [
+  "rewrites": [
     { "source": "/(.*)", "destination": "/api/index" }
   ]
 }
