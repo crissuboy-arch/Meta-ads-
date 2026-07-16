@@ -412,17 +412,19 @@ function renderResultCards(text){
 }
 
 function addActionButtons(target){
-  if(!actionButtons.length)return;
-  const bar=document.createElement('div');bar.className='action-bar';
-  const title=document.createElement('div');title.className='action-bar-title';title.textContent='O que deseja fazer agora?';
-  bar.appendChild(title);
-  for(const btn of actionButtons){
-    const b=document.createElement('button');b.className='action-btn';
-    b.innerHTML=btn.icon+' '+btn.label;
-    b.onclick=async()=>{if(P[btn.id])await sendChat(P[btn.id])};
-    bar.appendChild(b)
-  }
-  target.parentNode.insertBefore(bar,target.nextSibling)
+  try{
+    if(!actionButtons.length||!target||!target.parentNode)return;
+    const bar=document.createElement('div');bar.className='action-bar';
+    const title=document.createElement('div');title.className='action-bar-title';title.textContent='O que deseja fazer agora?';
+    bar.appendChild(title);
+    for(const btn of actionButtons){
+      const b=document.createElement('button');b.className='action-btn';
+      b.innerHTML=btn.icon+' '+btn.label;
+      b.onclick=async()=>{if(P[btn.id])await sendChat(P[btn.id])};
+      bar.appendChild(b)
+    }
+    target.parentNode.insertBefore(bar,target.nextSibling)
+  }catch(e){console.warn('addActionButtons:',e.message)}
 }
 
 async function streamChat(model,msgs,h){
@@ -448,9 +450,10 @@ function addMessage(role,text,noCards){
     if(cardsHTML){b.innerHTML=cardsHTML}else{b.textContent=text}
   }else{b.textContent=text}
   w.appendChild(t);w.appendChild(b);
+  log.appendChild(w);
   if(role==='assistant'&&!noCards){const c=document.createElement('button');c.className='copy-btn';c.textContent='Copiar';c.onclick=()=>{navigator.clipboard.writeText(text);c.textContent='Copiado!';setTimeout(()=>{c.textContent='Copiar'},2000)};w.appendChild(c);if(!renderResultCards(text))addActionButtons(w)}
   else if(role==='assistant'){const c=document.createElement('button');c.className='copy-btn';c.textContent='Copiar';c.onclick=()=>{navigator.clipboard.writeText(text);c.textContent='Copiado!';setTimeout(()=>{c.textContent='Copiar'},2000)};w.appendChild(c)}
-  log.appendChild(w);scrollToEnd();return b
+  scrollToEnd();return b
 }
 
 async function sendChat(text){
