@@ -52,12 +52,30 @@ def _load_skills():
     skills = {}
     if not skills_dir.is_dir():
         return skills
-    for fpath in sorted(skills_dir.glob("*.md")):
-        model_id = fpath.stem
-        words = model_id.replace("-", " ").title().split()
-        label = " ".join(words) + " AI"
-        content = fpath.read_text(encoding="utf-8")
-        skills[model_id] = {"label": label, "content": content}
+
+    def _walk_and_load(path, prefix=""):
+        for entry in sorted(path.iterdir()):
+            if entry.is_file() and entry.suffix.lower() == ".md" and entry.stem == "SKILL":
+                parts = prefix.split("/") if prefix else []
+                model_id = "_".join(parts) if parts else entry.stem
+                if not model_id.strip():
+                    model_id = entry.parent.stem
+                content = entry.read_text(encoding="utf-8")
+                words = model_id.replace("_", " ").title().split()
+                label = " ".join(words) + " AI"
+                skills[model_id] = {"label": label, "content": content}
+            elif entry.is_file() and entry.suffix.lower() == ".md" and entry.stem != "SKILL":
+                if not prefix:
+                    model_id = entry.stem
+                    words = model_id.replace("-", " ").title().split()
+                    label = " ".join(words) + " AI"
+                    content = entry.read_text(encoding="utf-8")
+                    skills[model_id] = {"label": label, "content": content}
+            elif entry.is_dir():
+                new_prefix = prefix + "/" + entry.name if prefix else entry.name
+                _walk_and_load(entry, new_prefix)
+
+    _walk_and_load(skills_dir)
     return skills
 
 

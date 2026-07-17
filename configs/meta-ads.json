@@ -60,6 +60,7 @@
       {"label": "Otimiza\u00e7\u00e3o", "key": "otimizacao"},
       {"label": "Analytics", "key": "analytics"},
       {"label": "Automa\u00e7\u00f5es", "key": "automacoes"},
+      {"label": "Conhecimento", "key": "conhecimento"},
       {"label": "Especialistas", "key": "especialistas"}
     ],
     "items": {
@@ -91,6 +92,12 @@
       "automacoes": [
         {"id": "automacoes", "label": "Automa\u00e7\u00f5es", "icon": "\u2699\uFE0F"}
       ],
+      "conhecimento": [
+        {"id": "criar-app", "label": "Aplicativos", "icon": "\uD83D\uDCF1"},
+        {"id": "melhorar-ebook", "label": "Ebooks", "icon": "\uD83D\uDCD6"},
+        {"id": "pesquisa-mercado", "label": "Pesquisa de Mercado", "icon": "\uD83D\uDD0D"},
+        {"id": "analise-resultados", "label": "An\u00e1lise de Resultados", "icon": "\uD83D\uDCCA"}
+      ],
       "especialistas": [
         {"id": "especialista-meta", "label": "Meta Ads Expert", "icon": "\uD83D\uDCF1"},
         {"id": "especialista-google", "label": "Google Ads", "icon": "\uD83C\uDF10"},
@@ -106,7 +113,12 @@
     {"id": "criar-copy", "icon": "\u270D\uFE0F", "label": "Criar Copy", "desc": "Copies persuasivas com gatilhos mentais, prova social e CTAs fortes."},
     {"id": "criar-criativos", "icon": "\uD83C\uDFA8", "label": "Criar Criativos", "desc": "Criativos de alto impacto com headlines e descri\u00e7\u00f5es que convertem."},
     {"id": "auditoria", "icon": "\uD83D\uDD0D", "label": "Auditor de Campanhas", "desc": "Auditoria completa com nota 0-100, diagn\u00f3stico e plano de otimiza\u00e7\u00e3o."},
-    {"id": "escalar", "icon": "\uD83D\uDE80", "label": "Escalar Campanhas", "desc": "Estrat\u00e9gia de escala com aumento de budget e expans\u00e3o de p\u00fablicos."}
+    {"id": "escalar", "icon": "\uD83D\uDE80", "label": "Escalar Campanhas", "desc": "Estrat\u00e9gia de escala com aumento de budget e expans\u00e3o de p\u00fablicos."},
+    {"id": "criar-app", "icon": "\uD83D\uDCF1", "label": "Criar Aplicativo", "desc": "Estrat\u00e9gia de aquisi\u00e7\u00e3o para apps com campanhas de instala\u00e7\u00e3o e eventos in-app."},
+    {"id": "melhorar-ebook", "icon": "\uD83D\uDCD6", "label": "Melhorar Ebook", "desc": "Auditoria e otimiza\u00e7\u00e3o de ebooks para aumentar convers\u00e3o e valor percebido."},
+    {"id": "pesquisa-mercado", "icon": "\uD83D\uDD0D", "label": "Pesquisa de Mercado", "desc": "An\u00e1lise de concorr\u00eancia, tend\u00eancias e oportunidades no nicho."},
+    {"id": "google-ads", "icon": "\uD83C\uDF10", "label": "Google Ads", "desc": "Campanhas de pesquisa, display e v\u00eddeo no Google Ads."},
+    {"id": "analise-resultados", "icon": "\uD83D\uDCCA", "label": "An\u00e1lise de Resultados", "desc": "Leitura de m\u00e9tricas, diagn\u00f3stico e recomenda\u00e7\u00f5es baseadas em dados."}
   ],
   "imports": [
     {"id": "import-imagem", "icon": "\uD83D\uDCF7", "label": "Upload de Imagem"},
@@ -144,7 +156,10 @@
     {"id": "criar-lp", "label": "Criar Landing Page", "icon": "\uD83D\uDCE2"},
     {"id": "criar-app", "label": "Criar Aplicativo", "icon": "\uD83D\uDCF1"},
     {"id": "melhorar-ebook", "label": "Melhorar Ebook", "icon": "\uD83D\uDCD6"},
-    {"id": "auditoria", "label": "Auditoria Completa", "icon": "\uD83D\uDD0D"}
+    {"id": "auditoria", "label": "Auditoria Completa", "icon": "\uD83D\uDD0D"},
+    {"id": "pesquisa-mercado", "label": "Pesquisa de Mercado", "icon": "\uD83D\uDD0D"},
+    {"id": "google-ads", "label": "Google Ads", "icon": "\uD83C\uDF10"},
+    {"id": "analise-resultados", "label": "An\u00e1lise de Resultados", "icon": "\uD83D\uDCCA"}
   ],
   "uploads": {
     "image": true,
@@ -247,6 +262,11 @@
     "nicho-imobiliaria": "Voc\u00ea \u00e9 um consultor de Meta Ads para imobili\u00e1rias. Pergunte primeiro: Qual a cidade/bairro? Venda ou loca\u00e7\u00e3o? Qual o perfil de im\u00f3veis?",
     "nicho-automotivo": "Voc\u00ea \u00e9 um consultor de Meta Ads para automotivo. Pergunte primeiro: Qual o tipo de ve\u00edculo? Venda direta ou test drive? Qual a regi\u00e3o?",
     "nicho-ebook": "Voc\u00ea \u00e9 um consultor de Meta Ads para ebooks. Pergunte primeiro: Qual o tema? Qual o pre\u00e7o? J\u00e1 tem p\u00e1gina de vendas?",
-    "nicho-pv": "Voc\u00ea \u00e9 um consultor de Meta Ads para p\u00e1ginas de venda. Pergunte primeiro: Qual o produto? Qual o pre\u00e7o? J\u00e1 tem p\u00e1gina criada?"
+    "nicho-pv": "Voc\u00ea \u00e9 um consultor de Meta Ads para p\u00e1ginas de venda. Pergunte primeiro: Qual o produto? Qual o pre\u00e7o? J\u00e1 tem p\u00e1gina criada?",
+    "criar-app": "Voc\u00ea \u00e9 um especialista em aquisi\u00e7\u00e3o de usu\u00e1rios para aplicativos. Primeiro pergunte: Qual o tipo de app? Qual o modelo de receita? J\u00e1 tem eventos configurados no Meta? Qual o CPA aceit\u00e1vel por instala\u00e7\u00e3o? Aguarde as respostas antes de sugerir campanhas.",
+    "melhorar-ebook": "Voc\u00ea \u00e9 um consultor especializado em otimiza\u00e7\u00e3o de ebooks. Primeiro pergunte: Qual o tema do ebook? Qual o pre\u00e7o? J\u00e1 tem p\u00e1gina de vendas? Qual a taxa de convers\u00e3o atual? Aguarde antes de sugerir melhorias.",
+    "pesquisa-mercado": "Voc\u00ea \u00e9 um analista de pesquisa de mercado. Primeiro pergunte: Qual o nicho ou produto? Qual o p\u00fablico-alvo? Qual o pa\u00eds? J\u00e1 conhece os principais concorrentes? Aguarde as respostas antes de produzir an\u00e1lise.",
+    "google-ads": "Voc\u00ea \u00e9 um consultor de Google Ads. Primeiro pergunte: Qual o produto ou servi\u00e7o? Qual o objetivo (pesquisa, display, v\u00eddeo)? Qual o or\u00e7amento di\u00e1rio? Qual o pa\u00eds? Aguarde antes de sugerir estrutura.",
+    "analise-resultados": "Voc\u00ea \u00e9 um analista de m\u00e9tricas de marketing digital. Primeiro pergunte: Quais plataformas o usu\u00e1rio quer analisar? Quais m\u00e9tricas ele tem dispon\u00edveis? Qual o per\u00edodo da an\u00e1lise? Aguarde antes de gerar diagn\u00f3stico."
   }
 }
