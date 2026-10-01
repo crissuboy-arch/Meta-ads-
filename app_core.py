@@ -138,6 +138,18 @@ def _scrub_secrets(text: str) -> str:
     return out
 
 
+def _safe_model_id(value, fallback: str) -> str:
+    """Return `value` if it looks like a provider model ID (``vendor/model``).
+
+    Guards against a secret or other garbage landing in a *_MODEL setting:
+    a value that looks like an API key must never be sent as the model ID.
+    """
+    v = (value or "").strip()
+    if not v or v.startswith("sk-") or "/" not in v:
+        return fallback
+    return v
+
+
 def _load_skills():
     skills_dir = ROOT / "skills"
     skills = {}
@@ -383,8 +395,9 @@ def _build_registry(skills=None):
             "api": "openrouter",
             "api_key": openrouter_key,
             "params": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 4096},
-            "underlying": APP_MODELS.get("openrouter_text") or os.getenv(
-                "OPENROUTER_TEXT_MODEL", "meta-llama/llama-3.3-70b-instruct:free"
+            "underlying": _safe_model_id(
+                APP_MODELS.get("openrouter_text") or os.getenv("OPENROUTER_TEXT_MODEL"),
+                "qwen/qwen3.8-27b:free",
             ),
         }
         registry["openrouter/gemma-4-31b-vision-free"] = {
@@ -394,8 +407,9 @@ def _build_registry(skills=None):
             "api": "openrouter",
             "api_key": openrouter_key,
             "params": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048},
-            "underlying": APP_MODELS.get("openrouter_vision") or os.getenv(
-                "OPENROUTER_VISION_MODEL", "google/gemma-4-31b-it:free"
+            "underlying": _safe_model_id(
+                APP_MODELS.get("openrouter_vision") or os.getenv("OPENROUTER_VISION_MODEL"),
+                "google/gemma-4-31b-it:free",
             ),
         }
 
