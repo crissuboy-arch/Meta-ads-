@@ -462,6 +462,39 @@ def _build_registry(skills=None):
     return registry
 
 
+def _strip_vercel_prefix(asgi_app):
+    """ASGI wrapper: normalize paths mangled by Vercel's catch-all rewrite.
+
+    Behind `vercel.json`'s `/(.*) -> /api/index` rewrite, the function can
+    receive the rewritten path ("/api/index" or "/api/index/<real path>")
+    instead of the path the visitor asked for, so no FastAPI route matches
+    and even "/" answers 404 {"detail":"Not Found"}. Strip that prefix
+    before dispatching. Lives here (not in api/index.py) so EVERY entry
+    point (api/index.py, server.py) gets it, whichever one Vercel serves.
+    Normal paths pass through untouched, so local runs are unaffected.
+    """
+    prefixes = ("/api/index.py", "/api/index")
+
+    async def wrapped(scope, receive, send):
+        if scope.get("type") in ("http", "websocket"):
+            path = scope.get("path") or ""
+            for prefix in prefixes:
+                if path == prefix:
+                    scope = {**scope, "path": "/", "raw_path": b"/"}
+                    break
+                if path.startswith(prefix + "/"):
+                    stripped = path[len(prefix):]
+                    scope = {
+                        **scope,
+                        "path": stripped,
+                        "raw_path": stripped.encode("utf-8"),
+                    }
+                    break
+        await asgi_app(scope, receive, send)
+
+    return wrapped
+
+
 def create_app():
     skills = _load_skills()
     model_registry = _build_registry(skills)
@@ -908,4 +941,4 @@ def create_app():
         except Exception as exc:
             return JSONResponse({"error": str(exc)}, status_code=500)
 
-    return app
+    return _strip_vercel_prefix(app)
