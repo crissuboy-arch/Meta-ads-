@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import re
+import sys
 import tempfile
 import time
 import urllib.parse
@@ -148,6 +149,59 @@ def _safe_model_id(value, fallback: str) -> str:
     if not v or v.startswith("sk-") or "/" not in v:
         return fallback
     return v
+
+
+# ---------------------------------------------------------------------------
+# Free-model fallback chains (OpenRouter). Free models draw from a SHARED
+# upstream pool per model: when that pool is saturated the provider answers
+# 429 ("temporarily rate-limited upstream") even though the API key is fine.
+# Rolling the request over to the next free model turns that hard failure
+# into an invisible retry. Chains verified against the public OpenRouter
+# catalog on 2026-10-01 (all :free, big-context, text-capable; the vision
+# chain is image-capable). Override with OPENROUTER_TEXT_FALLBACK_MODELS /
+# OPENROUTER_VISION_FALLBACK_MODELS (comma-separated model IDs).
+# ---------------------------------------------------------------------------
+_OPENROUTER_TEXT_FALLBACKS = (
+    "google/gemma-4-31b-it:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "qwen/qwen3.8-27b:free",
+)
+_OPENROUTER_VISION_FALLBACKS = (
+    "google/gemma-4-26b-a4b-it:free",
+    "qwen/qwen3.8-27b:free",
+)
+
+
+def _fallback_chain(env_key: str, defaults, primary: str) -> list:
+    """Ordered fallback model IDs after `primary` (deduped, junk filtered)."""
+    raw = os.getenv(env_key, "")
+    ids = [p.strip() for p in raw.split(",")] if raw.strip() else list(defaults)
+    chain = []
+    for mid in ids:
+        mid = _safe_model_id(mid, "")
+        if mid and mid != primary and mid not in chain:
+            chain.append(mid)
+    return chain
+
+
+def _friendly_ai_error(exc: Exception, lang: str = "en") -> str:
+    """Short, localized, user-facing text for a provider failure.
+
+    Raw provider payloads (429 JSON blobs, SDK reprs) are technical noise
+    for end users — and can echo request details — so the client only ever
+    sees a calm "busy, try again" style message in its own language.
+    """
+    raw = str(exc) or ""
+    low = raw.lower()
+    if "429" in raw or "rate" in low or "temporarily" in low or "busy" in low:
+        return _msg(lang, "ai_busy")
+    if "401" in raw or "403" in raw or "auth" in low or "api key" in low:
+        return _msg(lang, "ai_auth_error")
+    if "timeout" in low or "timed out" in low:
+        return _msg(lang, "ai_timeout")
+    return _msg(lang, "ai_generic_error")
 
 
 def _load_skills():
@@ -388,6 +442,10 @@ def _build_registry(skills=None):
         registry.update(nvidia_models)
 
     if openrouter_key:
+        text_underlying = _safe_model_id(
+            APP_MODELS.get("openrouter_text") or os.getenv("OPENROUTER_TEXT_MODEL"),
+            "qwen/qwen3.8-27b:free",
+        )
         registry["openrouter/llama-3.3-70b-free"] = {
             "label": "Llama 3.3 70B (OpenRouter Free)",
             "provider": "OpenRouter",
@@ -395,11 +453,19 @@ def _build_registry(skills=None):
             "api": "openrouter",
             "api_key": openrouter_key,
             "params": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 4096},
-            "underlying": _safe_model_id(
-                APP_MODELS.get("openrouter_text") or os.getenv("OPENROUTER_TEXT_MODEL"),
-                "qwen/qwen3.8-27b:free",
+            "underlying": text_underlying,
+            # When the primary free model answers 429 (shared pool busy),
+            # the request rolls over to these instead of failing.
+            "fallback_models": _fallback_chain(
+                "OPENROUTER_TEXT_FALLBACK_MODELS",
+                _OPENROUTER_TEXT_FALLBACKS,
+                text_underlying,
             ),
         }
+        vision_underlying = _safe_model_id(
+            APP_MODELS.get("openrouter_vision") or os.getenv("OPENROUTER_VISION_MODEL"),
+            "google/gemma-4-31b-it:free",
+        )
         registry["openrouter/gemma-4-31b-vision-free"] = {
             "label": "Gemma 4 31B Vision (OpenRouter Free)",
             "provider": "OpenRouter",
@@ -407,9 +473,11 @@ def _build_registry(skills=None):
             "api": "openrouter",
             "api_key": openrouter_key,
             "params": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048},
-            "underlying": _safe_model_id(
-                APP_MODELS.get("openrouter_vision") or os.getenv("OPENROUTER_VISION_MODEL"),
-                "google/gemma-4-31b-it:free",
+            "underlying": vision_underlying,
+            "fallback_models": _fallback_chain(
+                "OPENROUTER_VISION_FALLBACK_MODELS",
+                _OPENROUTER_VISION_FALLBACKS,
+                vision_underlying,
             ),
         }
 
@@ -565,8 +633,32 @@ def create_app():
             clients[cache_key] = _provider_client(api, key)
         return clients[cache_key], params
 
-    def _vision_target():
-        """Pick the vision route: NVIDIA -> GPT-4o -> Claude -> OpenRouter free."""
+    def _targets_for(model_id):
+        """Ordered attempts for a registry model: primary, then fallbacks.
+
+        Each attempt is {client, model, params, retry}. Fallbacks reuse the
+        same provider client — they are just other model IDs on it — so a
+        busy free model (429) rolls over instead of failing the request.
+        """
+        entry = model_registry.get(model_id) or {}
+        client, params = client_for(model_id)
+        targets = [{
+            "client": client,
+            "model": entry.get("underlying", model_id),
+            "params": params,
+            "retry": bool(entry.get("retry")),
+        }]
+        for fb_model in entry.get("fallback_models") or []:
+            targets.append({
+                "client": client,
+                "model": fb_model,
+                "params": params,
+                "retry": False,
+            })
+        return targets
+
+    def _vision_targets():
+        """Ordered vision attempts: NVIDIA -> GPT-4o -> Claude -> OpenRouter free."""
         candidates = [
             APP_MODELS.get("vision", "meta/llama-3.2-90b-vision-instruct"),
             "openai/gpt-4o",
@@ -575,8 +667,14 @@ def create_app():
         ]
         for vision_id in candidates:
             if vision_id in model_registry:
-                client, _params = client_for(vision_id)
-                return client, model_registry[vision_id].get("underlying", vision_id)
+                return _targets_for(vision_id)
+        return []
+
+    def _vision_target():
+        targets = _vision_targets()
+        if targets:
+            first = targets[0]
+            return first["client"], first["model"]
         return None, None
 
     def _create_completion(client, model, messages, params, retry=False):
@@ -594,29 +692,56 @@ def create_app():
                     time.sleep(2 ** attempt)
         raise last_exc
 
-    def _sse_stream(client, model, messages, params, retry=False):
+    def _sse_stream(targets, messages, lang="en"):
+        """Stream a completion, rolling over to the next target on failure.
+
+        `targets` is an ordered list of {client, model, params, retry}
+        (a single bare target dict is also accepted). When a model fails
+        BEFORE producing any content — the common case: OpenRouter free
+        tier answers 429 while its shared upstream pool is busy — the next
+        model is tried and the user never sees the error. If every model
+        fails, the client gets one short localized message instead of the
+        raw provider payload.
+        """
+        if isinstance(targets, dict):
+            targets = [targets]
         start = time.monotonic()
-        first_token_at = None
-        try:
-            completion = _create_completion(client, model, messages, params, retry)
-            for chunk in completion:
-                if not getattr(chunk, "choices", None):
-                    continue
-                choice = chunk.choices[0]
-                delta = getattr(choice, "delta", None)
-                if delta is None:
-                    continue
-                content = getattr(delta, "content", None)
-                if content:
-                    if first_token_at is None:
-                        first_token_at = time.monotonic()
-                        ttft_ms = int((first_token_at - start) * 1000)
-                        yield f"event: meta\ndata: {json.dumps({'ttft_ms': ttft_ms})}\n\n"
-                    yield f"data: {json.dumps({'content': content})}\n\n"
-            total_ms = int((time.monotonic() - start) * 1000)
-            yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
-        except Exception as exc:
-            yield f"event: error\ndata: {json.dumps({'message': _scrub_secrets(str(exc))})}\n\n"
+        emitted = False
+        last_exc = None
+        for target in targets:
+            try:
+                completion = _create_completion(
+                    target["client"], target["model"], messages,
+                    target["params"], retry=target.get("retry", False),
+                )
+                for chunk in completion:
+                    if not getattr(chunk, "choices", None):
+                        continue
+                    choice = chunk.choices[0]
+                    delta = getattr(choice, "delta", None)
+                    if delta is None:
+                        continue
+                    content = getattr(delta, "content", None)
+                    if content:
+                        if not emitted:
+                            emitted = True
+                            ttft_ms = int((time.monotonic() - start) * 1000)
+                            yield f"event: meta\ndata: {json.dumps({'ttft_ms': ttft_ms, 'model': target['model']})}\n\n"
+                        yield f"data: {json.dumps({'content': content})}\n\n"
+                total_ms = int((time.monotonic() - start) * 1000)
+                yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
+                return
+            except Exception as exc:  # noqa: BLE001 - roll over unless already streaming
+                last_exc = exc
+                print(
+                    f"[ai] model {target.get('model')} failed: "
+                    f"{_scrub_secrets(str(exc))[:300]}",
+                    file=sys.stderr,
+                )
+                if emitted:
+                    break
+        if last_exc is not None:
+            yield f"event: error\ndata: {json.dumps({'message': _friendly_ai_error(last_exc, lang)})}\n\n"
 
     def _sse_response(stream_gen):
         return StreamingResponse(
@@ -645,15 +770,12 @@ def create_app():
                 return JSONResponse({"error": _msg(lang, "model_not_found")}, status_code=500)
             system_content = entry.get("skill_content", "")
 
-        underlying = entry.get("underlying", model_id)
-        client, params = client_for(model_id)
-
         messages = []
         if system_content:
             messages.append({"role": "system", "content": system_content})
         messages.append({"role": "user", "content": user_prompt})
 
-        return _sse_response(_sse_stream(client, underlying, messages, params, retry=bool(entry.get("retry"))))
+        return _sse_response(_sse_stream(_targets_for(model_id), messages, lang=lang))
 
     def _detect_platform(url: str) -> str:
         for pattern, name in PLATFORM_PATTERNS:
@@ -796,10 +918,7 @@ def create_app():
             if skill_content:
                 messages = [{"role": "system", "content": skill_content}] + messages
 
-        client, params = client_for(model)
-        api_model = entry.get("underlying", model)
-
-        return _sse_response(_sse_stream(client, api_model, messages, params, retry=bool(entry.get("retry"))))
+        return _sse_response(_sse_stream(_targets_for(model), messages, lang=lang))
 
     @app.post("/api/upload-image")
     async def upload_image(file: UploadFile = File(...), lang: str = "en"):
@@ -826,8 +945,8 @@ def create_app():
             max_chars=24000,
             lang=lang,
         )
-        vision_client, vision_model = _vision_target()
-        if vision_client is None:
+        vision_targets = _vision_targets()
+        if not vision_targets:
             raise HTTPException(503, _msg(lang, "vision_not_configured"))
 
         messages = [
@@ -838,8 +957,7 @@ def create_app():
             ]},
         ]
 
-        vision_params = {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048}
-        return _sse_response(_sse_stream(vision_client, vision_model, messages, vision_params))
+        return _sse_response(_sse_stream(vision_targets, messages, lang=lang))
 
     @app.post("/api/upload-pdf")
     async def upload_pdf(file: UploadFile = File(...), lang: str = "en"):
@@ -906,8 +1024,8 @@ def create_app():
         if not system_prompt:
             raise HTTPException(400, _msg(lang, "screenshot_unavailable"))
 
-        vision_client, vision_model = _vision_target()
-        if vision_client is None:
+        vision_targets = _vision_targets()
+        if not vision_targets:
             raise HTTPException(503, _msg(lang, "vision_not_configured"))
 
         messages = [
@@ -918,8 +1036,7 @@ def create_app():
             ]},
         ]
 
-        vision_params = {"temperature": 0.7, "top_p": 0.95, "max_tokens": 2048}
-        return _sse_response(_sse_stream(vision_client, vision_model, messages, vision_params))
+        return _sse_response(_sse_stream(vision_targets, messages, lang=lang))
 
     @app.post("/api/analyze-url")
     async def analyze_url(request: Request):
