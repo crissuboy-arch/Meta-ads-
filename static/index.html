@@ -263,6 +263,20 @@
   .utm-result-wrap{margin-top:4px}
   .utm-result{font-size:12.5px;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:10px 14px;word-break:break-all;line-height:1.6;min-height:20px}
   .utm-row{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+  .trk-status{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.03em;white-space:nowrap}
+  .trk-status.none{background:rgba(255,255,255,0.08);color:var(--text-dim)}
+  .trk-status.saved{background:rgba(245,158,11,0.18);color:#FBBF24}
+  .trk-status.ok{background:rgba(34,197,94,0.18);color:#4ADE80}
+  .trk-status.err{background:rgba(239,68,68,0.18);color:#FCA5A5}
+  .trk-block{margin-top:18px}
+  .trk-block-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .trk-code{font-size:11px;line-height:1.55;color:var(--text);background:rgba(0,0,0,0.35);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:12px 14px;overflow:auto;max-height:300px;white-space:pre;margin:0}
+  .trk-events{display:flex;flex-wrap:wrap;gap:14px}
+  .trk-events label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);cursor:pointer}
+  .trk-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+  .trk-table th{text-align:left;color:var(--text-faint);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--glass-border);text-transform:uppercase;font-size:9.5px;letter-spacing:.05em}
+  .trk-table td{color:var(--text-dim);padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .trk-sample-badge{display:inline-block;font-size:10px;font-weight:700;color:#FBBF24;background:rgba(245,158,11,0.15);padding:3px 10px;border-radius:999px;margin-bottom:10px;letter-spacing:.04em}
   .utm-msg{font-size:12px;color:#fca5a5}
   .utm-tips{margin:10px 0 0;padding-left:18px;font-size:12px;color:var(--text-dim);line-height:1.8}
 
@@ -314,6 +328,7 @@
     </section>
 
     <section class="sec" id="dashSection" style="display:none">
+      <div><span class="trk-sample-badge" id="dashSampleBadge" style="display:none"></span></div>
       <div class="dash-grid" id="dashGrid"></div>
     </section>
 
@@ -334,6 +349,50 @@
           <span class="utm-msg" id="utmMsg"></span>
         </div>
         <ul class="utm-tips" id="utmTips"></ul>
+      </div>
+    </section>
+
+    <section class="sec" id="trackingSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="trkTitle"></h3><span class="trk-status none" id="trkStatus"></span><span class="ln"></span><button class="btn-s" id="trkClose" type="button"></button></div>
+      <p class="utm-desc" id="trkDesc"></p>
+      <div class="utm-grid">
+        <div class="utm-field"><label id="trkPixelLabel"></label><input id="trkPixel" class="url-input" inputmode="numeric" autocomplete="off"><div class="utm-hint" id="trkPixelHint"></div></div>
+        <div class="utm-field"><label id="trkTokenLabel"></label><div style="display:flex;gap:6px"><input id="trkToken" type="password" class="url-input" autocomplete="off" style="flex:1"><button class="btn-s" id="trkTokenToggle" type="button"></button></div><div class="utm-hint" id="trkTokenHint"></div></div>
+        <div class="utm-field"><label id="trkTestCodeLabel"></label><input id="trkTestCode" class="url-input" autocomplete="off" placeholder="TEST12345"><div class="utm-hint" id="trkTestCodeHint"></div></div>
+        <div class="utm-field"><label id="trkDomainLabel"></label><input id="trkDomain" class="url-input" autocomplete="off"><div class="utm-hint" id="trkDomainHint"></div></div>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkEventsTitle"></div>
+        <div class="trk-events" id="trkEvents"></div>
+      </div>
+      <div class="utm-row">
+        <button class="btn-p" id="trkSave" type="button"></button>
+        <button class="btn-s" id="trkTest" type="button"></button>
+        <button class="btn-s" id="trkSendTest" type="button"></button>
+        <span class="utm-msg" id="trkMsg"></span>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkScriptTitle"></div>
+        <pre class="trk-code" id="trkScript"></pre>
+        <div class="utm-row"><button class="btn-p" id="trkCopyScript" type="button"></button><span class="utm-msg" id="trkScriptMsg"></span></div>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkInstallTitle"></div>
+        <ul class="utm-tips" id="trkInstall"></ul>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkWebhookTitle"></div>
+        <p class="utm-desc" id="trkWebhookDesc"></p>
+        <div class="utm-result" id="trkWebhookUrl"></div>
+        <div class="utm-row"><button class="btn-p" id="trkCopyWebhook" type="button"></button><span class="utm-msg" id="trkWebhookMsg"></span><button class="btn-s" id="trkOpenUtm" type="button"></button></div>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkSalesTitle"></div>
+        <div class="utm-row">
+          <select id="trkSalesFilter" class="app-select" style="width:auto"></select>
+          <button class="btn-s" id="trkSalesRefresh" type="button"></button>
+        </div>
+        <div id="trkSalesList"></div>
       </div>
     </section>
 
@@ -540,6 +599,7 @@ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventD
 
 document.querySelector('.app').addEventListener('click',async e=>{
   const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
+  if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'){openTrackingScreen();return}
   if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentModule=btn.dataset.id;currentSystemPrompt=p;syncUTMPanel();await sendChat(btn.dataset.label||btn.dataset.id)}return}
   const id=btn.dataset.id;if(!id)return;
   if(id==='import-imagem'){document.getElementById('fileInput').click();return}
@@ -554,6 +614,18 @@ document.getElementById('pdfInput').addEventListener('change',async e=>{const f=
 document.getElementById('screenshotInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;e.target.value='';await handleScreenshotUpload(f)});
 
 document.getElementById('heroStart').addEventListener('click',()=>{document.querySelector('.chat-panel').scrollIntoView({behavior:'smooth'});setTimeout(()=>input.focus(),400)});
+
+document.getElementById('trkClose').addEventListener('click',closeTrackingScreen);
+document.getElementById('trkSave').addEventListener('click',trkSave);
+document.getElementById('trkTest').addEventListener('click',trkTestConn);
+document.getElementById('trkSendTest').addEventListener('click',trkSendTest);
+document.getElementById('trkTokenToggle').addEventListener('click',()=>{const t=document.getElementById('trkToken');if(!t)return;t.type=t.type==='password'?'text':'password';const b=document.getElementById('trkTokenToggle');if(b)b.textContent=t.type==='password'?UI.trk_show:UI.trk_hide});
+document.getElementById('trkCopyScript').addEventListener('click',()=>{trkCopyTo(document.getElementById('trkScript').textContent,document.getElementById('trkScriptMsg'))});
+document.getElementById('trkCopyWebhook').addEventListener('click',()=>{trkCopyTo(document.getElementById('trkWebhookUrl').textContent,document.getElementById('trkWebhookMsg'))});
+document.getElementById('trkSalesRefresh').addEventListener('click',trkLoadSales);
+document.getElementById('trkSalesFilter').addEventListener('change',trkLoadSales);
+document.getElementById('trkPixel').addEventListener('input',trkRenderScript);
+document.getElementById('trkOpenUtm').addEventListener('click',()=>{closeTrackingScreen();const u=document.getElementById('utmSection');if(u)u.scrollIntoView({behavior:'smooth'})});
 document.getElementById('heroImport').addEventListener('click',()=>{const g=document.getElementById('importsGrid');if(g)g.scrollIntoView({behavior:'smooth'})});
 
 clearBtn.addEventListener('click',()=>{
@@ -653,6 +725,211 @@ async function copyUTM(){
 function syncUTMPanel(){
   const s=document.getElementById('utmSection');if(!s)return;
   s.style.display=(currentModule==='tracking'&&UTMF)?'block':'none';
+}
+
+// -------- Tracking screen (Meta Pixel + Conversions API + sales) --------
+const TRK_EVENT_NAMES=['PageView','ViewContent','AddToCart','InitiateCheckout','AddPaymentInfo','Purchase','Lead'];
+let trkSavedDisplays=null,trkSalesCache=[],trkConfigured=false,trkLastTestOk=null;
+
+function trkStoreGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function trkStoreSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function trkKey(){let k=trkStoreGet('metaAdsTrackingKey');if(!k||!/^[a-f0-9]{32,64}$/.test(k)){const a=new Uint8Array(16);crypto.getRandomValues(a);k=Array.from(a).map(function(b){return b.toString(16).padStart(2,'0')}).join('');trkStoreSet('metaAdsTrackingKey',k)}return k}
+function trkEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function trkSetStatus(kind){const el=document.getElementById('trkStatus');if(!el)return;el.className='trk-status '+kind;el.textContent=kind==='ok'?UI.trk_status_connected:kind==='saved'?UI.trk_status_saved:kind==='err'?UI.trk_status_error:UI.trk_status_none}
+function trkRefreshStatus(){if(!trkConfigured){trkSetStatus('none');return}if(trkLastTestOk===true)trkSetStatus('ok');else if(trkLastTestOk===false)trkSetStatus('err');else trkSetStatus('saved')}
+function trkSelectedEvents(){return TRK_EVENT_NAMES.filter(function(n){const c=document.getElementById('trkEv_'+n);return c&&c.checked})}
+function trkMsg(t,ok){const m=document.getElementById('trkMsg');if(!m)return;m.textContent=t||'';m.style.color=ok===false?'#fca5a5':''}
+
+function openTrackingScreen(){
+  const sec=document.getElementById('trackingSection');if(!sec)return;
+  if(!trkSavedDisplays){trkSavedDisplays={};const ids=['heroSection','dashSection','toolsSection','utmSection','importsSection','nichesSection'];for(const id of ids){const el=document.getElementById(id);if(el)trkSavedDisplays[id]=el.style.display}}
+  for(const id in trkSavedDisplays){const el=document.getElementById(id);if(el)el.style.display='none'}
+  sec.style.display='block';currentModule='tracking';
+  applyTrackingTexts();trkLoadDraft();trkLoadConfig();trkLoadSales();refreshTrackingDash();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeTrackingScreen(){
+  const sec=document.getElementById('trackingSection');if(sec)sec.style.display='none';
+  if(trkSavedDisplays){for(const id in trkSavedDisplays){const el=document.getElementById(id);if(el)el.style.display=trkSavedDisplays[id]}trkSavedDisplays=null}
+  const u=document.getElementById('utmSection');if(u)u.style.display=(currentModule==='tracking'&&UTMF)?'block':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function trkBuildEvents(){
+  const box=document.getElementById('trkEvents');if(!box)return;
+  const checked=trkSelectedEvents();
+  const use=checked.length?checked:['PageView','ViewContent','AddToCart','InitiateCheckout','Purchase'];
+  box.innerHTML='';
+  for(const n of TRK_EVENT_NAMES){
+    const l=document.createElement('label');
+    const c=document.createElement('input');c.type='checkbox';c.id='trkEv_'+n;c.checked=use.indexOf(n)>=0;
+    c.addEventListener('change',trkRenderScript);
+    l.appendChild(c);l.appendChild(document.createTextNode(' '+n));box.appendChild(l);
+  }
+}
+function trkRenderScript(){
+  const pre=document.getElementById('trkScript');if(!pre)return;
+  const pxEl=document.getElementById('trkPixel');
+  const px=((pxEl&&pxEl.value)||'').replace(/\D/g,'');
+  if(!/^\d{8,20}$/.test(px)){pre.textContent=UI.trk_script_empty||'';return}
+  const extra=trkSelectedEvents().filter(function(e){return e!=='PageView'});
+  const lines=extra.map(function(e){return "  fbq('track', '"+e+"', {}, {eventID: maepId('"+e.toLowerCase()+"')});"});
+  let s='<!-- Meta Pixel - Meta Ads Expert PRO -->\n<script>\n'+
+    "  function maepId(p){return (p||'ev')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,10)}\n"+
+    "  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');\n"+
+    "  fbq('init', '"+px+"');\n"+
+    "  fbq('track', 'PageView', {}, {eventID: maepId('pageview')});\n"+
+    '</scr'+'ipt>\n<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='+px+'&ev=PageView&noscript=1"/></noscript>';
+  if(lines.length)s+='\n\n<!-- '+(UI.trk_script_events_comment||'')+' -->\n<script>\n'+lines.join('\n')+'\n</scr'+'ipt>';
+  pre.textContent=s;
+}
+function trkRenderWebhook(){const el=document.getElementById('trkWebhookUrl');if(!el)return;el.textContent=location.origin+'/api/webhooks/sales/'+trkKey()}
+
+function applyTrackingTexts(){
+  const set=function(id,v){const el=document.getElementById(id);if(el)el.textContent=v||''};
+  set('trkTitle',UI.trk_title);set('trkClose',UI.trk_close);set('trkDesc',UI.trk_desc);
+  set('trkPixelLabel',UI.trk_pixel_label);set('trkPixelHint',UI.trk_pixel_hint);
+  set('trkTokenLabel',UI.trk_token_label);
+  const tt=document.getElementById('trkToken');const tgl=document.getElementById('trkTokenToggle');
+  if(tgl)tgl.textContent=(tt&&tt.type==='text')?UI.trk_hide:UI.trk_show;
+  set('trkTestCodeLabel',UI.trk_testcode_label);set('trkTestCodeHint',UI.trk_testcode_hint);
+  set('trkDomainLabel',UI.trk_domain_label);
+  const dm=document.getElementById('trkDomain');if(dm)dm.placeholder=UI.trk_domain_ph||'';
+  set('trkEventsTitle',UI.trk_events_title);
+  set('trkSave',UI.trk_save);set('trkTest',UI.trk_test_conn);set('trkSendTest',UI.trk_send_test);
+  set('trkScriptTitle',UI.trk_script_title);set('trkCopyScript',UI.trk_copy);
+  set('trkInstallTitle',UI.trk_install_title);
+  const inst=document.getElementById('trkInstall');
+  if(inst)inst.innerHTML=[UI.trk_install_html,UI.trk_install_shopify,UI.trk_install_wp].filter(Boolean).map(function(t){return '<li>'+t+'</li>'}).join('');
+  set('trkWebhookTitle',UI.trk_webhook_title);set('trkWebhookDesc',UI.trk_webhook_desc);
+  set('trkCopyWebhook',UI.trk_copy);set('trkOpenUtm',UI.trk_open_utm);
+  set('trkSalesTitle',UI.trk_sales_title);set('trkSalesRefresh',UI.trk_refresh);
+  const f=document.getElementById('trkSalesFilter');
+  if(f){const cur=f.value;f.innerHTML='';[['',UI.trk_filter_all],['pix',UI.trk_method_pix],['boleto',UI.trk_method_boleto],['card',UI.trk_method_card],['other',UI.trk_method_other]].forEach(function(p){const o=document.createElement('option');o.value=p[0];o.textContent=p[1]||p[0];f.appendChild(o)});f.value=cur||''}
+  const badge=document.getElementById('dashSampleBadge');if(badge)badge.textContent=UI.trk_sample_data||'';
+  trkBuildEvents();trkRenderScript();trkRenderWebhook();trkRenderSales();trkRefreshStatus();
+}
+
+function trkLoadDraft(){
+  try{const d=JSON.parse(trkStoreGet('metaAdsTrackingDraft')||'null');if(!d)return;
+    const px=document.getElementById('trkPixel');if(px&&!px.value&&d.pixel_id)px.value=d.pixel_id;
+    const dm=document.getElementById('trkDomain');if(dm&&!dm.value&&d.domain)dm.value=d.domain;
+    const tc=document.getElementById('trkTestCode');if(tc&&!tc.value&&d.test_code)tc.value=d.test_code;
+  }catch(e){}
+}
+async function trkLoadConfig(){
+  try{
+    const r=await fetch('/api/tracking/config?key='+encodeURIComponent(trkKey()));
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    trkConfigured=!!d.configured;
+    trkLastTestOk=d.last_test_ok===true?true:d.last_test_ok===false?false:null;
+    if(d.configured){
+      const px=document.getElementById('trkPixel');if(px&&d.pixel_id)px.value=d.pixel_id;
+      const dm=document.getElementById('trkDomain');if(dm)dm.value=d.domain||'';
+      const tc=document.getElementById('trkTestCode');if(tc)tc.value=d.test_code||'';
+      if(d.events&&d.events.length){for(const n of TRK_EVENT_NAMES){const c=document.getElementById('trkEv_'+n);if(c)c.checked=d.events.indexOf(n)>=0}trkRenderScript()}
+    }
+    const hint=document.getElementById('trkTokenHint');if(hint)hint.textContent=d.has_token?UI.trk_token_saved:UI.trk_token_hint;
+  }catch(e){}
+  trkRefreshStatus();
+}
+async function trkSave(){
+  const pxEl=document.getElementById('trkPixel');
+  const px=((pxEl&&pxEl.value)||'').replace(/\D/g,'');
+  if(!/^\d{8,20}$/.test(px)){trkMsg(UI.trk_pixel_invalid,false);if(pxEl)pxEl.focus();return}
+  pxEl.value=px;
+  const payload={key:trkKey(),pixel_id:px,token:(document.getElementById('trkToken').value||''),test_code:document.getElementById('trkTestCode').value.trim(),domain:document.getElementById('trkDomain').value.trim(),events:trkSelectedEvents()};
+  trkMsg(UI.trk_sending);
+  try{
+    const r=await fetch('/api/tracking/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    trkConfigured=true;
+    document.getElementById('trkToken').value='';
+    const hint=document.getElementById('trkTokenHint');if(hint)hint.textContent=d.has_token?UI.trk_token_saved:UI.trk_token_hint;
+    trkStoreSet('metaAdsTrackingDraft',JSON.stringify({pixel_id:px,domain:payload.domain,test_code:payload.test_code,events:payload.events}));
+    trkMsg(UI.trk_saved_ok,true);trkRefreshStatus();trkRenderScript();trkLoadSales();refreshTrackingDash();
+  }catch(e){trkMsg(UI.trk_send_fail,false)}
+}
+async function trkPost(path){
+  const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:trkKey()})});
+  let d={};try{d=await r.json()}catch(e){}
+  return{ok:r.ok,d:d};
+}
+async function trkTestConn(){
+  if(!trkConfigured){trkMsg(UI.trk_not_configured,false);return}
+  trkMsg(UI.trk_testing);
+  try{
+    const res=await trkPost('/api/tracking/test');
+    if(res.ok&&res.d.ok){trkLastTestOk=true;trkMsg(UI.trk_test_ok,true)}
+    else{trkLastTestOk=false;trkMsg(UI.trk_test_fail,false)}
+  }catch(e){trkLastTestOk=false;trkMsg(UI.trk_test_fail,false)}
+  trkRefreshStatus();
+}
+async function trkSendTest(){
+  if(!trkConfigured){trkMsg(UI.trk_not_configured,false);return}
+  trkMsg(UI.trk_sending);
+  try{
+    const res=await trkPost('/api/tracking/test-event');
+    if(res.ok&&res.d.ok)trkMsg(UI.trk_sent_ok,true);
+    else if(res.d&&(res.d.detail==='test_code_required'))trkMsg(UI.trk_testcode_required,false);
+    else trkMsg(UI.trk_send_fail,false);
+  }catch(e){trkMsg(UI.trk_send_fail,false)}
+}
+
+function trkFmtMoney(amount,currency){
+  try{return new Intl.NumberFormat(HTML_LANG_MAP[LANG]||'en-US',{style:'currency',currency:currency||'USD'}).format(amount||0)}
+  catch(e){return (currency||'')+' '+(amount||0)}
+}
+function trkRenderSales(){
+  const box=document.getElementById('trkSalesList');if(!box)return;
+  if(!trkSalesCache.length){box.innerHTML='<p class="utm-desc">'+trkEsc(UI.trk_no_sales)+'</p>';return}
+  const rows=trkSalesCache.map(function(s){
+    const dt=new Date((s.ts||0)*1000).toLocaleString(HTML_LANG_MAP[LANG]||'en-US');
+    const m=s.method==='pix'?UI.trk_method_pix:s.method==='boleto'?UI.trk_method_boleto:s.method==='card'?UI.trk_method_card:UI.trk_method_other;
+    const st=s.status==='paid'?UI.trk_paid:s.status==='refunded'?UI.trk_refunded:UI.trk_pending_st;
+    const capi=s.capi_event?(trkEsc(s.capi_event)+': '+(s.capi_status==='sent'?UI.trk_capi_sent:UI.trk_capi_error)):'—';
+    return '<tr><td>'+trkEsc(dt)+'</td><td>'+trkEsc(trkFmtMoney(s.amount,s.currency))+'</td><td>'+trkEsc(m)+'</td><td>'+trkEsc(st)+'</td><td>'+trkEsc(s.utm_campaign||'—')+'</td><td>'+capi+'</td></tr>';
+  }).join('');
+  box.innerHTML='<table class="trk-table"><thead><tr><th>'+trkEsc(UI.trk_col_date)+'</th><th>'+trkEsc(UI.trk_col_value)+'</th><th>'+trkEsc(UI.trk_col_method)+'</th><th>'+trkEsc(UI.trk_col_status)+'</th><th>'+trkEsc(UI.trk_col_campaign)+'</th><th>'+trkEsc(UI.trk_col_capi)+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+async function trkLoadSales(){
+  try{
+    const f=document.getElementById('trkSalesFilter');const m=f?f.value:'';
+    const r=await fetch('/api/sales?key='+encodeURIComponent(trkKey())+(m?'&method='+encodeURIComponent(m):''));
+    if(!r.ok)throw 0;
+    const d=await r.json();trkSalesCache=d.sales||[];
+  }catch(e){trkSalesCache=[]}
+  trkRenderSales();
+}
+async function refreshTrackingDash(){
+  const badge=document.getElementById('dashSampleBadge');
+  let sales=[];
+  try{
+    const k=trkStoreGet('metaAdsTrackingKey');
+    if(k){const r=await fetch('/api/sales?key='+encodeURIComponent(k));if(r.ok){const d=await r.json();sales=d.sales||[]}}
+  }catch(e){}
+  const paid=sales.filter(function(s){return s.status==='paid'});
+  if(!paid.length){if(badge)badge.style.display='inline-block';return}
+  if(badge)badge.style.display='none';
+  const grid=document.getElementById('dashGrid');if(!grid)return;
+  const cur=paid[0].currency||'BRL';
+  const rev=paid.reduce(function(a,s){return a+(s.amount||0)},0);
+  const avg=paid.length?rev/paid.length:0;
+  const pend=sales.filter(function(s){return s.status==='pending'}).length;
+  const cards=[[UI.trk_m_revenue,trkFmtMoney(rev,cur),'gold'],[UI.trk_m_conversions,String(paid.length),'green'],[UI.trk_m_avg_ticket,trkFmtMoney(avg,cur),''],[UI.trk_m_pending,String(pend),'']];
+  grid.innerHTML='';
+  for(const cd of cards){
+    const c=document.createElement('div');c.className='dash-card';
+    c.innerHTML='<div class="d-top"><span class="d-lbl">'+trkEsc(cd[0])+'</span></div><div class="d-val '+cd[2]+'">'+trkEsc(cd[1])+'</div><div class="d-bar">'+'<span></span>'.repeat(8)+'</div>';
+    grid.appendChild(c);
+  }
+}
+async function trkCopyTo(text,msgEl){
+  try{await navigator.clipboard.writeText(text)}
+  catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(x){}ta.remove()}
+  if(msgEl)msgEl.textContent=UI.trk_copied||'';
 }
 
 function renderImports(imports){
@@ -937,6 +1214,8 @@ function applyConfig(cfg){
   renderSidebar(cfg);
   renderHero(cfg.hero||{});
   renderDashboardMetrics(cfg.dashboard_metrics||[]);
+  applyTrackingTexts();
+  refreshTrackingDash();
 
   document.getElementById('toolsSection').style.display=(cfg.tools&&cfg.tools.length)?'block':'none';
   if(cfg.tools&&cfg.tools.length)renderTools(cfg.tools);

@@ -1,11 +1,14 @@
 import base64
+import hashlib
 import json
 import os
 import re
+import secrets
 import sys
 import tempfile
 import time
 import urllib.parse
+import uuid
 from pathlib import Path
 
 from config import (
@@ -608,6 +611,244 @@ def _strip_vercel_prefix(asgi_app):
     return wrapped
 
 
+# ---------------------------------------------------------------------------
+# Tracking (Meta Pixel + Conversions API) — storage, webhook sales, CAPI.
+#
+# Config and sales are kept server-side, keyed by an unguessable per-user
+# key that also sits in the webhook URL the user pastes into their checkout.
+# Locally this is a JSON file under data/; on serverless (VERCEL) it falls
+# back to /tmp, which is ephemeral — durable storage needs a KV/DB (phase 2).
+# The CAPI token lives ONLY server-side: it is never returned to the
+# browser, never put in a URL we generate, and never logged (all error
+# paths scrub secrets via _scrub_secrets).
+# ---------------------------------------------------------------------------
+_GRAPH_BASE = os.getenv("META_GRAPH_BASE", "https://graph.facebook.com/v21.0")
+_TRK_KEY_RE = re.compile(r"^[a-f0-9]{32,64}$")
+_TRK_PIXEL_RE = re.compile(r"^\d{8,20}$")
+_TRK_EVENTS = ["PageView", "ViewContent", "AddToCart", "InitiateCheckout",
+               "AddPaymentInfo", "Purchase", "Lead"]
+
+
+def _trk_data_dir() -> Path:
+    env = os.getenv("META_ADS_DATA_DIR")
+    if env:
+        p = Path(env)
+    elif os.getenv("VERCEL"):
+        p = Path("/tmp/meta-ads-data")
+    else:
+        p = ROOT / "data"
+    try:
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+    except Exception:
+        p = Path(tempfile.gettempdir()) / "meta-ads-data"
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+
+def _trk_load() -> dict:
+    try:
+        return json.loads((_trk_data_dir() / "tracking_store.json").read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _trk_save_all(data: dict) -> None:
+    path = _trk_data_dir() / "tracking_store.json"
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
+def _trk_clean(value, maxlen=200):
+    if value is None:
+        return ""
+    s = "".join(ch for ch in str(value) if ch.isprintable() or ch == " ")
+    return s.strip()[:maxlen]
+
+
+def _trk_amount(value):
+    try:
+        f = float(str(value).replace(" ", "").replace(",", "."))
+    except Exception:
+        return None
+    if f != f or f in (float("inf"), float("-inf")) or f < 0 or f > 100_000_000:
+        return None
+    return round(f, 2)
+
+
+def _trk_hash(value, kind):
+    """SHA-256 of normalized PII, per Meta's Conversions API requirements."""
+    if not value:
+        return None
+    v = str(value).strip().lower()
+    if kind == "ph":
+        v = re.sub(r"\D", "", v)
+    if kind == "fn":
+        v = v.split(" ")[0]
+    if not v:
+        return None
+    return hashlib.sha256(v.encode("utf-8")).hexdigest()
+
+
+def _trk_method(raw):
+    s = _trk_clean(raw, 60).lower()
+    if "pix" in s:
+        return "pix"
+    if "billet" in s or "boleto" in s:
+        return "boleto"
+    if "card" in s or "credit" in s or "cart" in s or "credito" in s or "crédito" in s:
+        return "card"
+    return "other"
+
+
+def _trk_status(raw):
+    s = _trk_clean(raw, 80).lower()
+    if any(t in s for t in ("refund", "chargeback", "cancel", "estorn")):
+        return "refunded"
+    if any(t in s for t in ("paid", "approved", "complete", "succeeded", "pago", "aprovad", "confirmed")):
+        return "paid"
+    return "pending"
+
+
+def _trk_utms(*dicts):
+    out = {}
+    for d in dicts:
+        if not isinstance(d, dict):
+            continue
+        for k in ("utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbp", "fbc"):
+            if not out.get(k) and d.get(k):
+                out[k] = _trk_clean(d.get(k), 200)
+    return out
+
+
+def _trk_extract_sale(body):
+    """Best-effort normalization of checkout webhooks (Hotmart, Kiwify,
+    Stripe, generic). Returns only non-PII fields plus the raw PII values
+    under _pii (used once for the CAPI send, never persisted)."""
+    if not isinstance(body, dict):
+        return None
+    data = body.get("data") if isinstance(body.get("data"), dict) else {}
+    purchase = data.get("purchase") if isinstance(data.get("purchase"), dict) else {}
+    buyer = data.get("buyer") if isinstance(data.get("buyer"), dict) else {}
+    price = purchase.get("price") if isinstance(purchase.get("price"), dict) else {}
+    payment = purchase.get("payment") if isinstance(purchase.get("payment"), dict) else {}
+    obj = data.get("object") if isinstance(data.get("object"), dict) else {}
+    cust = obj.get("customer_details") if isinstance(obj.get("customer_details"), dict) else {}
+    utms = _trk_utms(body, data, purchase, obj,
+                     body.get("metadata") if isinstance(body.get("metadata"), dict) else {},
+                     obj.get("metadata") if isinstance(obj.get("metadata"), dict) else {})
+    base = {"utm_source": utms.get("utm_source", ""), "utm_medium": utms.get("utm_medium", ""),
+            "utm_campaign": utms.get("utm_campaign", ""), "utm_term": utms.get("utm_term", ""),
+            "utm_content": utms.get("utm_content", ""),
+            "_pii": {"fbp": utms.get("fbp"), "fbc": utms.get("fbc")}}
+    if purchase:  # Hotmart v2
+        base.update(platform="hotmart", amount=_trk_amount(price.get("value")),
+                    currency=_trk_clean(price.get("currency_code"), 3).upper() or "BRL",
+                    method=_trk_method(payment.get("type")),
+                    status=_trk_status(purchase.get("status") or body.get("event")))
+        base["_pii"].update(email=buyer.get("email"), name=buyer.get("name"),
+                            phone=buyer.get("checkout_phone") or buyer.get("phone"))
+        return base
+    if obj and (body.get("type") or "").startswith("checkout.session"):  # Stripe
+        cents = obj.get("amount_total")
+        base.update(platform="stripe",
+                    amount=(round(cents / 100, 2) if isinstance(cents, (int, float)) else _trk_amount(cents)),
+                    currency=_trk_clean(obj.get("currency"), 3).upper() or "USD",
+                    method=_trk_method(" ".join(obj.get("payment_method_types") or [])),
+                    status="paid" if obj.get("payment_status") == "paid" else "pending")
+        base["_pii"].update(email=cust.get("email"), name=cust.get("name"), phone=cust.get("phone"))
+        return base
+    if body.get("order_status") or body.get("payment_method"):  # Kiwify-like
+        base.update(platform="kiwify",
+                    amount=_trk_amount(body.get("order_amount") or body.get("amount") or body.get("value")),
+                    currency=_trk_clean(body.get("currency"), 3).upper() or "BRL",
+                    method=_trk_method(body.get("payment_method")),
+                    status=_trk_status(body.get("order_status") or body.get("status")))
+        base["_pii"].update(email=body.get("email"), name=body.get("name"), phone=body.get("phone"))
+        return base
+    # Generic flat payload
+    base.update(platform="generic",
+                amount=_trk_amount(body.get("amount") or body.get("value") or body.get("price")),
+                currency=_trk_clean(body.get("currency"), 3).upper() or "BRL",
+                method=_trk_method(body.get("method") or body.get("payment_method")),
+                status=_trk_status(body.get("status") or body.get("event")))
+    base["_pii"].update(email=body.get("email"), name=body.get("name"), phone=body.get("phone"))
+    return base
+
+
+def _trk_sale_event(status, method):
+    if status == "paid":
+        return "Purchase"
+    if status == "pending":
+        return "AddPaymentInfo" if method == "boleto" else "InitiateCheckout"
+    return None
+
+
+def _capi_send(cfg, event_name, event_id, value=None, currency=None, pii=None, test_code=None, utms=None):
+    """Send one event to the Conversions API. Returns (ok, short_detail).
+
+    The token travels in the POST body only; failures return short codes,
+    never provider payloads, and stderr logging is secret-scrubbed."""
+    pixel = cfg.get("pixel_id")
+    token = cfg.get("token")
+    if not pixel or not token:
+        return False, "not_configured"
+    if _requests is None:
+        return False, "no_http_client"
+    pii = pii or {}
+    user_data = {}
+    for field, kind in (("email", "em"), ("phone", "ph"), ("name", "fn")):
+        h = _trk_hash(pii.get(field), kind)
+        if h:
+            user_data[kind] = [h]
+    if pii.get("fbp"):
+        user_data["fbp"] = pii["fbp"]
+    if pii.get("fbc"):
+        user_data["fbc"] = pii["fbc"]
+    event = {"event_name": event_name, "event_time": int(time.time()),
+             "event_id": event_id, "action_source": "system_generated",
+             "user_data": user_data}
+    custom = {}
+    if value is not None:
+        custom["value"] = value
+    if currency:
+        custom["currency"] = currency
+    for k, v in (utms or {}).items():
+        if v:
+            custom[k] = v
+    if custom:
+        event["custom_data"] = custom
+    payload = {"data": [event], "access_token": token}
+    if test_code:
+        payload["test_event_code"] = test_code
+    try:
+        r = _requests.post(f"{_GRAPH_BASE}/{pixel}/events", json=payload, timeout=15)
+        if r.status_code == 200:
+            return True, "sent"
+        return False, f"meta_{r.status_code}"
+    except Exception as exc:
+        print(f"[tracking] capi send error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
+        return False, "network_error"
+
+
+def _capi_test(cfg):
+    """Validate pixel + token against the Graph API. Returns (ok, detail)."""
+    pixel = cfg.get("pixel_id")
+    token = cfg.get("token")
+    if not pixel or not token:
+        return False, "not_configured"
+    if _requests is None:
+        return False, "no_http_client"
+    try:
+        r = _requests.get(f"{_GRAPH_BASE}/{pixel}",
+                          params={"fields": "id,name", "access_token": token}, timeout=15)
+        return (r.status_code == 200), ("ok" if r.status_code == 200 else f"meta_{r.status_code}")
+    except Exception as exc:
+        print(f"[tracking] capi test error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
+        return False, "network_error"
+
+
 def create_app():
     skills = _load_skills()
     model_registry = _build_registry(skills)
@@ -1102,5 +1343,144 @@ def create_app():
             })
         except Exception as exc:
             return JSONResponse({"error": str(exc)}, status_code=500)
+
+    # ----------------------------- Tracking -----------------------------
+    def _trk_record(key):
+        return _trk_load().get(key)
+
+    def _trk_public_view(rec):
+        if not rec or not rec.get("config"):
+            return {"configured": False, "has_token": False}
+        cfg = rec["config"]
+        return {
+            "configured": True,
+            "pixel_id": cfg.get("pixel_id", ""),
+            "domain": cfg.get("domain", ""),
+            "test_code": cfg.get("test_code", ""),
+            "events": cfg.get("events", []),
+            "has_token": bool(cfg.get("token")),
+            "last_test_ok": rec.get("last_test_ok"),
+        }
+
+    @app.post("/api/tracking/config")
+    async def tracking_save_config(request: Request):
+        body = await request.json()
+        key = _trk_clean(body.get("key"), 64).lower()
+        if not _TRK_KEY_RE.match(key):
+            raise HTTPException(400, "invalid_key")
+        pixel = re.sub(r"\D", "", _trk_clean(body.get("pixel_id"), 32))
+        if not _TRK_PIXEL_RE.match(pixel):
+            raise HTTPException(400, "invalid_pixel")
+        domain = _trk_clean(body.get("domain"), 120).lower()
+        domain = re.sub(r"^https?://", "", domain).split("/")[0]
+        if domain and not re.match(r"^[a-z0-9.-]+\.[a-z]{2,}$", domain):
+            raise HTTPException(400, "invalid_domain")
+        events = [e for e in (body.get("events") or []) if e in _TRK_EVENTS] or ["PageView"]
+        store = _trk_load()
+        rec = store.get(key) or {"config": {}, "sales": []}
+        cfg = rec.get("config") or {}
+        token_in = str(body.get("token") or "").strip()
+        if token_in:
+            cfg["token"] = token_in[:512]
+        cfg.update({"pixel_id": pixel, "domain": domain,
+                    "test_code": _trk_clean(body.get("test_code"), 64).upper(),
+                    "events": events})
+        rec["config"] = cfg
+        store[key] = rec
+        _trk_save_all(store)
+        return {"ok": True, **_trk_public_view(rec)}
+
+    @app.get("/api/tracking/config")
+    async def tracking_get_config(key: str = ""):
+        key = _trk_clean(key, 64).lower()
+        if not _TRK_KEY_RE.match(key):
+            return {"configured": False, "has_token": False}
+        return _trk_public_view(_trk_record(key))
+
+    @app.post("/api/tracking/test")
+    async def tracking_test(request: Request):
+        body = await request.json()
+        key = _trk_clean(body.get("key"), 64).lower()
+        rec = _trk_record(key) if _TRK_KEY_RE.match(key) else None
+        if not rec or not rec.get("config"):
+            raise HTTPException(400, "not_configured")
+        ok, detail = _capi_test(rec["config"])
+        store = _trk_load()
+        if key in store:
+            store[key]["last_test_ok"] = ok
+            _trk_save_all(store)
+        return {"ok": ok, "detail": detail}
+
+    @app.post("/api/tracking/test-event")
+    async def tracking_test_event(request: Request):
+        body = await request.json()
+        key = _trk_clean(body.get("key"), 64).lower()
+        rec = _trk_record(key) if _TRK_KEY_RE.match(key) else None
+        if not rec or not rec.get("config"):
+            raise HTTPException(400, "not_configured")
+        cfg = rec["config"]
+        if not cfg.get("test_code"):
+            raise HTTPException(400, "test_code_required")
+        event_id = "test-" + uuid.uuid4().hex[:24]
+        ok, detail = _capi_send(cfg, "PageView", event_id,
+                                pii={"email": "test@example.com", "name": "Test"},
+                                test_code=cfg["test_code"])
+        return {"ok": ok, "detail": detail, "event_id": event_id}
+
+    @app.post("/api/webhooks/sales/{key}")
+    async def tracking_sales_webhook(key: str, request: Request):
+        key = _trk_clean(key, 64).lower()
+        if not _TRK_KEY_RE.match(key):
+            raise HTTPException(404, "not_found")
+        raw = await request.body()
+        if len(raw) > 262144:
+            raise HTTPException(413, "payload_too_large")
+        try:
+            body = json.loads(raw.decode("utf-8", "replace"))
+        except Exception:
+            raise HTTPException(400, "invalid_json")
+        sale = _trk_extract_sale(body)
+        if not sale or sale.get("amount") is None:
+            raise HTTPException(400, "unrecognized_payload")
+        store = _trk_load()
+        rec = store.get(key) or {"config": {}, "sales": []}
+        cfg = rec.get("config") or {}
+        event_name = _trk_sale_event(sale["status"], sale["method"])
+        capi_status = "skipped"
+        event_id = "sale-" + uuid.uuid4().hex[:24]
+        if event_name and cfg.get("pixel_id") and cfg.get("token"):
+            ok, detail = _capi_send(
+                cfg, event_name, event_id, value=sale["amount"], currency=sale["currency"],
+                pii=sale.get("_pii") or {},
+                utms={k: sale.get(k) for k in ("utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content")})
+            capi_status = "sent" if ok else f"error:{detail}"
+        elif event_name:
+            capi_status = "no_credentials"
+        record = {
+            "id": event_id, "ts": int(time.time()), "platform": sale["platform"],
+            "method": sale["method"], "status": sale["status"],
+            "amount": sale["amount"], "currency": sale["currency"],
+            "utm_source": sale.get("utm_source", ""), "utm_medium": sale.get("utm_medium", ""),
+            "utm_campaign": sale.get("utm_campaign", ""), "utm_term": sale.get("utm_term", ""),
+            "utm_content": sale.get("utm_content", ""),
+            "has_fbp": bool((sale.get("_pii") or {}).get("fbp")),
+            "has_fbc": bool((sale.get("_pii") or {}).get("fbc")),
+            "capi_event": event_name, "capi_status": capi_status, "capi_event_id": event_id,
+        }
+        rec.setdefault("sales", []).append(record)
+        rec["sales"] = rec["sales"][-500:]
+        store[key] = rec
+        _trk_save_all(store)
+        return {"ok": True, "sale_id": event_id, "capi_event": event_name, "capi_status": capi_status}
+
+    @app.get("/api/sales")
+    async def tracking_list_sales(key: str = "", method: str = ""):
+        key = _trk_clean(key, 64).lower()
+        rec = _trk_record(key) if _TRK_KEY_RE.match(key) else None
+        sales = list((rec or {}).get("sales") or [])
+        if method in ("pix", "boleto", "card", "other"):
+            sales = [s for s in sales if s.get("method") == method]
+        sales.sort(key=lambda s: s.get("ts", 0), reverse=True)
+        return {"sales": sales[:200], "total": len(sales)}
 
     return _strip_vercel_prefix(app)
