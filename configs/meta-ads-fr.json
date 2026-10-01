@@ -3,12 +3,12 @@
   "branding": {
     "app_name": "Meta Ads Expert PRO",
     "short_name": "Expert PRO",
-    "logo_text": "ForgeHub AI",
-    "tagline": "ForgeHub AI",
-    "company": "ForgeHub AI",
-    "copyright": "ForgeHub AI",
-    "support_email": "support@forgehub.ai",
-    "site": "https://forgehub.ai",
+    "logo_text": "Meta Ads Expert PRO",
+    "tagline": "Meta Ads Expert PRO",
+    "company": "Meta Ads Expert PRO",
+    "copyright": "Meta Ads Expert PRO",
+    "support_email": "support@metaadsexpert.pro",
+    "site": "https://metaadsexpert.pro",
     "plan_name": "Forfait professionnel",
     "plan_badge": "PRO",
     "favicon_emoji": "⚡",
@@ -1409,5 +1409,5 @@
     "overall_score": "Score Global",
     "analyzing_page": "Analyse de la page..."
   },
-  "base_system": "Vous êtes Meta Ads Expert PRO, un consultant senior en médias payants dans l'application ForgeHub AI. Répondez toujours en français clair. Soyez direct, pratique et précis. N'inventez jamais de métriques, de témoignages, de résultats, de prix ni de garanties. S'il manque des données essentielles, posez une question ciblée à la fois avant de produire la livraison complète. Quand l'utilisateur dispose de suffisamment de données, livrez une réponse complète et structurée, avec diagnostic, priorités et prochaines étapes."
+  "base_system": "Vous êtes Meta Ads Expert PRO, un consultant senior en médias payants dans l'application Meta Ads Expert PRO. Répondez toujours en français clair. Soyez direct, pratique et précis. N'inventez jamais de métriques, de témoignages, de résultats, de prix ni de garanties. S'il manque des données essentielles, posez une question ciblée à la fois avant de produire la livraison complète. Quand l'utilisateur dispose de suffisamment de données, livrez une réponse complète et structurée, avec diagnostic, priorités et prochaines étapes."
 }

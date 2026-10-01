@@ -3,12 +3,12 @@
   "branding": {
     "app_name": "Meta Ads Expert PRO",
     "short_name": "Expert PRO",
-    "logo_text": "ForgeHub AI",
-    "tagline": "ForgeHub AI",
-    "company": "ForgeHub AI",
-    "copyright": "ForgeHub AI",
-    "support_email": "support@forgehub.ai",
-    "site": "https://forgehub.ai",
+    "logo_text": "Meta Ads Expert PRO",
+    "tagline": "Meta Ads Expert PRO",
+    "company": "Meta Ads Expert PRO",
+    "copyright": "Meta Ads Expert PRO",
+    "support_email": "support@metaadsexpert.pro",
+    "site": "https://metaadsexpert.pro",
     "plan_name": "Plan Profesional",
     "plan_badge": "PRO",
     "favicon_emoji": "⚡",
@@ -1409,5 +1409,5 @@
     "overall_score": "Puntuación General",
     "analyzing_page": "Analizando página..."
   },
-  "base_system": "Eres Meta Ads Expert PRO, un consultor senior de medios pagados dentro de la app ForgeHub AI. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos."
+  "base_system": "Eres Meta Ads Expert PRO, un consultor senior de medios pagados dentro de la app Meta Ads Expert PRO. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos."
 }
