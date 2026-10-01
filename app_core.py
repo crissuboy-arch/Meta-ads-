@@ -107,6 +107,37 @@ def _provider_client(api, key):
     return OpenAI(base_url=spec["base_url"], api_key=key, timeout=REQUEST_TIMEOUT, **kwargs)
 
 
+_SECRET_ENV_KEYS = (
+    "OPENROUTER_API_KEY",
+    "AGNES_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "OPENAI_API_KEY",
+)
+
+_SECRET_PATTERNS = (
+    re.compile(r"sk-or-v1-[A-Za-z0-9\-_]{8,}"),
+    re.compile(r"sk-[A-Za-z0-9\-_]{8,}"),
+    re.compile(r"(?i)bearer\s+[A-Za-z0-9\-_\.]{8,}"),
+)
+
+
+def _scrub_secrets(text: str) -> str:
+    """Redact API keys/secrets from text before it goes to the client.
+
+    Provider errors can echo the offending value back (e.g. an invalid
+    model-id error quoting the string that was sent). Never let a secret
+    reach the browser inside an error message.
+    """
+    out = text or ""
+    for env_key in _SECRET_ENV_KEYS:
+        value = os.environ.get(env_key)
+        if value and len(value) >= 8:
+            out = out.replace(value, "***")
+    for pattern in _SECRET_PATTERNS:
+        out = pattern.sub("***", out)
+    return out
+
+
 def _load_skills():
     skills_dir = ROOT / "skills"
     skills = {}
@@ -571,7 +602,7 @@ def create_app():
             total_ms = int((time.monotonic() - start) * 1000)
             yield f"event: done\ndata: {json.dumps({'total_ms': total_ms})}\n\n"
         except Exception as exc:
-            yield f"event: error\ndata: {json.dumps({'message': str(exc)})}\n\n"
+            yield f"event: error\ndata: {json.dumps({'message': _scrub_secrets(str(exc))})}\n\n"
 
     def _sse_response(stream_gen):
         return StreamingResponse(
