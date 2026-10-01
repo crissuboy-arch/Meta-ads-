@@ -332,4 +332,6 @@ UI = {
     "status_generating": "oluşturuluyor",
     "overall_score": "Genel Puan",
     "analyzing_page": "Sayfa analiz ediliyor...",
+    "powered_by": "<strong>{name}</strong> tarafından sunulmaktadır",
+    "live_badge": "CANLI",
 }

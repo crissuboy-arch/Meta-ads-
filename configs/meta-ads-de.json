@@ -9,7 +9,7 @@
     "copyright": "Meta Ads Expert PRO",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
-    "plan_name": "Professional",
+    "plan_name": "Professionell",
     "plan_badge": "PRO",
     "favicon_emoji": "⚡",
     "assistant_name": "Meta Ads AI"
@@ -1362,7 +1362,9 @@
     "extracted_content": "Extrahierter Inhalt:"
   },
   "ui_strings": {
-    "plan_suffix": " Plan",
+    "powered_by": "Bereitgestellt von <strong>{name}</strong>",
+    "live_badge": "LIVE",
+    "plan_suffix": "",
     "plan_sub": "Unbegrenzte Funktionen",
     "hero_start": "Jetzt starten",
     "hero_import": "Produkt importieren",

@@ -332,4 +332,6 @@ UI = {
     "status_generating": "génération",
     "overall_score": "Score Global",
     "analyzing_page": "Analyse de la page...",
+    "powered_by": "Propulsé par <strong>{name}</strong>",
+    "live_badge": "EN DIRECT",
 }

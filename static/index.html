@@ -2,6 +2,7 @@
 <html lang="en-US">
 <head>
 <meta charset="UTF-8" />
+<script>try{var _sv=['en','pt','es','fr','tr','de'];var _sg=null;try{_sg=localStorage.getItem('metaAdsLang')}catch(e){}var _nv=((navigator.language||'').toLowerCase().split('-')[0]);var _lg=_sv.indexOf(_sg)>=0?_sg:(_sv.indexOf(_nv)>=0?_nv:'pt');document.documentElement.lang=({en:'en-US',pt:'pt-BR',es:'es-419',fr:'fr-CA',tr:'tr-TR',de:'de-DE'})[_lg]||_lg}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title id="headTitle">Meta Ads Expert PRO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -352,7 +353,7 @@
 
   <div class="chat-panel">
     <div class="chat-head">
-      <span class="ch-t">&#x1F4AC; <span id="assistantLabel">Assistant</span> <span class="live">LIVE</span></span>
+      <span class="ch-t">&#x1F4AC; <span id="assistantLabel">Assistant</span> <span class="live" id="liveBadge">LIVE</span></span>
       <div class="ch-actions">
         <button class="ch-btn" id="clearBtn">&#x1F504; New</button>
       </div>
@@ -408,7 +409,15 @@ let messages=[],busy=false,models=[],currentModel=null,currentURLType='lp',
     actionButtons=[],branding={},config={},P={},urlTypes=[],currentSystemPrompt='',currentModule='',
     currentAppId='';
 
-let LANG=localStorage.getItem('metaAdsLang')||'en';
+const SUPPORTED_LANGS=['en','pt','es','fr','tr','de'];
+const HTML_LANG_MAP={en:'en-US',pt:'pt-BR',es:'es-419',fr:'fr-CA',tr:'tr-TR',de:'de-DE'};
+function detectLang(){
+  try{const s=localStorage.getItem('metaAdsLang');if(s&&SUPPORTED_LANGS.includes(s))return s}catch(e){}
+  const nav=(navigator.language||'').toLowerCase().split('-')[0];
+  if(SUPPORTED_LANGS.includes(nav))return nav;
+  return 'pt';
+}
+let LANG=detectLang();
 const UI_DEFAULTS={
   plan_suffix:' plan',plan_sub:'Unlimited features',hero_start:'Start now',hero_import:'Import Product',
   sec_tools:'Main Tools',sec_imports:'Import Your Product',sec_niches:'Strategies by Niche',
@@ -423,7 +432,8 @@ const UI_DEFAULTS={
   sending_image:'Sending image...',analyzing_image:'Analyzing image...',sending_pdf:'Sending PDF...',analyzing_pdf:'Analyzing PDF...',
   sending_screenshot:'Sending screenshot...',analyzing_screenshot:'Analyzing screenshot...',fetching_page:'Fetching page and analyzing...',
   auto_identifies:'The AI automatically identifies:',expert_fallback:'Expert AI',loading:'Loading...',
-  send:'Send',status_generating:'generating',overall_score:'Overall Score',analyzing_page:'Analyzing page...'
+  send:'Send',status_generating:'generating',overall_score:'Overall Score',analyzing_page:'Analyzing page...',
+  powered_by:'Powered by <strong>{name}</strong>',live_badge:'LIVE'
 };
 let UI=Object.assign({},UI_DEFAULTS);
 const LANGS_DEFAULT=[{code:'en',label:'English'},{code:'pt',label:'Portugu\u00eas'},{code:'es',label:'Espa\u00f1ol'},{code:'fr',label:'Fran\u00e7ais'},{code:'tr',label:'T\u00fcrk\u00e7e'},{code:'de',label:'Deutsch'}];
@@ -915,7 +925,7 @@ function applyConfig(cfg){
   document.title=branding.app_name||'Meta Ads Expert PRO';
   const at=document.getElementById('appTitle');if(at)at.textContent=branding.app_name||'Meta Ads Expert PRO';
   const lt=document.getElementById('logoText');if(lt)lt.textContent=branding.logo_text||'Meta Ads Expert PRO';
-  const ft=document.getElementById('footerText');if(ft)ft.innerHTML='Powered by <strong>'+(branding.company||'Meta Ads Expert PRO')+'</strong>';
+  const ft=document.getElementById('footerText');if(ft)ft.innerHTML=(UI.powered_by||'Powered by <strong>{name}</strong>').replace('{name}',branding.company||'Meta Ads Expert PRO');
   const pb=document.getElementById('planBadge');if(pb)pb.innerHTML='<span class="gd"></span>'+(branding.plan_name||'Professional');
   const pt=document.getElementById('planText');if(pt)pt.textContent=(branding.plan_name||'Professional')+UI.plan_suffix;
 
@@ -950,7 +960,8 @@ function renderLangSelect(cfg){
 }
 
 function applyUIStrings(){
-  document.documentElement.lang=LANG;
+  document.documentElement.lang=HTML_LANG_MAP[LANG]||LANG;
+  const lb=document.getElementById('liveBadge');if(lb)lb.textContent=UI.live_badge;
   const planName=branding.plan_name||'Professional';
   const pt=document.getElementById('planText');if(pt)pt.textContent=planName+UI.plan_suffix;
   const ps=document.getElementById('planSub');if(ps)ps.textContent=UI.plan_sub;

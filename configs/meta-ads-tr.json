@@ -9,7 +9,7 @@
     "copyright": "Meta Ads Expert PRO",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
-    "plan_name": "Profesyonel",
+    "plan_name": "Profesyonel Plan",
     "plan_badge": "PRO",
     "favicon_emoji": "⚡",
     "assistant_name": "Meta Ads AI"
@@ -1362,7 +1362,9 @@
     "extracted_content": "Çıkarılan içerik:"
   },
   "ui_strings": {
-    "plan_suffix": " Plan",
+    "powered_by": "<strong>{name}</strong> tarafından sunulmaktadır",
+    "live_badge": "CANLI",
+    "plan_suffix": "",
     "plan_sub": "Sınırsız özellikler",
     "hero_start": "Şimdi başla",
     "hero_import": "Ürün İçe Aktar",

@@ -332,4 +332,6 @@ UI = {
     "status_generating": "generando",
     "overall_score": "Puntuación General",
     "analyzing_page": "Analizando página...",
+    "powered_by": "Desarrollado por <strong>{name}</strong>",
+    "live_badge": "EN VIVO",
 }

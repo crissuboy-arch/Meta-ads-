@@ -1362,6 +1362,8 @@
     "extracted_content": "Extracted content:"
   },
   "ui_strings": {
+    "powered_by": "Powered by <strong>{name}</strong>",
+    "live_badge": "LIVE",
     "plan_suffix": " plan",
     "plan_sub": "Unlimited features",
     "hero_start": "Start now",

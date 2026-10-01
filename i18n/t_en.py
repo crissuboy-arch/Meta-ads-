@@ -93,4 +93,6 @@ UI = {
     "status_generating": "generating",
     "overall_score": "Overall Score",
     "analyzing_page": "Analyzing page...",
+    "powered_by": "Powered by <strong>{name}</strong>",
+    "live_badge": "LIVE",
 }
