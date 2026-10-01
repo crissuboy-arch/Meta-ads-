@@ -14,4 +14,30 @@ if not configs_dir.is_dir():
 
 from app_core import create_app
 
-app = create_app()
+_fastapi_app = create_app()
+
+# On Vercel, the catch-all rewrite in vercel.json routes every request to this
+# function, and the app receives the *rewritten* path ("/api/index", or
+# "/api/index" + the original path) instead of the path the visitor asked for.
+# FastAPI then answers 404 {"detail":"Not Found"} even for "/". Strip that
+# prefix before dispatching so the real routes match. Local runs (server.py)
+# don't go through this file and are unaffected.
+_PREFIXES = ("/api/index.py", "/api/index")
+
+
+async def app(scope, receive, send):
+    if scope.get("type") in ("http", "websocket"):
+        path = scope.get("path") or ""
+        for prefix in _PREFIXES:
+            if path == prefix:
+                scope = {**scope, "path": "/", "raw_path": b"/"}
+                break
+            if path.startswith(prefix + "/"):
+                stripped = path[len(prefix):]
+                scope = {
+                    **scope,
+                    "path": stripped,
+                    "raw_path": stripped.encode("utf-8"),
+                }
+                break
+    await _fastapi_app(scope, receive, send)
