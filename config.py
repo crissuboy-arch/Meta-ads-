@@ -5,7 +5,18 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 
 _config_cache = {}
+_lang_config_cache = {}
 _default_app_id = None
+
+SUPPORTED_LANGS = ["en", "pt", "es", "fr", "tr", "de"]
+
+
+def normalize_lang(lang=None):
+    """Return a supported language code; anything unknown falls back to 'en'."""
+    if not isinstance(lang, str):
+        return "en"
+    code = lang.strip().lower()
+    return code if code in SUPPORTED_LANGS else "en"
 
 
 def _resolve_app_id(app_id=None):
@@ -37,11 +48,38 @@ def reload_config(app_id=None):
     return get_config(app_id)
 
 
+def get_lang_config(app_id=None, lang="en"):
+    """Load the config for `app_id` in language `lang`.
+
+    English returns the base config. Other languages load
+    `configs/{app_id}-{lang}.json`; when that file does not exist (e.g. an
+    app without translations), fall back to the English config.
+    """
+    app_id = _resolve_app_id(app_id)
+    lang = normalize_lang(lang)
+    if lang == "en":
+        return get_config(app_id)
+    cache_key = (app_id, lang)
+    if cache_key not in _lang_config_cache:
+        config_path = ROOT / "configs" / f"{app_id}-{lang}.json"
+        if not config_path.is_file():
+            return get_config(app_id)
+        with open(config_path, "r", encoding="utf-8") as f:
+            _lang_config_cache[cache_key] = json.load(f)
+    return _lang_config_cache[cache_key]
+
+
 def list_configs():
     configs_dir = ROOT / "configs"
     configs = []
     if configs_dir.is_dir():
+        stems = {f.stem for f in configs_dir.glob("*.json")}
         for fpath in sorted(configs_dir.glob("*.json")):
+            # Language variants (e.g. meta-ads-pt.json) belong to the base
+            # app; skip them so they do not show up as separate apps.
+            base_stem, _, suffix = fpath.stem.rpartition("-")
+            if suffix in SUPPORTED_LANGS and suffix != "en" and base_stem in stems:
+                continue
             try:
                 with open(fpath, "r", encoding="utf-8") as f:
                     data = json.load(f)

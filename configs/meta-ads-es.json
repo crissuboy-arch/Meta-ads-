@@ -1,0 +1,1413 @@
+{
+  "app_id": "meta-ads",
+  "branding": {
+    "app_name": "Meta Ads Expert PRO",
+    "short_name": "Expert PRO",
+    "logo_text": "ForgeHub AI",
+    "tagline": "ForgeHub AI",
+    "company": "ForgeHub AI",
+    "copyright": "ForgeHub AI",
+    "support_email": "support@forgehub.ai",
+    "site": "https://forgehub.ai",
+    "plan_name": "Plan Profesional",
+    "plan_badge": "PRO",
+    "favicon_emoji": "⚡",
+    "assistant_name": "Meta Ads AI"
+  },
+  "colors": {
+    "primary": "#2563EB",
+    "secondary": "#1D4ED8",
+    "accent": "#3B82F6",
+    "gold": "#F6C453",
+    "bg_deep": "#08142E",
+    "bg": "#0B1E3C",
+    "bg_mid": "#0F2447",
+    "bg_light": "#1A3359"
+  },
+  "models": {
+    "default": "meta/llama-3.1-70b-instruct",
+    "vision": "meta/llama-3.2-90b-vision-instruct",
+    "expert_underlying": "meta/llama-3.1-70b-instruct"
+  },
+  "skill": "pro.md",
+  "expert_name": "Meta Ads Expert",
+  "hero": {
+    "title": "Convierte cualquier producto en una campaña",
+    "highlight": "que realmente vende",
+    "subtitle": "Sube tu producto, página, imagen u oferta. La IA crea la campaña, el público, el copy, los creativos y el plan de escalado por ti.",
+    "floats": [
+      {
+        "label": "ROAS",
+        "value": "4.5x",
+        "color": "gold"
+      },
+      {
+        "label": "CPA",
+        "value": "$12.40"
+      },
+      {
+        "label": "CTR",
+        "value": "3.8%"
+      },
+      {
+        "label": "ROI",
+        "value": "320%",
+        "color": "green"
+      },
+      {
+        "label": "Meta Ads",
+        "value": "",
+        "big": true,
+        "icon": "📣"
+      },
+      {
+        "label": "CPM",
+        "value": "$18.20"
+      }
+    ]
+  },
+  "dashboard_metrics": [
+    {
+      "label": "ROAS",
+      "value": "4.5x",
+      "color": "gold",
+      "trend": "up",
+      "trend_value": "12%"
+    },
+    {
+      "label": "CTR",
+      "value": "3.8%",
+      "trend": "up",
+      "trend_value": "8%"
+    },
+    {
+      "label": "CPM",
+      "value": "$18",
+      "trend": "down",
+      "trend_value": "3%"
+    },
+    {
+      "label": "CPA",
+      "value": "$12",
+      "color": "green",
+      "trend": "up",
+      "trend_value": "5%"
+    },
+    {
+      "label": "Conversiones",
+      "value": "147"
+    },
+    {
+      "label": "Impresiones",
+      "value": "42.5K"
+    }
+  ],
+  "sidebar": {
+    "categories": [
+      {
+        "label": "Menú",
+        "key": "menu"
+      },
+      {
+        "label": "Plataformas",
+        "key": "plataformas"
+      },
+      {
+        "label": "Creación",
+        "key": "criacao"
+      },
+      {
+        "label": "Optimización",
+        "key": "otimizacao"
+      },
+      {
+        "label": "Analítica",
+        "key": "analytics"
+      },
+      {
+        "label": "Automatizaciones",
+        "key": "automacoes"
+      },
+      {
+        "label": "Conocimiento",
+        "key": "conhecimento"
+      },
+      {
+        "label": "Especialistas",
+        "key": "especialistas"
+      }
+    ],
+    "items": {
+      "menu": [
+        {
+          "id": "dashboard",
+          "label": "Panel",
+          "icon": "📊"
+        }
+      ],
+      "plataformas": [
+        {
+          "id": "criar-campanha",
+          "label": "Meta Ads",
+          "icon": "📈"
+        },
+        {
+          "id": "google-ads",
+          "label": "Google Ads",
+          "icon": "🌐"
+        },
+        {
+          "id": "tiktok-ads",
+          "label": "TikTok Ads",
+          "icon": "📹"
+        },
+        {
+          "id": "youtube-ads",
+          "label": "YouTube Ads",
+          "icon": "▶️"
+        },
+        {
+          "id": "pinterest-ads",
+          "label": "Pinterest Ads",
+          "icon": "📌"
+        },
+        {
+          "id": "whatsapp-ads",
+          "label": "WhatsApp Ads",
+          "icon": "💬"
+        }
+      ],
+      "criacao": [
+        {
+          "id": "criar-publico",
+          "label": "Públicos",
+          "icon": "🎯"
+        },
+        {
+          "id": "criar-copy",
+          "label": "Copywriting",
+          "icon": "✍️"
+        },
+        {
+          "id": "criar-criativos",
+          "label": "Creativos",
+          "icon": "🎨"
+        },
+        {
+          "id": "criar-lp",
+          "label": "Landing Pages",
+          "icon": "📢"
+        },
+        {
+          "id": "lead-ads",
+          "label": "Lead Ads",
+          "icon": "🧲"
+        },
+        {
+          "id": "brand-awareness",
+          "label": "Reconocimiento de Marca",
+          "icon": "📣"
+        },
+        {
+          "id": "influencer-ads",
+          "label": "Anuncios con Influencers",
+          "icon": "⭐"
+        }
+      ],
+      "otimizacao": [
+        {
+          "id": "remarketing",
+          "label": "Remarketing",
+          "icon": "🔄"
+        },
+        {
+          "id": "funis",
+          "label": "Embudos",
+          "icon": "🧰"
+        },
+        {
+          "id": "auditoria",
+          "label": "Auditoría",
+          "icon": "🔍"
+        },
+        {
+          "id": "escalar",
+          "label": "Escalado",
+          "icon": "🚀"
+        },
+        {
+          "id": "budget",
+          "label": "Presupuesto",
+          "icon": "💰"
+        },
+        {
+          "id": "ab-testing",
+          "label": "Pruebas A/B",
+          "icon": "🧪"
+        }
+      ],
+      "analytics": [
+        {
+          "id": "analytics",
+          "label": "Analítica",
+          "icon": "📊"
+        },
+        {
+          "id": "pixel",
+          "label": "Píxel",
+          "icon": "📡"
+        },
+        {
+          "id": "conversoes",
+          "label": "Conversiones",
+          "icon": "✅"
+        },
+        {
+          "id": "tracking",
+          "label": "Seguimiento",
+          "icon": "🧭"
+        }
+      ],
+      "automacoes": [
+        {
+          "id": "automacoes",
+          "label": "Automatizaciones",
+          "icon": "⚙️"
+        }
+      ],
+      "conhecimento": [
+        {
+          "id": "criar-app",
+          "label": "Apps",
+          "icon": "📱"
+        },
+        {
+          "id": "melhorar-ebook",
+          "label": "Ebooks",
+          "icon": "📖"
+        },
+        {
+          "id": "pesquisa-mercado",
+          "label": "Investigación de Mercado",
+          "icon": "🔍"
+        },
+        {
+          "id": "analise-resultados",
+          "label": "Análisis de Resultados",
+          "icon": "📊"
+        },
+        {
+          "id": "competitor-research",
+          "label": "Investigación de Competencia",
+          "icon": "🕵️"
+        },
+        {
+          "id": "seasonal-calendar",
+          "label": "Calendario Estacional",
+          "icon": "🗓️"
+        },
+        {
+          "id": "offer",
+          "label": "Revisión de Oferta",
+          "icon": "🏷️"
+        }
+      ],
+      "especialistas": [
+        {
+          "id": "especialista-meta",
+          "label": "Especialista Meta Ads",
+          "icon": "📱"
+        },
+        {
+          "id": "especialista-google",
+          "label": "Google Ads",
+          "icon": "🌐"
+        },
+        {
+          "id": "especialista-tiktok",
+          "label": "TikTok Ads",
+          "icon": "📹"
+        },
+        {
+          "id": "especialista-copy",
+          "label": "Copywriter",
+          "icon": "✍️"
+        },
+        {
+          "id": "especialista-lp",
+          "label": "Landing Pages",
+          "icon": "📢"
+        }
+      ]
+    }
+  },
+  "tools": [
+    {
+      "id": "criar-campanha",
+      "icon": "📈",
+      "label": "Crear Campaña",
+      "desc": "Campañas completas con objetivo, segmentación y presupuesto optimizados."
+    },
+    {
+      "id": "criar-publico",
+      "icon": "🎯",
+      "label": "Crear Público",
+      "desc": "Públicos personalizados, similares y de remarketing diseñados para convertir."
+    },
+    {
+      "id": "criar-copy",
+      "icon": "✍️",
+      "label": "Escribir Copy",
+      "desc": "Copy persuasivo con hooks fuertes, prueba y CTAs claros."
+    },
+    {
+      "id": "criar-criativos",
+      "icon": "🎨",
+      "label": "Crear Creativos",
+      "desc": "Conceptos creativos de alto impacto, titulares y ángulos."
+    },
+    {
+      "id": "auditoria",
+      "icon": "🔍",
+      "label": "Auditoría de Campaña",
+      "desc": "Auditoría completa con puntuación 0-100, diagnóstico y plan de optimización."
+    },
+    {
+      "id": "escalar",
+      "icon": "🚀",
+      "label": "Escalar Campañas",
+      "desc": "Estrategia de escalado con aumentos de presupuesto y expansión de público."
+    },
+    {
+      "id": "criar-app",
+      "icon": "📱",
+      "label": "Promocionar una App",
+      "desc": "Estrategia de adquisición de usuarios con campañas de instalación y eventos en la app."
+    },
+    {
+      "id": "melhorar-ebook",
+      "icon": "📖",
+      "label": "Mejorar un Ebook",
+      "desc": "Audita y optimiza ebooks para aumentar la conversión y el valor percibido."
+    },
+    {
+      "id": "pesquisa-mercado",
+      "icon": "🔍",
+      "label": "Investigación de Mercado",
+      "desc": "Análisis de competidores, tendencias y oportunidades de tu nicho."
+    },
+    {
+      "id": "google-ads",
+      "icon": "🌐",
+      "label": "Google Ads",
+      "desc": "Campañas de búsqueda, Performance Max, Shopping y vídeo."
+    },
+    {
+      "id": "analise-resultados",
+      "icon": "📊",
+      "label": "Análisis de Resultados",
+      "desc": "Lectura de métricas, diagnóstico y recomendaciones basadas en datos."
+    },
+    {
+      "id": "tracking",
+      "icon": "🧭",
+      "label": "Configurar Seguimiento",
+      "desc": "Configuración de Píxel + API de Conversiones con mapa de eventos, deduplicación y QA."
+    },
+    {
+      "id": "budget",
+      "icon": "✨",
+      "label": "Planificador de Presupuesto",
+      "desc": "Reparte y divide presupuestos entre campañas de la forma más inteligente."
+    },
+    {
+      "id": "competitor-research",
+      "icon": "✨",
+      "label": "Investigación de Anuncios de Competencia",
+      "desc": "Haz ingeniería inversa de anuncios, ángulos y ofertas de la competencia."
+    },
+    {
+      "id": "youtube-ads",
+      "icon": "✨",
+      "label": "YouTube Ads",
+      "desc": "Campañas de vídeo estructuradas para enganchar, retener y convertir."
+    },
+    {
+      "id": "pinterest-ads",
+      "icon": "✨",
+      "label": "Pinterest Ads",
+      "desc": "Campañas de pins para descubrimiento, tráfico y ventas."
+    },
+    {
+      "id": "whatsapp-ads",
+      "icon": "✨",
+      "label": "WhatsApp Ads",
+      "desc": "Campañas de clic a WhatsApp que inician conversaciones."
+    },
+    {
+      "id": "lead-ads",
+      "icon": "✨",
+      "label": "Lead Ads",
+      "desc": "Meta Lead Ads con formularios que capturan leads cualificados."
+    },
+    {
+      "id": "brand-awareness",
+      "icon": "✨",
+      "label": "Reconocimiento de Marca",
+      "desc": "Campañas de alcance y reconocimiento que generan demanda."
+    },
+    {
+      "id": "influencer-ads",
+      "icon": "✨",
+      "label": "Anuncios con Influencers",
+      "desc": "Estructuras de whitelisting y anuncios con creadores que rinden."
+    },
+    {
+      "id": "ab-testing",
+      "icon": "✨",
+      "label": "Plan de Pruebas A/B",
+      "desc": "Pruebas estructuradas de creativos, copy, público y ofertas."
+    },
+    {
+      "id": "seasonal-calendar",
+      "icon": "✨",
+      "label": "Calendario Estacional",
+      "desc": "Calendario de campañas para festivos y picos estacionales."
+    },
+    {
+      "id": "offer",
+      "icon": "✨",
+      "label": "Revisión de Oferta",
+      "desc": "Evalúa y fortalece tu oferta antes de invertir."
+    }
+  ],
+  "imports": [
+    {
+      "id": "import-imagem",
+      "icon": "📷",
+      "label": "Subir Imagen"
+    },
+    {
+      "id": "import-pdf",
+      "icon": "📄",
+      "label": "Subir PDF"
+    },
+    {
+      "id": "import-screenshot",
+      "icon": "🖼️",
+      "label": "Captura de Pantalla"
+    },
+    {
+      "id": "import-lp",
+      "icon": "🌐",
+      "label": "Landing Page"
+    },
+    {
+      "id": "import-loja",
+      "icon": "🛒",
+      "label": "Tienda"
+    },
+    {
+      "id": "import-app",
+      "icon": "📱",
+      "label": "App"
+    }
+  ],
+  "import_tags": [
+    "Producto",
+    "Oferta",
+    "Avatar",
+    "Promesa",
+    "Precio",
+    "Público",
+    "Embudo",
+    "Creativos",
+    "Titular",
+    "CTA",
+    "Estrategia"
+  ],
+  "niches": [
+    {
+      "id": "nicho-loja",
+      "icon": "🏍️",
+      "label": "Tienda Online"
+    },
+    {
+      "id": "nicho-infoproduto",
+      "icon": "📦",
+      "label": "Infoproductos"
+    },
+    {
+      "id": "nicho-advocacia",
+      "icon": "⚖️",
+      "label": "Bufete de Abogados"
+    },
+    {
+      "id": "nicho-clinica",
+      "icon": "🏥",
+      "label": "Clínica"
+    },
+    {
+      "id": "nicho-odontologia",
+      "icon": "🦷",
+      "label": "Odontología"
+    },
+    {
+      "id": "nicho-estetica",
+      "icon": "✨",
+      "label": "Estética"
+    },
+    {
+      "id": "nicho-academia",
+      "icon": "🏋️",
+      "label": "Gimnasio"
+    },
+    {
+      "id": "nicho-restaurante",
+      "icon": "🍔",
+      "label": "Restaurante"
+    },
+    {
+      "id": "nicho-cursos",
+      "icon": "🎓",
+      "label": "Cursos"
+    },
+    {
+      "id": "nicho-apps",
+      "icon": "📱",
+      "label": "Apps"
+    },
+    {
+      "id": "nicho-saas",
+      "icon": "🤖",
+      "label": "Micro SaaS"
+    },
+    {
+      "id": "nicho-consultoria",
+      "icon": "💼",
+      "label": "Consultoría"
+    },
+    {
+      "id": "nicho-imobiliaria",
+      "icon": "🏢",
+      "label": "Inmobiliaria"
+    },
+    {
+      "id": "nicho-automotivo",
+      "icon": "🚗",
+      "label": "Automoción"
+    },
+    {
+      "id": "nicho-ebook",
+      "icon": "📖",
+      "label": "Ebook"
+    },
+    {
+      "id": "nicho-pv",
+      "icon": "📢",
+      "label": "Página de Ventas"
+    }
+  ],
+  "action_buttons": [
+    {
+      "id": "criar-campanha",
+      "label": "Crear Campaña",
+      "icon": "🚀"
+    },
+    {
+      "id": "criar-publico",
+      "label": "Crear Público",
+      "icon": "🎯"
+    },
+    {
+      "id": "criar-copy",
+      "label": "Escribir Copy",
+      "icon": "✍️"
+    },
+    {
+      "id": "criar-criativos",
+      "label": "Crear Creativos",
+      "icon": "🎨"
+    },
+    {
+      "id": "escalar",
+      "label": "Escalar",
+      "icon": "📈"
+    },
+    {
+      "id": "criar-lp",
+      "label": "Crear Landing Page",
+      "icon": "📢"
+    },
+    {
+      "id": "criar-app",
+      "label": "Promocionar una App",
+      "icon": "📱"
+    },
+    {
+      "id": "melhorar-ebook",
+      "label": "Mejorar Ebook",
+      "icon": "📖"
+    },
+    {
+      "id": "auditoria",
+      "label": "Auditoría Completa",
+      "icon": "🔍"
+    },
+    {
+      "id": "pesquisa-mercado",
+      "label": "Investigación de Mercado",
+      "icon": "🔍"
+    },
+    {
+      "id": "google-ads",
+      "label": "Google Ads",
+      "icon": "🌐"
+    },
+    {
+      "id": "analise-resultados",
+      "label": "Análisis de Resultados",
+      "icon": "📊"
+    }
+  ],
+  "utm_builder": {
+    "title": "Generador de Enlaces UTM",
+    "desc": "Pega tu URL de destino, completa los campos y copia el enlace completo con UTM — sin llamar a la IA.",
+    "fields": [
+      {
+        "id": "base_url",
+        "label": "URL de Destino",
+        "placeholder": "https://tusitio.com/oferta",
+        "required": true,
+        "hint": "La página a la que el anuncio envía a las personas."
+      },
+      {
+        "id": "utm_source",
+        "label": "Fuente",
+        "placeholder": "meta",
+        "required": true,
+        "hint": "De dónde viene el tráfico: meta, instagram, tiktok."
+      },
+      {
+        "id": "utm_medium",
+        "label": "Medio",
+        "placeholder": "cpc",
+        "required": true,
+        "hint": "Cómo llegan: cpc, paid-social, email."
+      },
+      {
+        "id": "utm_campaign",
+        "label": "Campaña",
+        "placeholder": "lanzamiento-oferta",
+        "required": true,
+        "hint": "Nombre de la campaña. Minúsculas, sin espacios."
+      },
+      {
+        "id": "utm_term",
+        "label": "Término (opcional)",
+        "placeholder": "nombre-del-conjunto",
+        "required": false,
+        "hint": "Conjunto de anuncios o palabra clave."
+      },
+      {
+        "id": "utm_content",
+        "label": "Contenido (opcional)",
+        "placeholder": "creativo-a",
+        "required": false,
+        "hint": "Qué creativo o ángulo: creativo-a, video-1."
+      }
+    ],
+    "result_label": "Tu URL etiquetada",
+    "copy": "Copiar URL",
+    "copied": "¡Copiado!",
+    "copy_empty": "Completa primero los campos obligatorios.",
+    "invalid_url": "La URL de destino debe empezar con http:// o https://",
+    "tips": [
+      "Usa minúsculas y guiones en lugar de espacios.",
+      "Mantén los nombres consistentes: el mismo nombre de campaña en todo.",
+      "Prueba el enlace antes de poner presupuesto detrás de él."
+    ]
+  },
+  "uploads": {
+    "image": true,
+    "pdf": true,
+    "screenshot": true,
+    "url": true
+  },
+  "skill_routes": {
+    "dashboard": [
+      "full-account-diagnosis",
+      "metrics-reading"
+    ],
+    "criar-campanha": [
+      "meta-ads-campaign",
+      "meta-ads-manager",
+      "audience-targeting",
+      "budget-allocation"
+    ],
+    "google-ads": [
+      "google-ads-search",
+      "google-ads-manager",
+      "keyword-research",
+      "google-ads-pmax",
+      "google-shopping"
+    ],
+    "tiktok-ads": [
+      "tiktok-ads",
+      "video-ads-structure",
+      "ugc-script"
+    ],
+    "youtube-ads": [
+      "youtube-ads",
+      "video-ads-structure"
+    ],
+    "pinterest-ads": [
+      "pinterest-ads",
+      "creative-hooks"
+    ],
+    "whatsapp-ads": [
+      "whatsapp-ads-click",
+      "lead-ads-meta"
+    ],
+    "criar-publico": [
+      "audience-targeting",
+      "local-ads-strategy"
+    ],
+    "criar-copy": [
+      "ad-copywriting",
+      "ad-creative-brief"
+    ],
+    "criar-criativos": [
+      "creative-hooks",
+      "creative-score",
+      "video-ads-structure",
+      "ad-creative-brief"
+    ],
+    "criar-lp": [
+      "landing-page-ads-match",
+      "sales-page-audit",
+      "offer-evaluation"
+    ],
+    "remarketing": [
+      "dynamic-ads",
+      "ecommerce-ads-strategy"
+    ],
+    "funis": [
+      "webinar-funnel",
+      "book-funnel",
+      "application-funnel",
+      "bundle-strategy",
+      "affiliate-program-setup"
+    ],
+    "auditoria": [
+      "campaign-audit",
+      "full-account-diagnosis",
+      "metrics-reading",
+      "ad-fatigue-diagnosis"
+    ],
+    "escalar": [
+      "scaling-strategy",
+      "budget-allocation",
+      "ab-testing-plan"
+    ],
+    "budget": [
+      "budget-allocation",
+      "micro-budget-ads"
+    ],
+    "analytics": [
+      "metrics-reading",
+      "ad-fatigue-diagnosis"
+    ],
+    "pixel": [
+      "pixel-tracking-setup",
+      "conversion-tracking"
+    ],
+    "conversoes": [
+      "conversion-tracking",
+      "pixel-tracking-setup"
+    ],
+    "tracking": [
+      "conversion-tracking",
+      "pixel-tracking-setup"
+    ],
+    "automacoes": [
+      "meta-ads-manager",
+      "campaign-audit"
+    ],
+    "criar-app": [
+      "app-install-campaign"
+    ],
+    "melhorar-ebook": [
+      "offer-evaluation",
+      "sales-page-audit",
+      "bundle-strategy"
+    ],
+    "pesquisa-mercado": [
+      "market-research",
+      "competitor-ad-research",
+      "keyword-research"
+    ],
+    "competitor-research": [
+      "competitor-ad-research",
+      "market-research"
+    ],
+    "analise-resultados": [
+      "metrics-reading",
+      "full-account-diagnosis",
+      "ad-fatigue-diagnosis"
+    ],
+    "lead-ads": [
+      "lead-ads-meta",
+      "conversion-tracking"
+    ],
+    "brand-awareness": [
+      "brand-awareness-campaign",
+      "audience-targeting"
+    ],
+    "influencer-ads": [
+      "influencer-ads-whitelisting",
+      "ugc-script",
+      "creative-hooks"
+    ],
+    "ab-testing": [
+      "ab-testing-plan",
+      "metrics-reading"
+    ],
+    "seasonal-calendar": [
+      "seasonal-ads-calendar",
+      "market-research"
+    ],
+    "offer": [
+      "offer-evaluation",
+      "sales-page-audit"
+    ],
+    "especialista-meta": [
+      "meta-ads-manager",
+      "meta-ads-campaign"
+    ],
+    "especialista-google": [
+      "google-ads-manager",
+      "keyword-research",
+      "google-ads-search"
+    ],
+    "especialista-tiktok": [
+      "tiktok-ads",
+      "ugc-script"
+    ],
+    "especialista-copy": [
+      "ad-copywriting",
+      "creative-hooks"
+    ],
+    "especialista-lp": [
+      "sales-page-audit",
+      "landing-page-ads-match"
+    ],
+    "nicho-loja": [
+      "ecommerce-ads-strategy",
+      "dynamic-ads",
+      "meta-ads-campaign"
+    ],
+    "nicho-infoproduto": [
+      "offer-evaluation",
+      "sales-page-audit",
+      "meta-ads-campaign"
+    ],
+    "nicho-advocacia": [
+      "local-ads-strategy",
+      "lead-ads-meta"
+    ],
+    "nicho-clinica": [
+      "local-ads-strategy",
+      "lead-ads-meta"
+    ],
+    "nicho-odontologia": [
+      "local-ads-strategy",
+      "lead-ads-meta"
+    ],
+    "nicho-estetica": [
+      "local-ads-strategy",
+      "creative-hooks"
+    ],
+    "nicho-academia": [
+      "local-ads-strategy",
+      "lead-ads-meta"
+    ],
+    "nicho-restaurante": [
+      "local-ads-strategy",
+      "dynamic-ads"
+    ],
+    "nicho-cursos": [
+      "offer-evaluation",
+      "sales-page-audit",
+      "webinar-funnel"
+    ],
+    "nicho-apps": [
+      "app-install-campaign"
+    ],
+    "nicho-saas": [
+      "offer-evaluation",
+      "meta-ads-campaign",
+      "lead-ads-meta"
+    ],
+    "nicho-consultoria": [
+      "lead-ads-meta",
+      "application-funnel"
+    ],
+    "nicho-imobiliaria": [
+      "local-ads-strategy",
+      "lead-ads-meta"
+    ],
+    "nicho-automotivo": [
+      "local-ads-strategy",
+      "dynamic-ads"
+    ],
+    "nicho-ebook": [
+      "offer-evaluation",
+      "bundle-strategy",
+      "sales-page-audit"
+    ],
+    "nicho-pv": [
+      "sales-page-audit",
+      "landing-page-ads-match",
+      "offer-evaluation"
+    ],
+    "upload-image": [
+      "creative-score",
+      "creative-hooks",
+      "ad-creative-brief"
+    ],
+    "upload-screenshot": [
+      "metrics-reading",
+      "ad-fatigue-diagnosis",
+      "creative-score"
+    ],
+    "upload-pdf": [
+      "offer-evaluation",
+      "sales-page-audit"
+    ],
+    "url-lp": [
+      "landing-page-ads-match",
+      "sales-page-audit",
+      "offer-evaluation"
+    ],
+    "url-loja": [
+      "ecommerce-ads-strategy",
+      "dynamic-ads",
+      "offer-evaluation"
+    ],
+    "url-app": [
+      "app-install-campaign",
+      "offer-evaluation"
+    ]
+  },
+  "url_analysis": {
+    "types": [
+      {
+        "id": "lp",
+        "label": "Landing Page",
+        "icon": "🌐"
+      },
+      {
+        "id": "loja",
+        "label": "Tienda Online",
+        "icon": "🛒"
+      },
+      {
+        "id": "app",
+        "label": "App",
+        "icon": "📱"
+      }
+    ],
+    "platform_patterns": [
+      [
+        "(shopify|myshopify)\\.",
+        "Shopify"
+      ],
+      [
+        "hotmart\\.",
+        "Hotmart"
+      ],
+      [
+        "kiwify\\.",
+        "Kiwify"
+      ],
+      [
+        "eduzz\\.",
+        "Eduzz"
+      ],
+      [
+        "monetizze\\.",
+        "Monetizze"
+      ],
+      [
+        "wordpress\\.",
+        "WordPress"
+      ],
+      [
+        "lovable\\.",
+        "Lovable"
+      ],
+      [
+        "flutterflow\\.",
+        "FlutterFlow"
+      ],
+      [
+        "bubble\\.io",
+        "Bubble"
+      ],
+      [
+        "github\\.",
+        "GitHub"
+      ],
+      [
+        "drive\\.google\\.",
+        "Google Drive"
+      ],
+      [
+        "supabase\\.",
+        "Supabase"
+      ],
+      [
+        "canva\\.",
+        "Canva"
+      ],
+      [
+        "woocommerce",
+        "WooCommerce"
+      ],
+      [
+        "checkout\\.",
+        "Checkout"
+      ],
+      [
+        "pay\\.",
+        "Checkout"
+      ],
+      [
+        "pagamento",
+        "Checkout"
+      ],
+      [
+        "app\\.",
+        "App"
+      ]
+    ],
+    "product_type_keywords": {
+      "infoproduct": [
+        "infoproduct",
+        "online course",
+        "ebook",
+        "digital product"
+      ],
+      "course": [
+        "course",
+        "class",
+        "training",
+        "program",
+        "module"
+      ],
+      "mentoring": [
+        "mentoring",
+        "mentor",
+        "coaching",
+        "guidance"
+      ],
+      "ebook": [
+        "ebook",
+        "digital book",
+        "guide",
+        "handbook",
+        "manual"
+      ],
+      "app": [
+        "app",
+        "application",
+        "mobile",
+        "ios",
+        "android"
+      ],
+      "saas": [
+        "saas",
+        "subscription",
+        "monthly plan",
+        "plan",
+        "software"
+      ],
+      "store": [
+        "store",
+        "ecommerce",
+        "shop",
+        "buy",
+        "cart",
+        "checkout"
+      ],
+      "clinic": [
+        "clinic",
+        "doctor",
+        "appointment",
+        "health"
+      ],
+      "law firm": [
+        "lawyer",
+        "law firm",
+        "legal",
+        "attorney"
+      ],
+      "restaurant": [
+        "restaurant",
+        "delivery",
+        "food",
+        "menu"
+      ],
+      "aesthetics": [
+        "aesthetics",
+        "beauty",
+        "treatment",
+        "skincare"
+      ],
+      "dentistry": [
+        "dentist",
+        "dentistry",
+        "smile",
+        "implant"
+      ],
+      "gym": [
+        "gym",
+        "trainer",
+        "workout",
+        "fitness"
+      ],
+      "real estate": [
+        "real estate",
+        "property",
+        "apartment",
+        "house",
+        "realtor"
+      ],
+      "consulting": [
+        "consulting",
+        "consultant",
+        "business advisory"
+      ],
+      "marketplace": [
+        "marketplace",
+        "listing",
+        "classifieds"
+      ],
+      "tool": [
+        "tool",
+        "platform",
+        "dashboard",
+        "software"
+      ],
+      "lead magnet": [
+        "lead magnet",
+        "free download",
+        "free guide",
+        "download"
+      ],
+      "workshop": [
+        "workshop",
+        "live event",
+        "masterclass",
+        "event"
+      ],
+      "community": [
+        "community",
+        "membership",
+        "exclusive group"
+      ],
+      "subscription": [
+        "subscription",
+        "recurring",
+        "monthly plan",
+        "membership"
+      ]
+    }
+  },
+  "system_prompts": {
+    "image": "Eres un analista experto en marketing digital y Meta Ads.\nAnaliza la imagen subida y extrae todas las señales disponibles.\n\nPresenta tu análisis en este formato:\n\n✓ PRODUCTO: [qué producto o servicio]\n✓ OFERTA: [la oferta principal]\n✓ AVATAR: [para quién es]\n✓ PÚBLICO: [el público objetivo]\n✓ PROMESA: [la promesa principal]\n✓ TITULAR: [el titular o título]\n✓ CREATIVO: [descripción del creativo]\n✓ CTA: [la llamada a la acción]\n✓ EMBUDO: [qué etapa del embudo]\n✓ ESTRATEGIA: [la estrategia detrás]\n\nDespués de la lista, pregunta al usuario:\n\"¿Quieres que cree la campaña completa basándome en este análisis?\"",
+    "pdf": "Eres un especialista en Meta Ads analizando un documento PDF.\n\nAnaliza el contenido extraído e identifica:\n\n✓ NOMBRE DEL PRODUCTO: [nombre del producto]\n✓ NICHO: [nicho de mercado]\n✓ OFERTA: [oferta principal]\n✓ PROMESA: [promesa central]\n✓ PÚBLICO: [público objetivo]\n✓ DOLORES: [principales puntos de dolor]\n✓ BENEFICIOS: [beneficios]\n✓ DIFERENCIADORES: [qué lo hace diferente]\n✓ PRECIO: [precio, si lo hay]\n✓ GARANTÍA: [si la hay]\n✓ BONOS: [si los hay]\n✓ CTA: [llamada a la acción]\n✓ EMBUDO: [estructura del embudo]\n✓ ESTRATEGIA: [estrategia de campaña]\n\nDespués de la lista, pregunta al usuario:\n\"¿Quieres que cree la campaña, el público, el copy o los creativos basándome en este análisis?\"",
+    "screenshot": "Eres un analista experto en marketing digital y Meta Ads.\nEsto es una CAPTURA DE PANTALLA de un anuncio, página, checkout o app.\n\nIdentifica:\n\n✓ TIPO DE MATERIAL: [anuncio, página, checkout, app, creativo]\n✓ PRODUCTO: [producto o servicio]\n✓ MARCA: [marca anunciante]\n✓ OFERTA: [oferta principal]\n✓ TITULAR: [titular principal]\n✓ CTA: [llamada a la acción]\n✓ PÚBLICO PROBABLE: [público objetivo]\n✓ ELEMENTOS VISUALES: [colores, imágenes, diseño]\n✓ PUNTOS FUERTES: [qué funciona bien]\n✓ PROBLEMAS: [qué podría mejorarse]\n✓ MEJORAS: [sugerencias de optimización]\n✓ ESTRATEGIA: [estrategia de Meta Ads]\n\nDespués del análisis, pregunta al usuario:\n\"¿Quieres que cree la campaña, el público, el copy o los creativos basándome en este análisis?\"",
+    "url": {
+      "lp": "Eres un especialista en Meta Ads analizando una LANDING PAGE.\n\nIdentifica:\n\n✓ PRODUCTO: [producto o servicio]\n✓ OFERTA: [oferta principal]\n✓ PROMESA: [promesa central]\n✓ PÚBLICO: [público objetivo]\n✓ TITULAR: [titular principal]\n✓ BENEFICIOS: [beneficios principales]\n✓ PRUEBA: [testimonios, casos, números]\n✓ GARANTÍA: [si la hay]\n✓ BONOS: [si los hay]\n✓ CTA: [llamada a la acción]\n✓ OBJECIONES: [objeciones probables]\n✓ PUNTOS FUERTES: [qué funciona]\n✓ PUNTOS DÉBILES: [qué mejorar]\n✓ MEJORAS: [optimizaciones de conversión]\n✓ CAMPAÑA RECOMENDADA: [estrategia de Meta Ads]\n✓ PÚBLICOS SUGERIDOS: [ideas de segmentación]\n✓ IDEAS DE ANUNCIOS: [sugerencias de creativos]\n\nDespués del análisis, pregunta al usuario:\n\"¿Quieres que cree la campaña, el público, el copy o los creativos basándome en este análisis?\"",
+      "loja": "Eres un especialista en Meta Ads analizando una TIENDA ONLINE.\n\nIdentifica:\n\n✓ PRODUCTO PRINCIPAL: [producto o servicio]\n✓ CATEGORÍA: [categoría del producto]\n✓ RANGO DE PRECIOS: [precios]\n✓ PÚBLICO PROBABLE: [público objetivo]\n✓ ÁNGULOS DE VENTA: [enfoques comerciales]\n✓ CAMPAÑA RECOMENDADA: [estrategia]\n✓ PÚBLICOS: [segmentación sugerida]\n✓ CREATIVOS: [ideas de creativos]\n✓ COPY: [sugerencias de copy]\n✓ REMARKETING: [estrategia de remarketing]\n✓ CATÁLOGO: [estrategia de catálogo, si aplica]\n\nDespués del análisis, pregunta al usuario:\n\"¿Quieres que cree la campaña, el público, el copy o los creativos basándome en este análisis?\"",
+      "app": "Eres un especialista en Meta Ads analizando una APP.\n\nIdentifica:\n\n✓ POSICIONAMIENTO: [cómo se posiciona la app]\n✓ PÚBLICO: [público objetivo]\n✓ PROPUESTA DE VALOR: [valor central]\n✓ BENEFICIOS: [beneficios]\n✓ DIFERENCIADORES: [ventajas competitivas]\n✓ CAMPAÑA DE ADQUISICIÓN: [estrategia de instalación]\n✓ CAMPAÑA DE CONVERSIÓN: [estrategia de eventos en la app]\n✓ CREATIVOS: [ideas de creativos]\n✓ COPY: [sugerencias de copy]\n✓ EMBUDO: [embudo recomendado]\n\nDespués del análisis, pregunta al usuario:\n\"¿Quieres que cree la campaña, el público, el copy o los creativos basándome en este análisis?\""
+    }
+  },
+  "prompts": {
+    "criar-campanha": "Eres un consultor de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto o servicio? ¿Qué país? ¿Cuál es el objetivo de la campaña (ventas, leads, tráfico)? ¿Cuál es el presupuesto diario? ¿El Píxel de Meta ya está instalado? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "criar-publico": "Eres un consultor de públicos de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto o servicio? ¿Qué país? ¿Qué rango de edad tiene el público? ¿Cuál es el ticket medio? ¿Ya tienes una lista de clientes para crear un público personalizado? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "criar-copy": "Eres un consultor de copy de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es la oferta principal? ¿Quién es el público objetivo? ¿Cuál es el tono de la marca? ¿Cuál es el principal diferenciador del producto? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "criar-criativos": "Eres un consultor de creativos de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el objetivo de la campaña? ¿Qué ubicación (Feed, Stories, Reels)? ¿Ya tienes imágenes o creamos desde cero? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "auditoria": "Eres un especialista en auditoría de Meta Ads. Primero pregunta qué datos de campaña tiene disponibles el usuario. Pregunta un dato a la vez: días en marcha, objetivo, importe gastado, conversiones, CPM, CTR, CPC, CPA, frecuencia, alcance, impresiones, ROAS, ticket medio, presupuesto diario, público utilizado, creativos. Después de recibir los datos, presenta el análisis por etapas: primero los problemas críticos, luego la puntuación general, luego el plan de acción. No lo vuelques todo de una vez.",
+    "escalar": "Eres un consultor de escalado de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el ROAS actual? ¿Cuál es el presupuesto diario actual? ¿Cuál es el CPA actual? ¿Cuántos días lleva estable la campaña? ¿Cuántos conjuntos de anuncios están activos? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "remarketing": "Eres un especialista en remarketing de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto o servicio? ¿Hace cuántos días se instaló el píxel? ¿Cuál es el volumen de tráfico del sitio? ¿Cuál es el ticket medio? ¿Cuántas páginas vistas por visitante? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "funis": "Eres un especialista en embudos de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el modelo de negocio? ¿Ya tienes tráfico tibio? ¿Cuál es el ticket medio? ¿Cuál es el objetivo (lead, venta, suscripción)? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "criar-lp": "Eres un especialista en landing pages para Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el objetivo de la página? ¿Quién es el público objetivo? ¿Ya tienes dominio y hosting? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "dashboard": "Eres el asistente de Meta Ads Expert PRO. ¿En qué puedo ayudarte hoy?",
+    "analytics": "Eres un analista de datos de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué métricas quieres analizar? ¿Tienes acceso al Administrador de anuncios? ¿Qué periodo debemos analizar? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "pixel": "Eres un especialista en Píxel de Meta. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué plataforma usa el sitio? ¿El píxel ya está instalado? ¿Qué eventos quieres rastrear? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "conversoes": "Eres un especialista en conversiones de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el objetivo de conversión? ¿Ya configuraste los eventos? ¿Usas la API de Conversiones (CAPI)? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "tracking": "Eres un especialista en seguimiento de conversiones de Meta para Píxel + API de Conversiones (CAPI). No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué plataforma o CMS ejecuta el sitio o el checkout? ¿El Píxel de Meta ya está instalado? ¿Qué eventos importan más: PageView, ViewContent, AddToCart, InitiateCheckout, Lead, Purchase o eventos personalizados? ¿El CAPI funcionará mediante una integración nativa de la plataforma, Google Tag Manager del lado del servidor o una integración directa del servidor? Nunca pidas al usuario que pegue un token de acceso de CAPI aquí; los tokens permanecen dentro de Meta, GTM o la configuración de la plataforma. Cuando tengas suficientes respuestas, entrega: mapa de eventos con parámetros, pasos del Píxel en el navegador, pasos del CAPI en el servidor, reglas de deduplicación por event_id, control de calidad en Test Events del Administrador de eventos, notas de consentimiento y las correcciones más comunes. Sé directo y consultivo.",
+    "automacoes": "Eres un especialista en automatización de marketing. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué procesos quieres automatizar? ¿Usas un CRM? ¿Cuál es tu volumen de leads? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "budget": "Eres un especialista en presupuesto de medios pagados. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el presupuesto mensual total? ¿En qué plataformas anunciarás? ¿Cuál es el objetivo principal? ¿Cuál es tu CPA objetivo? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "lead-ads": "Eres un especialista en Meta Lead Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué ofreces a cambio del lead? ¿Quién es el lead ideal? ¿A dónde van los leads después de la captura (CRM, email, WhatsApp)? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "brand-awareness": "Eres un especialista en campañas de reconocimiento de marca. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es la marca o producto? ¿Quién necesita recordarla? ¿Qué región? ¿Qué deberían asociar las personas con la marca? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "influencer-ads": "Eres un especialista en anuncios con influencers y whitelisting. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Quién es el creador? ¿Ya tienes permiso de whitelisting? ¿Cuál es el producto? ¿En qué plataforma corre el anuncio? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "ab-testing": "Eres un especialista en pruebas A/B. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué quieres probar (creativo, copy, público, oferta)? ¿Cuál es el resultado actual de referencia? ¿Cuánto presupuesto puede usar la prueba? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "seasonal-calendar": "Eres un especialista en planificación de campañas estacionales. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué vendes? ¿Qué mercado/país? ¿Qué fechas importan más para tu nicho? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "offer": "Eres un especialista en evaluación de ofertas. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el precio? ¿Cuál es la promesa principal? ¿Qué bonos y garantía existen? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "competitor-research": "Eres un analista de investigación de anuncios de la competencia. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Quiénes son tus principales competidores? ¿Qué producto estamos comparando? ¿Qué país/mercado? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "youtube-ads": "Eres un consultor de YouTube Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Ya tienes un vídeo? ¿Cuál es el objetivo (vistas, leads, ventas)? ¿Cuál es el presupuesto diario? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "pinterest-ads": "Eres un consultor de Pinterest Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Quién es el público? ¿Ya tienes pins o un feed de productos? ¿Cuál es el objetivo? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "whatsapp-ads": "Eres un especialista en anuncios de clic a WhatsApp. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto o servicio? ¿Quién responde las conversaciones? ¿Qué debería pasar después del primer mensaje? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "especialista-meta": "Eres un consultor senior de Meta Ads. ¿En qué puedo ayudarte con tu estrategia publicitaria?",
+    "especialista-google": "Eres un consultor de Google Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el objetivo de la campaña? ¿Cuál es el presupuesto? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "especialista-tiktok": "Eres un consultor de TikTok Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Quién es el público? ¿Ya tienes contenido orgánico? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "especialista-copy": "Eres un copywriter especialista. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Quién es el avatar del cliente? ¿Cuál es el principal disparador psicológico? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "especialista-lp": "Eres un especialista en landing pages. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el objetivo de la página? ¿Cuál es el producto? ¿Quién es el público? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-loja": "Eres un consultor de Meta Ads para e-commerce. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el nicho de la tienda? ¿Cuál es el ticket medio? ¿El catálogo de productos ya está configurado? ¿Usas Shopify, WooCommerce u otra plataforma? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-infoproduto": "Eres un consultor de Meta Ads para infoproductos. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el tema del infoproducto? ¿Cuál es el precio? ¿Ya hay un lanzamiento programado? ¿Tienes una lista de correo? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-advocacia": "Eres un consultor de Meta Ads para bufetes de abogados. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el área de práctica? ¿Qué región? ¿El bufete busca leads o reconocimiento de marca? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-clinica": "Eres un consultor de Meta Ads para clínicas. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es la especialidad? ¿Cuál es la ubicación? ¿Aceptas seguros o solo pago privado? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-odontologia": "Eres un consultor de Meta Ads para dentistas. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es la especialidad? ¿Cuál es la ubicación? ¿Buscas reservas o reconocimiento? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-estetica": "Eres un consultor de Meta Ads para estética. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué tratamientos son los destacados? ¿Cuál es la ubicación? ¿Tienes fotos de antes/después? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-academia": "Eres un consultor de Meta Ads para gimnasios. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué tipo de gimnasio es? ¿Qué ciudad? ¿Buscas membresías o clientes de entrenamiento personal? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-restaurante": "Eres un consultor de Meta Ads para restaurantes. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué tipo de cocina? ¿Ofreces delivery? ¿Cuál es el área de entrega? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-cursos": "Eres un consultor de Meta Ads para cursos. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el tema? ¿Cuál es el formato (presencial/online)? ¿Cuál es el precio? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-apps": "Eres un consultor de Meta Ads para apps. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué tipo de app es? ¿Cuál es el modelo de ingresos? ¿Los eventos en la app ya están configurados? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-saas": "Eres un consultor de Meta Ads para SaaS. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué problema resuelve? ¿Cuál es el plan de precios? ¿Hay prueba gratuita? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-consultoria": "Eres un consultor de Meta Ads para consultores. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el área de consultoría? ¿Cuál es el tamaño del ticket? ¿Quién es el cliente ideal? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-imobiliaria": "Eres un consultor de Meta Ads para inmobiliarias. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué ciudad/barrio? ¿Ventas o alquileres? ¿Cuál es el perfil de la propiedad? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-automotivo": "Eres un consultor de Meta Ads para el sector automotriz. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué tipo de vehículo? ¿Venta directa o pruebas de manejo? ¿Qué región? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-ebook": "Eres un consultor de Meta Ads para ebooks. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el tema? ¿Cuál es el precio? ¿Ya tienes una página de ventas? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "nicho-pv": "Eres un consultor de Meta Ads para páginas de ventas. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el precio? ¿La página ya está construida? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "criar-app": "Eres un especialista en adquisición de usuarios para apps. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué tipo de app es? ¿Cuál es el modelo de ingresos? ¿Los eventos en la app de Meta ya están configurados? ¿Cuál es tu coste aceptable por instalación? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "melhorar-ebook": "Eres un consultor de optimización de ebooks. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el tema del ebook? ¿Cuál es el precio? ¿Ya tienes una página de ventas? ¿Cuál es la tasa de conversión actual? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "pesquisa-mercado": "Eres un analista de investigación de mercado. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el nicho o producto? ¿Quién es el público objetivo? ¿Qué país? ¿Ya conoces a los principales competidores? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "google-ads": "Eres un consultor de Google Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto o servicio? ¿Cuál es el objetivo (búsqueda, display, vídeo)? ¿Cuál es el presupuesto diario? ¿Qué país? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "analise-resultados": "Eres un analista de métricas de marketing digital. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué plataformas quieres analizar? ¿Qué métricas tienes disponibles? ¿Qué periodo debemos analizar? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
+    "tiktok-ads": "Eres un consultor de TikTok Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Quién es el público? ¿Ya tienes vídeos orgánicos o UGC? ¿Cuál es el objetivo (tráfico, leads, ventas)? ¿Cuál es el presupuesto diario? Espera las respuestas antes de seguir adelante. Sé directo y consultivo."
+  },
+  "lang": "es",
+  "languages": [
+    {
+      "code": "en",
+      "label": "English"
+    },
+    {
+      "code": "pt",
+      "label": "Português"
+    },
+    {
+      "code": "es",
+      "label": "Español"
+    },
+    {
+      "code": "fr",
+      "label": "Français"
+    },
+    {
+      "code": "tr",
+      "label": "Türkçe"
+    },
+    {
+      "code": "de",
+      "label": "Deutsch"
+    }
+  ],
+  "messages": {
+    "requests_not_installed": "La biblioteca 'requests' no está instalada. Ejecuta: pip install requests beautifulsoup4",
+    "bs4_not_installed": "La biblioteca 'beautifulsoup4' no está instalada. Ejecuta: pip install beautifulsoup4",
+    "file_url_not_allowed": "Las URLs de archivo no están permitidas",
+    "local_url_not_allowed": "Las URLs locales no están permitidas",
+    "internal_url_not_allowed": "Las URLs internas no están permitidas",
+    "page_timeout": "La página tardó demasiado en responder. Inténtalo de nuevo.",
+    "http_error": "Error HTTP {code} al acceder a la página.",
+    "cannot_connect": "No se pudo conectar al servidor. Verifica la URL.",
+    "url_error": "Error al acceder a la URL: {detail}",
+    "not_html": "La URL no devolvió una página HTML.",
+    "app_not_found": "App '{app_id}' no encontrada.",
+    "image_disabled": "La carga de imágenes no está habilitada para esta app.",
+    "image_invalid_format": "Formato no válido. Aceptados: JPG, JPEG, PNG, WEBP",
+    "image_too_large": "Archivo demasiado grande. Máximo: 10MB",
+    "vision_not_configured": "Ningún proveedor de visión configurado (define NVIDIA_API_KEY u OPENROUTER_API_KEY).",
+    "pdf_disabled": "La carga de PDF no está habilitada para esta app.",
+    "pypdf_not_installed": "La biblioteca 'pypdf' no está instalada. Ejecuta: pip install pypdf",
+    "pdf_invalid_format": "Formato no válido. Solo PDF.",
+    "pdf_too_large": "Archivo demasiado grande. Máximo: 20MB",
+    "pdf_no_text": "Este PDF parece escaneado y no contiene texto extraíble. Prueba a subir una imagen del documento.",
+    "pdf_content_label": "Contenido extraído del PDF",
+    "pdf_truncated": "[... contenido truncado por límite de tamaño]",
+    "screenshot_disabled": "La carga de capturas no está habilitada para esta app.",
+    "screenshot_too_large": "Archivo demasiado grande. Máximo: 10MB",
+    "screenshot_unavailable": "La carga de capturas no está disponible para esta app.",
+    "url_disabled": "El análisis de URL no está habilitado para esta app.",
+    "no_url": "No se proporcionó ninguna URL.",
+    "url_must_start": "La URL debe empezar con http:// o https://",
+    "model_not_found": "Modelo no encontrado",
+    "embeddings_need_key": "Los embeddings requieren que NVIDIA_API_KEY esté configurada.",
+    "analyze_image_prompt": "Analiza esta imagen de producto o anuncio en detalle.",
+    "analyze_screenshot_prompt": "Analiza esta captura en detalle.",
+    "detected_platform": "Plataforma detectada: {value}",
+    "detected_product_type": "Tipo de producto detectado: {value}",
+    "analyzed_url": "URL analizada: {url}",
+    "page_title": "Título de la página: {value}",
+    "meta_description": "Meta Description: {value}",
+    "extracted_content": "Contenido extraído:"
+  },
+  "ui_strings": {
+    "plan_suffix": "",
+    "plan_sub": "Funciones ilimitadas",
+    "hero_start": "Empezar ahora",
+    "hero_import": "Importar Producto",
+    "sec_tools": "Herramientas Principales",
+    "sec_imports": "Importa Tu Producto",
+    "sec_niches": "Estrategias por Nicho",
+    "assistant": "Asistente",
+    "new_chat": "Nuevo",
+    "input_placeholder": "Escribe tu mensaje...",
+    "hint_send": "para enviar",
+    "url_modal_title": "Analizar URL",
+    "url_analyze_prefix": "Analizar ",
+    "url_modal_cancel": "Cancelar",
+    "url_modal_analyze": "Analizar",
+    "url_error": "La URL debe empezar con http:// o https://",
+    "empty_title": "Listo para crear",
+    "empty_sub": "Haz clic en una herramienta o escribe abajo.",
+    "you": "Tú",
+    "error_label": "Error",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "view_details": "Ver detalles",
+    "open_tool": "Abrir herramienta →",
+    "next_title": "¿Qué quieres hacer ahora?",
+    "failed_prefix": "Error: ",
+    "status_connected": "conectado",
+    "status_connecting": "conectando",
+    "status_reconnecting": "reconectando",
+    "status_offline": "sin conexión",
+    "status_error": "error",
+    "status_error_switch": "error al cambiar de app",
+    "status_analyzing": "analizando",
+    "status_loading_app": "cargando ",
+    "file_too_large_20": "Archivo demasiado grande. Máximo: 20MB.",
+    "file_too_large_10": "Archivo demasiado grande. Máximo: 10MB.",
+    "sending_image": "Enviando imagen...",
+    "analyzing_image": "Analizando imagen...",
+    "sending_pdf": "Enviando PDF...",
+    "analyzing_pdf": "Analizando PDF...",
+    "sending_screenshot": "Enviando captura...",
+    "analyzing_screenshot": "Analizando captura...",
+    "fetching_page": "Obteniendo página y analizando...",
+    "auto_identifies": "La IA identifica automáticamente:",
+    "expert_fallback": "IA Especialista",
+    "loading": "Cargando...",
+    "send": "Enviar",
+    "status_generating": "generando",
+    "overall_score": "Puntuación General",
+    "analyzing_page": "Analizando página..."
+  },
+  "base_system": "Eres Meta Ads Expert PRO, un consultor senior de medios pagados dentro de la app ForgeHub AI. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos."
+}
