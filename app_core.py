@@ -477,41 +477,6 @@ def _strip_vercel_prefix(asgi_app):
 
     async def wrapped(scope, receive, send):
         if scope.get("type") in ("http", "websocket"):
-            # TEMPORARY PROBE: /...?__probe=1 echoes the raw ASGI routing info
-            # (path/root_path/headers) so we can see exactly what Vercel hands
-            # the function behind the rewrite. Remove after diagnosis.
-            if scope["type"] == "http" and b"__probe=1" in (
-                scope.get("query_string") or b""
-            ):
-                payload = json.dumps(
-                    {
-                        "path": scope.get("path"),
-                        "raw_path": (scope.get("raw_path") or b"").decode(
-                            "utf-8", "replace"
-                        ),
-                        "root_path": scope.get("root_path"),
-                        "method": scope.get("method"),
-                        "query_string": (scope.get("query_string") or b"").decode(
-                            "utf-8", "replace"
-                        ),
-                        "headers": [
-                            [k.decode("latin-1"), v.decode("latin-1")]
-                            for k, v in (scope.get("headers") or [])
-                        ],
-                    }
-                ).encode()
-                await send(
-                    {
-                        "type": "http.response.start",
-                        "status": 200,
-                        "headers": [
-                            [b"content-type", b"application/json"],
-                            [b"content-length", str(len(payload)).encode()],
-                        ],
-                    }
-                )
-                await send({"type": "http.response.body", "body": payload})
-                return
             path = scope.get("path") or ""
             for prefix in prefixes:
                 if path == prefix:
