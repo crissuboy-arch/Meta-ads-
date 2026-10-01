@@ -12,32 +12,41 @@ if not configs_dir.is_dir():
         "Verifique se o deploy inclui todos os arquivos."
     )
 
-from app_core import create_app
+import json
 
-_fastapi_app = create_app()
-
-# On Vercel, the catch-all rewrite in vercel.json routes every request to this
-# function, and the app receives the *rewritten* path ("/api/index", or
-# "/api/index" + the original path) instead of the path the visitor asked for.
-# FastAPI then answers 404 {"detail":"Not Found"} even for "/". Strip that
-# prefix before dispatching so the real routes match. Local runs (server.py)
-# don't go through this file and are unaffected.
-_PREFIXES = ("/api/index.py", "/api/index")
-
-
+# TEMPORARY PROBE (deploy diagnostic): answer every HTTP request with the raw
+# ASGI routing info Vercel hands us, so we can see the exact path/root_path the
+# function receives behind the vercel.json catch-all rewrite. Remove after use.
 async def app(scope, receive, send):
-    if scope.get("type") in ("http", "websocket"):
-        path = scope.get("path") or ""
-        for prefix in _PREFIXES:
-            if path == prefix:
-                scope = {**scope, "path": "/", "raw_path": b"/"}
-                break
-            if path.startswith(prefix + "/"):
-                stripped = path[len(prefix):]
-                scope = {
-                    **scope,
-                    "path": stripped,
-                    "raw_path": stripped.encode("utf-8"),
-                }
-                break
-    await _fastapi_app(scope, receive, send)
+    if scope.get("type") == "lifespan":
+        while True:
+            msg = await receive()
+            if msg["type"] == "lifespan.startup":
+                await send({"type": "lifespan.startup.complete"})
+            elif msg["type"] == "lifespan.shutdown":
+                await send({"type": "lifespan.shutdown.complete"})
+                return
+    if scope.get("type") != "http":
+        return
+    body = json.dumps(
+        {
+            "path": scope.get("path"),
+            "raw_path": (scope.get("raw_path") or b"").decode("utf-8", "replace"),
+            "root_path": scope.get("root_path"),
+            "method": scope.get("method"),
+            "query_string": (scope.get("query_string") or b"").decode(
+                "utf-8", "replace"
+            ),
+        }
+    ).encode()
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 200,
+            "headers": [
+                [b"content-type", b"application/json"],
+                [b"content-length", str(len(body)).encode()],
+            ],
+        }
+    )
+    await send({"type": "http.response.body", "body": body})
