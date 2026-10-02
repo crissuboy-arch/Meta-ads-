@@ -729,7 +729,8 @@ function syncUTMPanel(){
 
 // -------- Tracking screen (Meta Pixel + Conversions API + sales) --------
 const TRK_EVENT_NAMES=['PageView','ViewContent','AddToCart','InitiateCheckout','AddPaymentInfo','Purchase','Lead'];
-let trkSavedDisplays=null,trkSalesCache=[],trkConfigured=false,trkLastTestOk=null;
+let trkSavedDisplays=null,trkSalesCache=[],trkConfigured=false,trkLastTestOk=null,trkHasToken=false;
+function trkRenderTokenHint(){const hint=document.getElementById('trkTokenHint');if(hint)hint.textContent=trkHasToken?UI.trk_token_saved:UI.trk_token_hint;}
 
 function trkStoreGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function trkStoreSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
@@ -807,7 +808,7 @@ function applyTrackingTexts(){
   const f=document.getElementById('trkSalesFilter');
   if(f){const cur=f.value;f.innerHTML='';[['',UI.trk_filter_all],['pix',UI.trk_method_pix],['boleto',UI.trk_method_boleto],['card',UI.trk_method_card],['other',UI.trk_method_other]].forEach(function(p){const o=document.createElement('option');o.value=p[0];o.textContent=p[1]||p[0];f.appendChild(o)});f.value=cur||''}
   const badge=document.getElementById('dashSampleBadge');if(badge)badge.textContent=UI.trk_sample_data||'';
-  trkBuildEvents();trkRenderScript();trkRenderWebhook();trkRenderSales();trkRefreshStatus();
+  trkBuildEvents();trkRenderScript();trkRenderWebhook();trkRenderSales();trkRefreshStatus();trkRenderTokenHint();
 }
 
 function trkLoadDraft(){
@@ -830,7 +831,7 @@ async function trkLoadConfig(){
       const tc=document.getElementById('trkTestCode');if(tc)tc.value=d.test_code||'';
       if(d.events&&d.events.length){for(const n of TRK_EVENT_NAMES){const c=document.getElementById('trkEv_'+n);if(c)c.checked=d.events.indexOf(n)>=0}trkRenderScript()}
     }
-    const hint=document.getElementById('trkTokenHint');if(hint)hint.textContent=d.has_token?UI.trk_token_saved:UI.trk_token_hint;
+    trkHasToken=!!d.has_token;trkRenderTokenHint();
   }catch(e){}
   trkRefreshStatus();
 }
@@ -847,7 +848,7 @@ async function trkSave(){
     const d=await r.json();
     trkConfigured=true;
     document.getElementById('trkToken').value='';
-    const hint=document.getElementById('trkTokenHint');if(hint)hint.textContent=d.has_token?UI.trk_token_saved:UI.trk_token_hint;
+    trkHasToken=!!d.has_token;trkRenderTokenHint();
     trkStoreSet('metaAdsTrackingDraft',JSON.stringify({pixel_id:px,domain:payload.domain,test_code:payload.test_code,events:payload.events}));
     trkMsg(UI.trk_saved_ok,true);trkRefreshStatus();trkRenderScript();trkLoadSales();refreshTrackingDash();
   }catch(e){trkMsg(UI.trk_send_fail,false)}

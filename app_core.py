@@ -660,6 +660,93 @@ def _trk_save_all(data: dict) -> None:
     tmp.replace(path)
 
 
+def _sb_target():
+    url = os.getenv("SUPABASE_URL", "").rstrip("/")
+    key = os.getenv("SUPABASE_SERVICE_KEY", "")
+    return (url, key) if url and key else (None, None)
+
+
+def _sb_req(method, table, params=None, payload=None):
+    url, key = _sb_target()
+    if not url or _requests is None:
+        raise RuntimeError("supabase_unavailable")
+    headers = {"apikey": key, "Authorization": f"Bearer {key}",
+               "Content-Type": "application/json",
+               "Prefer": "resolution=merge-duplicates,return=minimal"}
+    resp = _requests.request(method, f"{url}/rest/v1/{table}", params=params,
+                             json=payload, headers=headers, timeout=15)
+    resp.raise_for_status()
+    if resp.status_code == 204 or not resp.content:
+        return None
+    return resp.json()
+
+
+def _store_get(key):
+    """Return {'config': {...}, 'sales': [...], 'last_test_ok': ...} or None.
+    Supabase when SUPABASE_URL + SUPABASE_SERVICE_KEY are set, else local file."""
+    url, _ = _sb_target()
+    if not url:
+        return _trk_load().get(key)
+    try:
+        rows = _sb_req("GET", "trk_configs", params={"key": f"eq.{key}", "select": "*"})
+        if not rows:
+            return None
+        row = rows[0]
+        cfg = {"pixel_id": row.get("pixel_id") or "",
+               "domain": row.get("domain") or "",
+               "test_code": row.get("test_code") or "",
+               "events": row.get("events") or []}
+        if row.get("token"):
+            cfg["token"] = row["token"]
+        sale_rows = _sb_req("GET", "trk_sales",
+                            params={"key": f"eq.{key}", "select": "record",
+                                    "order": "ts.desc", "limit": "500"}) or []
+        sales = [r["record"] for r in reversed(sale_rows)
+                 if isinstance(r.get("record"), dict)]
+        return {"config": cfg, "sales": sales,
+                "last_test_ok": row.get("last_test_ok")}
+    except Exception as exc:
+        print(f"[tracking] storage read error: {_scrub_secrets(str(exc))[:200]}",
+              file=sys.stderr)
+        return None
+
+
+def _store_put_config(key, cfg, last_test_ok):
+    url, _ = _sb_target()
+    if not url:
+        store = _trk_load()
+        rec = store.get(key) or {"config": {}, "sales": []}
+        rec["config"] = cfg
+        if last_test_ok is not None:
+            rec["last_test_ok"] = last_test_ok
+        store[key] = rec
+        _trk_save_all(store)
+        return
+    row = {"key": key,
+           "pixel_id": cfg.get("pixel_id", ""),
+           "token": cfg.get("token") or None,
+           "test_code": cfg.get("test_code", ""),
+           "domain": cfg.get("domain", ""),
+           "events": cfg.get("events") or [],
+           "last_test_ok": last_test_ok}
+    _sb_req("POST", "trk_configs", payload=row)
+
+
+def _store_add_sale(key, record):
+    url, _ = _sb_target()
+    if not url:
+        store = _trk_load()
+        rec = store.get(key) or {"config": {}, "sales": []}
+        rec.setdefault("sales", []).append(record)
+        rec["sales"] = rec["sales"][-500:]
+        store[key] = rec
+        _trk_save_all(store)
+        return
+    _sb_req("POST", "trk_sales",
+            payload={"event_id": record["id"], "key": key, "ts": record["ts"],
+                     "method": record["method"], "record": record})
+
+
 def _trk_clean(value, maxlen=200):
     if value is None:
         return ""
@@ -1346,7 +1433,7 @@ def create_app():
 
     # ----------------------------- Tracking -----------------------------
     def _trk_record(key):
-        return _trk_load().get(key)
+        return _store_get(key)
 
     def _trk_public_view(rec):
         if not rec or not rec.get("config"):
@@ -1376,8 +1463,7 @@ def create_app():
         if domain and not re.match(r"^[a-z0-9.-]+\.[a-z]{2,}$", domain):
             raise HTTPException(400, "invalid_domain")
         events = [e for e in (body.get("events") or []) if e in _TRK_EVENTS] or ["PageView"]
-        store = _trk_load()
-        rec = store.get(key) or {"config": {}, "sales": []}
+        rec = _store_get(key) or {"config": {}, "sales": []}
         cfg = rec.get("config") or {}
         token_in = str(body.get("token") or "").strip()
         if token_in:
@@ -1386,8 +1472,7 @@ def create_app():
                     "test_code": _trk_clean(body.get("test_code"), 64).upper(),
                     "events": events})
         rec["config"] = cfg
-        store[key] = rec
-        _trk_save_all(store)
+        _store_put_config(key, cfg, rec.get("last_test_ok"))
         return {"ok": True, **_trk_public_view(rec)}
 
     @app.get("/api/tracking/config")
@@ -1405,10 +1490,7 @@ def create_app():
         if not rec or not rec.get("config"):
             raise HTTPException(400, "not_configured")
         ok, detail = _capi_test(rec["config"])
-        store = _trk_load()
-        if key in store:
-            store[key]["last_test_ok"] = ok
-            _trk_save_all(store)
+        _store_put_config(key, rec["config"], ok)
         return {"ok": ok, "detail": detail}
 
     @app.post("/api/tracking/test-event")
@@ -1442,8 +1524,7 @@ def create_app():
         sale = _trk_extract_sale(body)
         if not sale or sale.get("amount") is None:
             raise HTTPException(400, "unrecognized_payload")
-        store = _trk_load()
-        rec = store.get(key) or {"config": {}, "sales": []}
+        rec = _store_get(key) or {"config": {}, "sales": []}
         cfg = rec.get("config") or {}
         event_name = _trk_sale_event(sale["status"], sale["method"])
         capi_status = "skipped"
@@ -1467,10 +1548,7 @@ def create_app():
             "has_fbc": bool((sale.get("_pii") or {}).get("fbc")),
             "capi_event": event_name, "capi_status": capi_status, "capi_event_id": event_id,
         }
-        rec.setdefault("sales", []).append(record)
-        rec["sales"] = rec["sales"][-500:]
-        store[key] = rec
-        _trk_save_all(store)
+        _store_add_sale(key, record)
         return {"ok": True, "sale_id": event_id, "capi_event": event_name, "capi_status": capi_status}
 
     @app.get("/api/sales")
