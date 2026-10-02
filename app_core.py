@@ -1378,6 +1378,10 @@ def create_app():
             for model_id, entry in model_registry.items()
         ])
 
+    @app.get("/sales")
+    def sales():
+        return FileResponse(static_dir / "sales.html")
+
     @app.get("/api/health")
     def health():
         return JSONResponse({
