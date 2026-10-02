@@ -688,9 +688,15 @@ def _store_get(key):
     if not url:
         return _trk_load().get(key)
     try:
+        sale_rows = _sb_req("GET", "trk_sales",
+                            params={"key": f"eq.{key}", "select": "record",
+                                    "order": "ts.desc", "limit": "500"}) or []
+        sales = [r["record"] for r in reversed(sale_rows)
+                 if isinstance(r.get("record"), dict)]
         rows = _sb_req("GET", "trk_configs", params={"key": f"eq.{key}", "select": "*"})
         if not rows:
-            return None
+            # Webhook-open keys have sales but no config row yet.
+            return {"config": {}, "sales": sales, "last_test_ok": None} if sales else None
         row = rows[0]
         cfg = {"pixel_id": row.get("pixel_id") or "",
                "domain": row.get("domain") or "",
@@ -698,11 +704,6 @@ def _store_get(key):
                "events": row.get("events") or []}
         if row.get("token"):
             cfg["token"] = row["token"]
-        sale_rows = _sb_req("GET", "trk_sales",
-                            params={"key": f"eq.{key}", "select": "record",
-                                    "order": "ts.desc", "limit": "500"}) or []
-        sales = [r["record"] for r in reversed(sale_rows)
-                 if isinstance(r.get("record"), dict)]
         return {"config": cfg, "sales": sales,
                 "last_test_ok": row.get("last_test_ok")}
     except Exception as exc:
