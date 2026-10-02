@@ -283,9 +283,36 @@
   @media(max-width:1200px){.app{grid-template-columns:var(--sidebar-w) 1fr}.chat-panel{display:none}}
   @media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.hero{grid-template-columns:1fr}.hero-right{display:none}.dash-grid{grid-template-columns:repeat(3,1fr)}.tool-grid{grid-template-columns:repeat(2,1fr)}.import-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:600px){.main{padding:0 14px 14px}.dash-grid{grid-template-columns:repeat(2,1fr)}.tool-grid{grid-template-columns:1fr}.import-grid{grid-template-columns:1fr}.hero-left h2{font-size:22px}.topbar-left .sub{display:none}}
+  .auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0B1220 0%,#101B33 55%,#0B1220 100%);padding:20px}
+  .auth-overlay.hidden{display:none}
+  .auth-card{width:100%;max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:30px 28px;box-shadow:0 24px 60px rgba(0,0,0,0.45)}
+  .auth-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;color:#fff}
+  .auth-logo .dot{width:10px;height:10px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,0.18)}
+  .auth-sub{color:var(--text-dim);font-size:13px;margin:10px 0 20px;line-height:1.5}
+  .auth-card label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text-dim);text-transform:uppercase;margin:14px 0 6px}
+  .auth-err{display:none;margin-top:14px;font-size:12.5px;color:#FCA5A5;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);padding:9px 11px;border-radius:9px}
+  .auth-submit{width:100%;margin-top:20px;padding:12px;font-size:14px}
+  .auth-switch{margin-top:16px;text-align:center;font-size:12.5px;color:var(--text-dim)}
+  .auth-switch button{background:none;border:none;color:#60A5FA;font-weight:700;cursor:pointer;font-size:12.5px;padding:0}
+  .logout-btn{display:block;width:100%;margin-top:10px;padding:8px;font-size:12px}
 </style>
 </head>
 <body>
+<div class="auth-overlay hidden" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span></div>
+    <div class="auth-sub" id="authSubtitle"></div>
+    <form id="authForm" autocomplete="on">
+      <label for="authEmail" id="authEmailLabel"></label>
+      <input id="authEmail" type="email" class="url-input" autocomplete="email" required>
+      <label for="authPassword" id="authPasswordLabel"></label>
+      <input id="authPassword" type="password" class="url-input" autocomplete="current-password" required minlength="8">
+      <div class="auth-err" id="authError"></div>
+      <button type="submit" class="btn-p auth-submit" id="authSubmit"></button>
+    </form>
+    <div class="auth-switch"><span id="authSwitchText"></span> <button type="button" id="authSwitchBtn"></button></div>
+  </div>
+</div>
 <div class="app">
 
     <aside class="side">
@@ -927,6 +954,53 @@ async function refreshTrackingDash(){
     grid.appendChild(c);
   }
 }
+let authMode='login',authUser=null;
+function applyAuthTexts(){
+  const st=function(id,v){const el=document.getElementById(id);if(el)el.textContent=v||''};
+  st('authSubtitle',UI.auth_subtitle);st('authEmailLabel',UI.auth_email);st('authPasswordLabel',UI.auth_password);
+  const isLogin=authMode==='login';
+  st('authSubmit',isLogin?UI.auth_login_btn:UI.auth_register_btn);
+  st('authSwitchText',isLogin?UI.auth_no_account:UI.auth_have_account);
+  st('authSwitchBtn',isLogin?UI.auth_to_register:UI.auth_to_login);
+  const lo=document.getElementById('logoutBtn');if(lo)lo.textContent=UI.auth_logout||'';
+}
+function authError(msg){const e=document.getElementById('authError');if(!e)return;if(!msg){e.style.display='none';return}e.textContent=msg;e.style.display='block'}
+function showAuth(){const o=document.getElementById('authOverlay');if(o)o.classList.remove('hidden');applyAuthTexts();const em=document.getElementById('authEmail');if(em)setTimeout(function(){em.focus()},60)}
+function hideAuth(){const o=document.getElementById('authOverlay');if(o)o.classList.add('hidden');authError(null)}
+async function authCheck(){
+  try{const r=await fetch('/api/auth/me');if(r.ok){const d=await r.json();authUser=d.email;hideAuth();ensureLogoutBtn();return true}}catch(e){}
+  showAuth();return false;
+}
+function ensureLogoutBtn(){
+  if(document.getElementById('logoutBtn'))return;
+  const f=document.querySelector('.side-footer');if(!f)return;
+  const b=document.createElement('button');b.type='button';b.id='logoutBtn';b.className='btn-s logout-btn';b.textContent=UI.auth_logout||'';
+  b.onclick=async function(){try{await fetch('/api/auth/logout',{method:'POST'})}catch(e){}location.reload()};
+  f.appendChild(b);
+}
+async function authSubmit(ev){
+  ev.preventDefault();authError(null);
+  const email=(document.getElementById('authEmail').value||'').trim();
+  const password=document.getElementById('authPassword').value||'';
+  if(password.length<8){authError(UI.auth_err_short_pw);return}
+  const path=authMode==='login'?'/api/auth/login':'/api/auth/register';
+  try{
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:password})});
+    const d=await r.json().catch(function(){return{}});
+    if(!r.ok){
+      const err=(d&&(d.detail||d.error))||'';
+      authError(err==='invalid_credentials'?UI.auth_err_invalid:err==='account_exists'?UI.auth_err_exists:err==='invalid_email'?UI.auth_err_email:UI.auth_err_generic);
+      return;
+    }
+    authUser=d.email||email;hideAuth();ensureLogoutBtn();
+  }catch(e){authError(UI.auth_err_generic)}
+}
+(function(){
+  const form=document.getElementById('authForm');if(form)form.addEventListener('submit',authSubmit);
+  const sw=document.getElementById('authSwitchBtn');if(sw)sw.addEventListener('click',function(){authMode=authMode==='login'?'register':'login';authError(null);applyAuthTexts();const pw=document.getElementById('authPassword');if(pw)pw.setAttribute('autocomplete',authMode==='login'?'current-password':'new-password')});
+  authCheck();
+})();
+
 async function trkCopyTo(text,msgEl){
   try{await navigator.clipboard.writeText(text)}
   catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(x){}ta.remove()}
@@ -1217,6 +1291,7 @@ function applyConfig(cfg){
   renderDashboardMetrics(cfg.dashboard_metrics||[]);
   applyTrackingTexts();
   refreshTrackingDash();
+  applyAuthTexts();
 
   document.getElementById('toolsSection').style.display=(cfg.tools&&cfg.tools.length)?'block':'none';
   if(cfg.tools&&cfg.tools.length)renderTools(cfg.tools);

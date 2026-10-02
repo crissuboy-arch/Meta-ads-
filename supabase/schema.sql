@@ -25,3 +25,14 @@ create index if not exists trk_sales_key_ts_idx on public.trk_sales (key, ts des
 
 alter table public.trk_configs enable row level security;
 alter table public.trk_sales enable row level security;
+
+-- App user accounts (login & password). Passwords are PBKDF2 hashes,
+-- never plain text.
+create table if not exists public.app_users (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  pass_hash text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.app_users enable row level security;

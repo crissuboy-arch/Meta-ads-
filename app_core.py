@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import hmac
 import json
 import os
 import re
@@ -937,6 +938,114 @@ def _capi_test(cfg):
         return False, "network_error"
 
 
+# ------------------------------- Auth -------------------------------
+_AUTH_COOKIE = "maep_session"
+_AUTH_EPHEMERAL = None
+_LOGIN_FAILS = {}
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
+
+
+def _auth_secret():
+    raw = os.getenv("APP_AUTH_SECRET") or os.getenv("SUPABASE_SERVICE_KEY")
+    if raw:
+        return hashlib.sha256(raw.encode()).digest()
+    global _AUTH_EPHEMERAL
+    if _AUTH_EPHEMERAL is None:
+        _AUTH_EPHEMERAL = secrets.token_bytes(32)
+    return _AUTH_EPHEMERAL
+
+
+def _pw_hash(password):
+    salt = secrets.token_bytes(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 200_000)
+    return "pbkdf2$200000$" + base64.b64encode(salt).decode() + "$" + base64.b64encode(dk).decode()
+
+
+def _pw_verify(password, stored):
+    try:
+        _, iters, salt_b64, hash_b64 = stored.split("$")
+        dk = hashlib.pbkdf2_hmac("sha256", password.encode(),
+                                 base64.b64decode(salt_b64), int(iters))
+        return hmac.compare_digest(base64.b64encode(dk).decode(), hash_b64)
+    except Exception:
+        return False
+
+
+def _b64u(data):
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
+
+
+def _b64u_dec(text):
+    return base64.urlsafe_b64decode(text + "=" * (-len(text) % 4))
+
+
+def _make_session(email):
+    payload = {"sub": email, "exp": int(time.time()) + 30 * 24 * 3600}
+    part = _b64u(json.dumps(payload, separators=(",", ":")).encode())
+    sig = hmac.new(_auth_secret(), part.encode(), hashlib.sha256).digest()
+    return part + "." + _b64u(sig)
+
+
+def _read_session(token):
+    if not token or "." not in token:
+        return None
+    part, sig = token.rsplit(".", 1)
+    good = _b64u(hmac.new(_auth_secret(), part.encode(), hashlib.sha256).digest())
+    if not hmac.compare_digest(sig, good):
+        return None
+    try:
+        payload = json.loads(_b64u_dec(part))
+    except Exception:
+        return None
+    if int(payload.get("exp", 0)) < int(time.time()):
+        return None
+    email = payload.get("sub")
+    return email if isinstance(email, str) and email else None
+
+
+def _users_path():
+    return _trk_data_dir() / "users.json"
+
+
+def _users_load():
+    try:
+        return json.loads(_users_path().read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _users_save(store):
+    path = _users_path()
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(store, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
+def _user_get(email):
+    url, _ = _sb_target()
+    if not url:
+        rec = _users_load().get(email)
+        return {"email": email, "pass_hash": rec["pass_hash"]} if rec else None
+    try:
+        rows = _sb_req("GET", "app_users", params={"email": f"eq.{email}", "select": "*"})
+        if not rows:
+            return None
+        return {"email": rows[0]["email"], "pass_hash": rows[0]["pass_hash"]}
+    except Exception as exc:
+        print(f"[auth] user read error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
+        return None
+
+
+def _user_create(email, pass_hash):
+    url, _ = _sb_target()
+    if not url:
+        store = _users_load()
+        store[email] = {"pass_hash": pass_hash}
+        _users_save(store)
+        return
+    _sb_req("POST", "app_users", payload={"email": email, "pass_hash": pass_hash})
+
+
 def create_app():
     skills = _load_skills()
     model_registry = _build_registry(skills)
@@ -1180,6 +1289,78 @@ def create_app():
 
     app = FastAPI()
     static_dir = ROOT / "static"
+
+    _PUBLIC_PREFIXES = ("/api/auth/", "/api/branding", "/api/health",
+                        "/api/webhooks/")
+    _PROTECTED_PREFIXES = ("/api/chat", "/api/models", "/api/tracking/",
+                           "/api/sales")
+
+    @app.middleware("http")
+    async def _auth_gate(request, call_next):
+        path = request.url.path
+        if any(path.startswith(p) for p in _PROTECTED_PREFIXES) and not any(
+                path.startswith(p) for p in _PUBLIC_PREFIXES):
+            email = _read_session(request.cookies.get(_AUTH_COOKIE) or "")
+            if not email:
+                return JSONResponse({"error": "unauthorized"}, status_code=401)
+            request.state.user_email = email
+        return await call_next(request)
+
+    def _session_cookie(resp, email):
+        resp.set_cookie(_AUTH_COOKIE, _make_session(email),
+                        max_age=30 * 24 * 3600, path="/", httponly=True,
+                        samesite="lax",
+                        secure=bool(os.getenv("VERCEL")))
+        return resp
+
+    def _valid_credentials(body):
+        email = str(body.get("email") or "").strip().lower()[:200]
+        password = str(body.get("password") or "")
+        if not _EMAIL_RE.match(email):
+            raise HTTPException(400, "invalid_email")
+        if len(password) < 8 or len(password) > 200:
+            raise HTTPException(400, "weak_password")
+        return email, password
+
+    @app.post("/api/auth/register")
+    async def auth_register(request: Request):
+        if os.getenv("APP_REGISTRATION", "open").lower() == "closed":
+            raise HTTPException(403, "registration_closed")
+        email, password = _valid_credentials(await request.json())
+        if _user_get(email):
+            raise HTTPException(409, "account_exists")
+        _user_create(email, _pw_hash(password))
+        return _session_cookie(JSONResponse({"ok": True, "email": email}), email)
+
+    @app.post("/api/auth/login")
+    async def auth_login(request: Request):
+        body = await request.json()
+        email = str(body.get("email") or "").strip().lower()[:200]
+        password = str(body.get("password") or "")
+        now = int(time.time())
+        fails = [t for t in _LOGIN_FAILS.get(email, []) if now - t < 600]
+        if len(fails) >= 8:
+            raise HTTPException(429, "too_many_attempts")
+        user = _user_get(email) if _EMAIL_RE.match(email) else None
+        if not user or not _pw_verify(password, user["pass_hash"]):
+            _LOGIN_FAILS[email] = fails + [now]
+            raise HTTPException(401, "invalid_credentials")
+        _LOGIN_FAILS.pop(email, None)
+        return _session_cookie(JSONResponse({"ok": True, "email": email}), email)
+
+    @app.post("/api/auth/logout")
+    async def auth_logout():
+        resp = JSONResponse({"ok": True})
+        resp.delete_cookie(_AUTH_COOKIE, path="/")
+        return resp
+
+    @app.get("/api/auth/me")
+    async def auth_me(request: Request):
+        email = _read_session(request.cookies.get(_AUTH_COOKIE) or "")
+        if not email:
+            raise HTTPException(401, "unauthorized")
+        return {"email": email}
+
 
     @app.get("/")
     def index():
