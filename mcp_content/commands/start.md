@@ -1,28 +1,23 @@
 ---
-description: Welcome + quick diagnosis of where you are, then tells you which command to run first
-argument-hint: "(no arguments — it asks what it needs)"
+description: Starts from the user's REAL accounts: shows what is running now across all Business Managers, then proposes the next step. No generic questionnaire.
+argument-hint: "(no arguments — it reads the accounts first)"
 ---
 
-Welcome the user to **Meta Ads Expert PRO** and find out where they are, so you can point them to the right first command. This command does not research, publish or spend anything.
+Start from data, not from a questionnaire. Never open with a list of questions you could answer with a tool. This command does not publish or spend anything.
 
-## Ask (short blocks, one at a time or grouped)
+## Steps
+1. Call `list_ad_accounts`.
+   - If it fails or returns nothing: say the Meta account is not connected, tell the user to open the app → **Connect ad accounts** → Connect with Facebook (or paste a Business Manager token), and stop there.
+2. Call `account_overview` with `date_preset: "today"`. Show one compact table grouped by Business Manager: account, status, active campaigns, spend, results, ROAS. Collapse accounts with no active campaigns and no spend into a single line ("N accounts idle: …"). Keep each account's own currency; never add different currencies.
+3. Add **at most 3 observations** taken from the numbers, for example: an account with spend but zero results; an account whose status is not ACTIVE (disabled, unsettled, in review); an account with active campaigns but no spend today (not delivering). If everything is quiet, say so.
+4. Offer the next step as a short menu based on what you saw:
+   - **See how everything is performing** → `/daily-check`
+   - **Create a new campaign** → `/campaign` (see below)
+   - **Audit a page, offer or account** → `/audit` or `/full-audit`
+   - **Fix tracking before spending** → `/tracking`
+5. If the user picks a new campaign, ask in **one message, at most 4 questions**, and only for what you cannot infer: what is being sold + the link of the page, the country/language, the daily test budget, and the goal (sales, leads, messages, traffic). Before asking, look at what already exists (`list_objects`, `list_pixels`, `list_pages`) and reuse the Page, Pixel, currency and objective that the account already uses. Offer them as defaults instead of asking.
 
-1. What do you sell? (one sentence)
-2. Who is it for, and what country/language will you advertise in?
-3. Daily budget for the test?
-4. Do you have a sales page? (ask for the link)
-5. Do you have the Meta Pixel installed and the Purchase event working?
-6. Do you already have creatives (images/videos)?
-7. Goal: direct sales, leads, WhatsApp/Direct messages, or traffic?
-8. Is your Meta account connected in the app (Connect ad accounts)? Check with `list_ad_accounts`. If not, tell the user to connect it there.
-
-## Recommend a sequence
-
-- No setup yet → `/setup`
-- No market research → `/research [product]`
-- Offer or price unclear → ask to run the `offer-evaluation` skill
-- Weak or unknown sales page → `/audit [product]`
-- Pixel/Purchase not confirmed and goal is sales → `/tracking` before any spend
-- Ready → `/creative` → `/campaign` → `/publish`
-
-End with the single next command to run and why.
+## Rules
+- Answer in the user's language.
+- Do not ask about the Pixel, Page or creatives before checking whether the tools already tell you.
+- Finish with the single next command and why.

@@ -1106,7 +1106,9 @@ _MCP_KEY_RE = re.compile(r"^mk_[A-Za-z0-9_-]{20,80}$")
 _MCP_CACHE = None
 _MCP_INSTRUCTIONS = (
     "Meta Ads Expert PRO: an AI media buyer for Facebook and Instagram ads. "
-    "Start with the prompt 'start' (or call list_commands). Each command tells you which "
+    "Start with the prompt 'start' (or call list_commands). Start from the user's real data: "
+    "call list_ad_accounts and account_overview BEFORE asking questions, and never open with a generic questionnaire. "
+    "Each command tells you which "
     "specialist skills to follow; load them with get_specialist. Campaigns are created "
     "with this app's own tools (list_ad_accounts, create_campaign, create_adset, create_ad, "
     "get_insights, set_status) and are always created paused."
