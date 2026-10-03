@@ -197,29 +197,55 @@ def register(app, d):
             print(f"[ads] callback error: {scrub(str(exc))[:300]}", file=sys.stderr)
             return RedirectResponse("/?ads=error", status_code=302)
 
+    def paged(path, token, params):
+        out = []
+        data = gget(path, token, params)
+        while True:
+            out.extend(data.get("data", []))
+            nxt = (data.get("paging") or {}).get("next")
+            if not nxt or len(out) > 2000:
+                break
+            data = requests.get(nxt, timeout=25).json()
+        return out
+
     def fetch_accounts(email, token):
         existing = {r["account_id"]: r.get("selected") for r in (sb_req(
             "GET", "ads_accounts",
             params={"email": f"eq.{email}", "platform": "eq.meta", "select": "account_id,selected"}) or [])}
-        url_params = {"fields": "account_id,name,currency,account_status", "limit": 200}
-        rows, nxt = [], None
-        data = gget("/me/adaccounts", token, url_params)
-        if not data.get("data"):  # Usuário do Sistema: contas atribuídas
-            try:
-                data = gget("/me/assigned_ad_accounts", token, url_params)
-            except RuntimeError:
-                pass
-        while True:
-            for a in data.get("data", []):
-                aid = str(a.get("account_id"))
-                rows.append({"email": email, "platform": "meta", "account_id": aid,
-                             "name": a.get("name") or aid, "currency": a.get("currency") or "",
-                             "status": str(a.get("account_status", "")),
-                             "selected": existing.get(aid, len(rows) == 0)})
-            nxt = (data.get("paging") or {}).get("next")
-            if not nxt:
-                break
-            data = requests.get(nxt, timeout=25).json()
+        fields = {"fields": "account_id,name,currency,account_status", "limit": 200}
+        found = {}  # account_id -> dict
+
+        def add(a, biz=None):
+            aid = str(a.get("account_id") or str(a.get("id", "")).replace("act_", ""))
+            if not aid.isdigit():
+                return
+            nm = a.get("name") or aid
+            cur = found.get(aid)
+            if cur and not biz:
+                return
+            found[aid] = {"name": (nm + " · " + biz) if biz else nm,
+                          "currency": a.get("currency") or "", "status": str(a.get("account_status", ""))}
+
+        for a in paged("/me/adaccounts", token, fields):
+            add(a)
+        try:  # Usuário do Sistema: contas atribuídas
+            for a in paged("/me/assigned_ad_accounts", token, fields):
+                add(a)
+        except RuntimeError:
+            pass
+        try:  # contas que estão DENTRO dos Business Managers (próprias e de clientes)
+            for b in paged("/me/businesses", token, {"fields": "id,name", "limit": 50}):
+                for edge in ("owned_ad_accounts", "client_ad_accounts"):
+                    try:
+                        for a in paged(f"/{b['id']}/{edge}", token, fields):
+                            add(a, b.get("name"))
+                    except RuntimeError:
+                        continue
+        except RuntimeError:
+            pass
+        rows = [{"email": email, "platform": "meta", "account_id": aid, "name": v["name"],
+                 "currency": v["currency"], "status": v["status"],
+                 "selected": existing.get(aid, True)} for aid, v in found.items()]
         if rows:
             sb_req("POST", "ads_accounts", params={"on_conflict": "email,platform,account_id"}, payload=rows)
         return rows
@@ -246,6 +272,16 @@ def register(app, d):
             raise HTTPException(400, "invalid_account")
         sb_req("PATCH", "ads_accounts",
                params={"email": f"eq.{email}", "platform": "eq.meta", "account_id": f"eq.{aid}"},
+               payload={"selected": bool(body.get("selected"))})
+        return {"ok": True}
+
+    @app.post("/api/ads/accounts/select-all")
+    async def ads_accounts_select_all(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        body = await request.json()
+        sb_req("PATCH", "ads_accounts",
+               params={"email": f"eq.{email}", "platform": "eq.meta"},
                payload={"selected": bool(body.get("selected"))})
         return {"ok": True}
 
@@ -312,14 +348,14 @@ def register(app, d):
             body = await request.json()
         except Exception:
             body = {}
-        days = max(1, min(int(body.get("days") or 30), 90))
+        days = max(0, min(int(body.get("days", 30)), 90))
         return sync_user(request.state.user_email, days)
 
     @app.get("/api/ads/insights")
     async def ads_insights(request: Request):
         need_supabase()
         email = request.state.user_email
-        days = max(1, min(int(request.query_params.get("days") or 30), 90))
+        days = max(0, min(int(request.query_params.get("days", "30")), 90))
         since = (date.today() - timedelta(days=days)).isoformat()
         params = {"email": f"eq.{email}", "platform": "eq.meta", "day": f"gte.{since}",
                   "select": "account_id,day,campaign_id,campaign_name,spend,impressions,clicks,purchases,purchase_value",
@@ -335,11 +371,17 @@ def register(app, d):
                                 "clicks": 0, "purchases": 0, "purchase_value": 0})
             for k in ("spend", "impressions", "clicks", "purchases", "purchase_value"):
                 c[k] += r.get(k) or 0
+        per = {}
+        for r in rows:
+            a = per.setdefault(r["account_id"], {"account_id": r["account_id"], "spend": 0, "clicks": 0, "impressions": 0})
+            a["spend"] += r.get("spend") or 0
+            a["clicks"] += r.get("clicks") or 0
+            a["impressions"] += r.get("impressions") or 0
         camps = sorted(camp.values(), key=lambda c: -c["spend"])
         tot = {k: sum(c[k] for c in camps) for k in ("spend", "impressions", "clicks", "purchases", "purchase_value")}
         tot["ctr"] = (tot["clicks"] / tot["impressions"] * 100) if tot["impressions"] else 0
         tot["roas"] = (tot["purchase_value"] / tot["spend"]) if tot["spend"] else 0
-        return {"days": days, "totals": tot, "campaigns": camps}
+        return {"days": days, "totals": tot, "campaigns": camps, "accounts": list(per.values())}
 
     @app.post("/api/ads/meta/token")
     async def ads_meta_token(request: Request):
