@@ -133,8 +133,6 @@ def register(app, d):
     async def ads_status(request: Request):
         email = request.state.user_email
         out = {"configured": configured(), "connected": False, "accounts": []}
-        if not configured():
-            return out
         need_supabase()
         rows = sb_req("GET", "ads_connections",
                       params={"email": f"eq.{email}", "platform": "eq.meta", "select": "name,expires_at"})
@@ -206,6 +204,11 @@ def register(app, d):
         url_params = {"fields": "account_id,name,currency,account_status", "limit": 200}
         rows, nxt = [], None
         data = gget("/me/adaccounts", token, url_params)
+        if not data.get("data"):  # Usuário do Sistema: contas atribuídas
+            try:
+                data = gget("/me/assigned_ad_accounts", token, url_params)
+            except RuntimeError:
+                pass
         while True:
             for a in data.get("data", []):
                 aid = str(a.get("account_id"))
@@ -338,6 +341,44 @@ def register(app, d):
         tot["roas"] = (tot["purchase_value"] / tot["spend"]) if tot["spend"] else 0
         return {"days": days, "totals": tot, "campaigns": camps}
 
+    @app.post("/api/ads/meta/token")
+    async def ads_meta_token(request: Request):
+        """Conecta com um token colado (ex.: Usuário do Sistema do Business Manager).
+        Serve quando a conta de anúncios está em outro login/e-mail do Facebook."""
+        need_supabase()
+        email = request.state.user_email
+        body = await request.json()
+        token = str(body.get("token") or "").strip()
+        if len(token) < 30 or len(token) > 1000 or " " in token:
+            raise HTTPException(400, "invalid_token")
+        info = {}
+        if configured():
+            try:
+                r = requests.get(graph_base() + "/debug_token", params={
+                    "input_token": token,
+                    "access_token": os.environ["META_APP_ID"] + "|" + os.environ["META_APP_SECRET"]}, timeout=25)
+                info = (r.json() or {}).get("data") or {}
+            except Exception:
+                info = {}
+        if info and info.get("is_valid") is False:
+            raise HTTPException(400, "token_invalid_or_expired")
+        scopes = info.get("scopes") or []
+        if scopes and "ads_read" not in scopes and "ads_management" not in scopes:
+            raise HTTPException(400, "token_missing_ads_permission")
+        try:
+            me = gget("/me", token, {"fields": "id,name"})
+        except RuntimeError as exc:
+            raise HTTPException(400, str(exc)[:200])
+        exp = info.get("expires_at") or 0
+        sb_req("POST", "ads_connections", params={"on_conflict": "email,platform"}, payload={
+            "email": email, "platform": "meta", "fb_user_id": me.get("id", ""),
+            "name": me.get("name", ""), "token_enc": enc(token),
+            "expires_at": int(exp) if exp else None})
+        rows = fetch_accounts(email, token)
+        return {"ok": True, "accounts": len(rows), "name": me.get("name", ""),
+                "permanent": not exp, "scopes": scopes,
+                "can_create": ("ads_management" in scopes) if scopes else None}
+
     @app.post("/api/ads/disconnect")
     async def ads_disconnect(request: Request):
         need_supabase()
@@ -435,7 +476,13 @@ def register(app, d):
         return {"ad_accounts": rows, "note": "Use account_id como ad_account_id nas outras ferramentas."}
 
     def t_list_pages(email, token, a):
-        d = gcall("GET", "/me/accounts", token, params={"fields": "id,name,instagram_business_account{id,username}", "limit": 100})
+        f = {"fields": "id,name,instagram_business_account{id,username}", "limit": 100}
+        d = gcall("GET", "/me/accounts", token, params=f)
+        if not d.get("data"):  # Usuário do Sistema: páginas atribuídas
+            try:
+                d = gcall("GET", "/me/assigned_pages", token, params={"fields": "id,name", "limit": 100})
+            except ToolError:
+                pass
         return {"pages": d.get("data", [])}
 
     def t_list_pixels(email, token, a):
