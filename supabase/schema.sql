@@ -99,3 +99,6 @@ create index if not exists ads_insights_day_idx on public.ads_insights (email, d
 alter table public.ads_connections enable row level security;
 alter table public.ads_accounts enable row level security;
 alter table public.ads_insights enable row level security;
+
+-- Nome do Business Manager (BM) de cada conta de anúncio
+alter table public.ads_accounts add column if not exists business text not null default '';

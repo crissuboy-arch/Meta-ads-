@@ -269,6 +269,7 @@
   .trk-status.ok{background:rgba(34,197,94,0.18);color:#4ADE80}
   .trk-status.err{background:rgba(239,68,68,0.18);color:#FCA5A5}
   body.cl-open #heroSection,body.cl-open #dashSection,body.cl-open #toolsSection,body.cl-open #utmSection,body.cl-open #importsSection,body.cl-open #nichesSection,body.cl-open #trackingSection{display:none !important}
+  .lv-table{width:100%;border-collapse:collapse;font-size:12.5px}.lv-table th,.lv-table td{padding:7px 8px;border-bottom:1px solid rgba(128,128,128,.25);text-align:right;white-space:nowrap}.lv-table th:first-child,.lv-table td:first-child{text-align:left;white-space:normal}.lv-bm td{background:rgba(96,165,250,.12);font-weight:700;text-align:left !important}.lv-row{cursor:pointer}.lv-row:hover td{background:rgba(128,128,128,.12)}
   #adTable th,#adTable td{padding:6px 8px;border-bottom:1px solid rgba(128,128,128,.25);text-align:right;white-space:nowrap}#adTable th:first-child,#adTable td:first-child{text-align:left;white-space:normal}
   .trk-block{margin-top:18px}
   .trk-block-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
@@ -422,6 +423,21 @@
           <button class="btn-s" id="trkSalesRefresh" type="button"></button>
         </div>
         <div id="trkSalesList"></div>
+      </div>
+    </section>
+
+    <section class="sec" id="adsLiveSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="lvTitle"></h3><span class="ln"></span><button class="btn-s" id="lvClose" type="button"></button></div>
+      <p class="utm-desc" id="lvDesc"></p>
+      <div class="trk-block">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+          <select id="lvPreset" class="app-select" style="width:auto"></select>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="lvActive" checked><span id="lvActiveLbl"></span></label>
+          <button class="btn-p" id="lvRefresh" type="button"></button>
+          <button class="btn-s" id="lvAnalyze" type="button"></button>
+        </div>
+        <div id="lvCrumbs" style="font-size:13px;margin-bottom:10px"></div>
+        <div style="overflow-x:auto"><div id="lvBody"></div></div>
       </div>
     </section>
 
@@ -686,9 +702,10 @@ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventD
 
 document.querySelector('.app').addEventListener('click',async e=>{
   const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
-  if(btn.dataset.id==='ads-connect'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();openAdsScreen();return}
-  if(btn.dataset.id==='claude-connect'){if(trkSavedDisplays)closeTrackingScreen();closeAdsScreen();openClaudeScreen();return}
-  closeClaudeScreen();closeAdsScreen();
+  if(btn.dataset.id==='ads-live'){if(trkSavedDisplays)closeTrackingScreen();lvOpenScreen();return}
+  if(btn.dataset.id==='ads-connect'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();lvCloseScreen();openAdsScreen();return}
+  if(btn.dataset.id==='claude-connect'){if(trkSavedDisplays)closeTrackingScreen();closeAdsScreen();lvCloseScreen();openClaudeScreen();return}
+  closeClaudeScreen();closeAdsScreen();lvCloseScreen();
   if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'){openTrackingScreen();return}
   if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentModule=btn.dataset.id;currentSystemPrompt=p;syncUTMPanel();await sendChat(btn.dataset.label||btn.dataset.id)}return}
   const id=btn.dataset.id;if(!id)return;
@@ -763,7 +780,9 @@ function renderSidebar(cfg){
   if(dash&&dash.nextSibling)nav.insertBefore(cb,dash.nextSibling);else nav.appendChild(cb);
   const ab=document.createElement('button');ab.className='side-item';ab.dataset.id='ads-connect';ab.dataset.label=adT().label;
   ab.innerHTML='<span class="ico">\uD83D\uDCCA</span>'+adT().label;
-  nav.insertBefore(ab,cb);
+  const lb=document.createElement('button');lb.className='side-item';lb.dataset.id='ads-live';lb.dataset.label=lvT().label;
+  lb.innerHTML='<span class="ico">\uD83D\uDCC8</span>'+lvT().label;
+  nav.insertBefore(lb,cb);nav.insertBefore(ab,cb);
 }
 
 function renderTools(tools){
@@ -1046,7 +1065,7 @@ async function adDisconnect(){
 }
 function openAdsScreen(){
   const sec=document.getElementById('adsSection');if(!sec)return;
-  closeClaudeScreen();adOpen=true;document.body.classList.add('cl-open');
+  closeClaudeScreen();lvCloseScreen();adOpen=true;document.body.classList.add('cl-open');
   sec.style.display='block';currentModule='ads-connect';
   adApply();window.scrollTo({top:0,behavior:'smooth'});adLoad();
 }
@@ -1065,6 +1084,114 @@ document.getElementById('adAccFilter').addEventListener('change',adLoadData);
 document.getElementById('adSelAll').addEventListener('click',adSelectAll);
 document.getElementById('adRefresh').addEventListener('click',adRefreshList);
 document.getElementById('adAnalyze').addEventListener('click',adAnalyze);
+
+// -------- Live ads panel (all BMs -> accounts -> campaigns -> ad sets -> ads) --------
+const LV_I18N={"en": {"label": "Ads panel", "title": "Ads panel — all Business Managers", "close": "Close", "desc": "What is running now in every connected ad account, live from Meta: status, spend, results and ROAS. Click an account to see campaigns, then ad sets and ads.", "refresh": "Refresh", "analyze": "Analyze with AI", "onlyActive": "Only active", "today": "Today", "yesterday": "Yesterday", "d7": "Last 7 days", "d30": "Last 30 days", "month": "This month", "all": "All accounts", "loading": "Loading from Meta…", "err": "Could not load from Meta. Try again.", "notConnected": "Connect your ad accounts first.", "noAccounts": "No selected accounts. Select accounts in Connect ad accounts.", "noBM": "No Business Manager", "account": "Account", "status": "Status", "activeCamps": "Active campaigns", "spend": "Spend", "results": "Results", "cpr": "Cost/result", "budget": "Daily budget", "campaign": "Campaign", "adset": "Ad set", "ad": "Ad", "empty": "Nothing to show for this period.", "clickHint": "Click an account to open its campaigns.", "rPurchase": "purchases", "rLead": "leads", "rMessage": "messages", "rClick": "clicks", "analyzePrompt": "Analyze the current performance of my Meta Ads ({d}). Point out what to pause, scale and fix first, with reasons. Data:", "st": {"ACTIVE": "Active", "PAUSED": "Paused", "CAMPAIGN_PAUSED": "Campaign paused", "ADSET_PAUSED": "Ad set paused", "IN_PROCESS": "Processing", "WITH_ISSUES": "With issues", "PENDING_REVIEW": "In review", "DISAPPROVED": "Disapproved", "ARCHIVED": "Archived", "DELETED": "Deleted", "PENDING_BILLING_INFO": "Billing pending", "DISABLED": "Disabled", "UNSETTLED": "Unsettled", "PENDING_RISK_REVIEW": "Risk review", "IN_GRACE_PERIOD": "Grace period", "CLOSED": "Closed", "PENDING_CLOSURE": "Closing", "PENDING_SETTLEMENT": "Settlement pending"}}, "pt": {"label": "Painel de anúncios", "title": "Painel de anúncios — todas as BMs", "close": "Fechar", "desc": "O que está rodando agora em cada conta de anúncio conectada, ao vivo do Meta: status, gasto, resultados e ROAS. Clique numa conta para ver as campanhas, depois conjuntos e anúncios.", "refresh": "Atualizar", "analyze": "Analisar com IA", "onlyActive": "Somente ativas", "today": "Hoje", "yesterday": "Ontem", "d7": "Últimos 7 dias", "d30": "Últimos 30 dias", "month": "Este mês", "all": "Todas as contas", "loading": "Carregando do Meta…", "err": "Não foi possível carregar do Meta. Tente de novo.", "notConnected": "Conecte suas contas de anúncio primeiro.", "noAccounts": "Nenhuma conta selecionada. Selecione em Conectar contas de anúncio.", "noBM": "Sem Business Manager", "account": "Conta", "status": "Status", "activeCamps": "Campanhas ativas", "spend": "Gasto", "results": "Resultados", "cpr": "Custo/resultado", "budget": "Orçamento diário", "campaign": "Campanha", "adset": "Conjunto", "ad": "Anúncio", "empty": "Nada para mostrar neste período.", "clickHint": "Clique numa conta para abrir as campanhas.", "rPurchase": "compras", "rLead": "leads", "rMessage": "mensagens", "rClick": "cliques", "analyzePrompt": "Analise o desempenho atual dos meus anúncios do Meta ({d}). Diga o que pausar, escalar e corrigir primeiro, com os motivos. Dados:", "st": {"ACTIVE": "Ativa", "PAUSED": "Pausada", "CAMPAIGN_PAUSED": "Campanha pausada", "ADSET_PAUSED": "Conjunto pausado", "IN_PROCESS": "Processando", "WITH_ISSUES": "Com problemas", "PENDING_REVIEW": "Em análise", "DISAPPROVED": "Reprovada", "ARCHIVED": "Arquivada", "DELETED": "Excluída", "PENDING_BILLING_INFO": "Cobrança pendente", "DISABLED": "Desativada", "UNSETTLED": "Pagamento pendente", "PENDING_RISK_REVIEW": "Análise de risco", "IN_GRACE_PERIOD": "Período de carência", "CLOSED": "Encerrada", "PENDING_CLOSURE": "Encerrando", "PENDING_SETTLEMENT": "Acerto pendente"}}, "es": {"label": "Panel de anuncios", "title": "Panel de anuncios — todos los BM", "close": "Cerrar", "desc": "Lo que está corriendo ahora en cada cuenta publicitaria conectada, en vivo desde Meta: estado, gasto, resultados y ROAS. Haz clic en una cuenta para ver campañas, luego conjuntos y anuncios.", "refresh": "Actualizar", "analyze": "Analizar con IA", "onlyActive": "Solo activas", "today": "Hoy", "yesterday": "Ayer", "d7": "Últimos 7 días", "d30": "Últimos 30 días", "month": "Este mes", "all": "Todas las cuentas", "loading": "Cargando desde Meta…", "err": "No se pudo cargar desde Meta. Inténtalo de nuevo.", "notConnected": "Conecta primero tus cuentas publicitarias.", "noAccounts": "Ninguna cuenta seleccionada. Selecciónalas en Conectar cuentas publicitarias.", "noBM": "Sin Business Manager", "account": "Cuenta", "status": "Estado", "activeCamps": "Campañas activas", "spend": "Gasto", "results": "Resultados", "cpr": "Costo/resultado", "budget": "Presupuesto diario", "campaign": "Campaña", "adset": "Conjunto", "ad": "Anuncio", "empty": "Nada que mostrar en este período.", "clickHint": "Haz clic en una cuenta para abrir sus campañas.", "rPurchase": "compras", "rLead": "leads", "rMessage": "mensajes", "rClick": "clics", "analyzePrompt": "Analiza el rendimiento actual de mis anuncios de Meta ({d}). Indica qué pausar, escalar y corregir primero, con los motivos. Datos:", "st": {"ACTIVE": "Activa", "PAUSED": "Pausada", "CAMPAIGN_PAUSED": "Campaña pausada", "ADSET_PAUSED": "Conjunto pausado", "IN_PROCESS": "Procesando", "WITH_ISSUES": "Con problemas", "PENDING_REVIEW": "En revisión", "DISAPPROVED": "Rechazada", "ARCHIVED": "Archivada", "DELETED": "Eliminada", "PENDING_BILLING_INFO": "Facturación pendiente", "DISABLED": "Deshabilitada", "UNSETTLED": "Pago pendiente", "PENDING_RISK_REVIEW": "Revisión de riesgo", "IN_GRACE_PERIOD": "Periodo de gracia", "CLOSED": "Cerrada", "PENDING_CLOSURE": "Cerrando", "PENDING_SETTLEMENT": "Liquidación pendiente"}}, "fr": {"label": "Tableau des annonces", "title": "Tableau des annonces — tous les BM", "close": "Fermer", "desc": "Ce qui tourne maintenant dans chaque compte publicitaire connecté, en direct de Meta : statut, dépense, résultats et ROAS. Cliquez sur un compte pour voir les campagnes, puis les ensembles et les annonces.", "refresh": "Actualiser", "analyze": "Analyser avec l’IA", "onlyActive": "Actives seulement", "today": "Aujourd’hui", "yesterday": "Hier", "d7": "7 derniers jours", "d30": "30 derniers jours", "month": "Ce mois-ci", "all": "Tous les comptes", "loading": "Chargement depuis Meta…", "err": "Impossible de charger depuis Meta. Réessayez.", "notConnected": "Connectez d’abord vos comptes publicitaires.", "noAccounts": "Aucun compte sélectionné. Sélectionnez-les dans Connecter les comptes publicitaires.", "noBM": "Sans Business Manager", "account": "Compte", "status": "Statut", "activeCamps": "Campagnes actives", "spend": "Dépense", "results": "Résultats", "cpr": "Coût/résultat", "budget": "Budget quotidien", "campaign": "Campagne", "adset": "Ensemble", "ad": "Annonce", "empty": "Rien à afficher pour cette période.", "clickHint": "Cliquez sur un compte pour ouvrir ses campagnes.", "rPurchase": "achats", "rLead": "leads", "rMessage": "messages", "rClick": "clics", "analyzePrompt": "Analysez la performance actuelle de mes annonces Meta ({d}). Indiquez quoi mettre en pause, développer et corriger en premier, avec les raisons. Données :", "st": {"ACTIVE": "Active", "PAUSED": "En pause", "CAMPAIGN_PAUSED": "Campagne en pause", "ADSET_PAUSED": "Ensemble en pause", "IN_PROCESS": "En cours", "WITH_ISSUES": "Avec problèmes", "PENDING_REVIEW": "En examen", "DISAPPROVED": "Refusée", "ARCHIVED": "Archivée", "DELETED": "Supprimée", "PENDING_BILLING_INFO": "Facturation en attente", "DISABLED": "Désactivé", "UNSETTLED": "Paiement en attente", "PENDING_RISK_REVIEW": "Examen de risque", "IN_GRACE_PERIOD": "Période de grâce", "CLOSED": "Fermé", "PENDING_CLOSURE": "Fermeture", "PENDING_SETTLEMENT": "Règlement en attente"}}, "tr": {"label": "Reklam paneli", "title": "Reklam paneli — tüm Business Manager’lar", "close": "Kapat", "desc": "Bağlı her reklam hesabında şu an çalışanlar, Meta’dan canlı: durum, harcama, sonuçlar ve ROAS. Kampanyaları görmek için bir hesaba, ardından reklam kümelerine ve reklamlara tıklayın.", "refresh": "Yenile", "analyze": "Yapay zekayla analiz et", "onlyActive": "Yalnızca aktifler", "today": "Bugün", "yesterday": "Dün", "d7": "Son 7 gün", "d30": "Son 30 gün", "month": "Bu ay", "all": "Tüm hesaplar", "loading": "Meta’dan yükleniyor…", "err": "Meta’dan yüklenemedi. Tekrar deneyin.", "notConnected": "Önce reklam hesaplarınızı bağlayın.", "noAccounts": "Seçili hesap yok. Reklam hesaplarını bağla bölümünde seçin.", "noBM": "Business Manager yok", "account": "Hesap", "status": "Durum", "activeCamps": "Aktif kampanyalar", "spend": "Harcama", "results": "Sonuçlar", "cpr": "Sonuç başına maliyet", "budget": "Günlük bütçe", "campaign": "Kampanya", "adset": "Reklam kümesi", "ad": "Reklam", "empty": "Bu dönem için gösterilecek bir şey yok.", "clickHint": "Kampanyaları açmak için bir hesaba tıklayın.", "rPurchase": "satın alma", "rLead": "potansiyel müşteri", "rMessage": "mesaj", "rClick": "tıklama", "analyzePrompt": "Meta reklamlarımın mevcut performansını analiz et ({d}). Nelerin önce duraklatılacağını, ölçekleneceğini ve düzeltileceğini nedenleriyle söyle. Veriler:", "st": {"ACTIVE": "Aktif", "PAUSED": "Duraklatıldı", "CAMPAIGN_PAUSED": "Kampanya duraklatıldı", "ADSET_PAUSED": "Reklam kümesi duraklatıldı", "IN_PROCESS": "İşleniyor", "WITH_ISSUES": "Sorunlu", "PENDING_REVIEW": "İncelemede", "DISAPPROVED": "Reddedildi", "ARCHIVED": "Arşivlendi", "DELETED": "Silindi", "PENDING_BILLING_INFO": "Faturalama bekliyor", "DISABLED": "Devre dışı", "UNSETTLED": "Ödenmemiş", "PENDING_RISK_REVIEW": "Risk incelemesi", "IN_GRACE_PERIOD": "Ek süre", "CLOSED": "Kapalı", "PENDING_CLOSURE": "Kapanıyor", "PENDING_SETTLEMENT": "Ödeme bekliyor"}}, "de": {"label": "Anzeigen-Panel", "title": "Anzeigen-Panel — alle Business Manager", "close": "Schließen", "desc": "Was gerade in jedem verbundenen Werbekonto läuft, live von Meta: Status, Ausgaben, Ergebnisse und ROAS. Klicken Sie auf ein Konto für Kampagnen, dann Anzeigengruppen und Anzeigen.", "refresh": "Aktualisieren", "analyze": "Mit KI analysieren", "onlyActive": "Nur aktive", "today": "Heute", "yesterday": "Gestern", "d7": "Letzte 7 Tage", "d30": "Letzte 30 Tage", "month": "Dieser Monat", "all": "Alle Konten", "loading": "Lade von Meta…", "err": "Laden von Meta nicht möglich. Bitte erneut versuchen.", "notConnected": "Verbinden Sie zuerst Ihre Werbekonten.", "noAccounts": "Keine Konten ausgewählt. Auswahl unter Werbekonten verbinden.", "noBM": "Kein Business Manager", "account": "Konto", "status": "Status", "activeCamps": "Aktive Kampagnen", "spend": "Ausgaben", "results": "Ergebnisse", "cpr": "Kosten/Ergebnis", "budget": "Tagesbudget", "campaign": "Kampagne", "adset": "Anzeigengruppe", "ad": "Anzeige", "empty": "Für diesen Zeitraum nichts anzuzeigen.", "clickHint": "Klicken Sie auf ein Konto, um die Kampagnen zu öffnen.", "rPurchase": "Käufe", "rLead": "Leads", "rMessage": "Nachrichten", "rClick": "Klicks", "analyzePrompt": "Analysiere die aktuelle Performance meiner Meta-Anzeigen ({d}). Nenne mit Begründung, was zuerst pausiert, skaliert und korrigiert werden soll. Daten:", "st": {"ACTIVE": "Aktiv", "PAUSED": "Pausiert", "CAMPAIGN_PAUSED": "Kampagne pausiert", "ADSET_PAUSED": "Anzeigengruppe pausiert", "IN_PROCESS": "In Bearbeitung", "WITH_ISSUES": "Mit Problemen", "PENDING_REVIEW": "In Prüfung", "DISAPPROVED": "Abgelehnt", "ARCHIVED": "Archiviert", "DELETED": "Gelöscht", "PENDING_BILLING_INFO": "Abrechnung ausstehend", "DISABLED": "Deaktiviert", "UNSETTLED": "Unbezahlt", "PENDING_RISK_REVIEW": "Risikoprüfung", "IN_GRACE_PERIOD": "Kulanzfrist", "CLOSED": "Geschlossen", "PENDING_CLOSURE": "Wird geschlossen", "PENDING_SETTLEMENT": "Abrechnung ausstehend"}}};
+let lvOpen=false,lvPreset='today',lvOnlyActive=true,lvStack=[{view:'overview'}],lvData=null,lvBusy=false;
+function lvT(){return LV_I18N[LANG]||LV_I18N.en}
+function lvLoc(){return (typeof HTML_LANG_MAP!=='undefined'&&HTML_LANG_MAP[LANG])||undefined}
+function lvMoney(n,cur){try{return new Intl.NumberFormat(lvLoc(),{style:'currency',currency:cur||'USD'}).format(n||0)}catch(e){return (cur||'')+' '+(Number(n)||0).toFixed(2)}}
+function lvNum(n){return (Number(n)||0).toLocaleString(lvLoc())}
+function lvStatus(st){
+  const t=lvT(),map=t.st||{};const label=map[st]||st||'—';
+  const good=st==='ACTIVE',bad=['DISAPPROVED','WITH_ISSUES','DISABLED','UNSETTLED','PENDING_RISK_REVIEW','IN_GRACE_PERIOD'].includes(st);
+  const c=good?'#22c55e':bad?'#ef4444':'#9ca3af';
+  return '<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid '+c+';color:'+c+'">'+adEsc(label)+'</span>';
+}
+function lvResultLabel(k){const t=lvT();return ({purchase:t.rPurchase,lead:t.rLead,message:t.rMessage,link_click:t.rClick})[k]||''}
+function lvCrumbs(){
+  const t=lvT();
+  const names=[t.all];lvStack.slice(1).forEach(s=>names.push(s.label||s.view));
+  document.getElementById('lvCrumbs').innerHTML=names.map((n,i)=>i<names.length-1?'<a href="#" data-lv-back="'+i+'" style="color:var(--accent,#60a5fa)">'+adEsc(n)+'</a>':'<b>'+adEsc(n)+'</b>').join(' › ');
+}
+function lvApplyTexts(){
+  const t=lvT();
+  clSet('lvTitle',t.title);clSet('lvClose',t.close);clSet('lvDesc',t.desc);clSet('lvRefresh',t.refresh);clSet('lvAnalyze',t.analyze);clSet('lvActiveLbl',t.onlyActive);
+  const ps=document.getElementById('lvPreset'),cur=lvPreset;
+  ps.innerHTML=[['today',t.today],['yesterday',t.yesterday],['last_7d',t.d7],['last_30d',t.d30],['this_month',t.month]].map(x=>'<option value="'+x[0]+'">'+adEsc(x[1])+'</option>').join('');ps.value=cur;
+  document.getElementById('lvActive').checked=lvOnlyActive;
+}
+async function lvLoad(){
+  if(lvBusy)return;lvBusy=true;
+  const t=lvT(),cur=lvStack[lvStack.length-1];
+  lvCrumbs();document.getElementById('lvBody').innerHTML='<div class="utm-hint">'+adEsc(t.loading)+'</div>';
+  try{
+    let url='/api/ads/live?preset='+encodeURIComponent(lvPreset)+'&view='+cur.view;
+    if(cur.view!=='overview'){url+='&account_id='+encodeURIComponent(cur.account_id)+(cur.parent?'&parent='+encodeURIComponent(cur.parent):'')+'&only_active='+(lvOnlyActive?1:0)}
+    const r=await fetch(url);
+    if(r.status===404){lvData=null;document.getElementById('lvBody').innerHTML='<div class="utm-hint">'+adEsc(t.notConnected)+'</div>';lvBusy=false;return}
+    if(!r.ok)throw new Error(r.status);
+    lvData=await r.json();lvData._view=cur.view;lvRender();
+  }catch(e){document.getElementById('lvBody').innerHTML='<div class="utm-hint">'+adEsc(t.err)+'</div>'}
+  lvBusy=false;
+}
+function lvCell(x,left){return '<td'+(left?' style="text-align:left"':'')+'>'+x+'</td>'}
+function lvRender(){
+  const t=lvT(),box=document.getElementById('lvBody');
+  if(lvData._view==='overview'){
+    const accs=lvData.accounts||[];
+    if(!accs.length){box.innerHTML='<div class="utm-hint">'+adEsc(t.noAccounts)+'</div>';return}
+    const groups={};accs.forEach(a=>{const k=a.business||t.noBM;(groups[k]=groups[k]||[]).push(a)});
+    let html='<table class="lv-table"><thead><tr><th>'+adEsc(t.account)+'</th><th>'+adEsc(t.status)+'</th><th>'+adEsc(t.activeCamps)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(t.results)+'</th><th>'+adEsc(t.cpr)+'</th><th>ROAS</th><th>CTR</th></tr></thead><tbody>';
+    const tot=k=>groups[k].reduce((s,a)=>s+(a.spend||0),0);Object.keys(groups).sort((x,y)=>tot(y)-tot(x)||x.localeCompare(y)).forEach(bm=>{
+      const sub={};groups[bm].forEach(a=>{const c=a.currency||'';sub[c]=(sub[c]||0)+(a.spend||0)});
+      html+='<tr class="lv-bm"><td colspan="8">'+adEsc(bm)+' · '+Object.keys(sub).map(c=>lvMoney(sub[c],c)).join(' + ')+'</td></tr>';
+      groups[bm].forEach(a=>{
+        if(a.error){html+='<tr><td style="text-align:left">'+adEsc(a.name)+'</td><td colspan="7" style="text-align:left;color:#ef4444">'+adEsc(a.error)+'</td></tr>';return}
+        html+='<tr class="lv-row" data-acc="'+adEsc(a.account_id)+'" data-name="'+adEsc(a.name)+'" data-cur="'+adEsc(a.currency)+'">'+lvCell(adEsc(a.name),1)+lvCell(lvStatus(a.account_status))+lvCell(lvNum(a.active_campaigns))+lvCell(lvMoney(a.spend,a.currency))+lvCell(lvNum(a.results)+(a.results?' <small style="opacity:.6">'+adEsc(lvResultLabel(a.result_type))+'</small>':''))+lvCell(a.results?lvMoney(a.cost_per_result,a.currency):'—')+lvCell(a.spend?(a.roas||0).toFixed(2)+'x':'—')+lvCell((a.ctr||0).toFixed(2)+'%')+'</tr>';
+      });
+    });
+    box.innerHTML=html+'</tbody></table><div class="utm-hint" style="margin-top:8px">'+adEsc(t.clickHint)+'</div>';
+    return;
+  }
+  const rows=lvData.rows||[],cur=lvData.currency,nextView={campaign:'adset',adset:'ad'}[lvData._view];
+  if(!rows.length){box.innerHTML='<div class="utm-hint">'+adEsc(t.empty)+'</div>';return}
+  let html='<table class="lv-table"><thead><tr><th>'+adEsc(t[lvData._view])+'</th><th>'+adEsc(t.status)+'</th><th>'+adEsc(t.budget)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(t.results)+'</th><th>'+adEsc(t.cpr)+'</th><th>ROAS</th><th>CTR</th><th>CPC</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const bud=r.daily_budget!=null?lvMoney(r.daily_budget/100,cur):'—';
+    html+='<tr class="'+(nextView?'lv-row':'')+'" data-id="'+adEsc(r.id)+'" data-name="'+adEsc(r.name)+'">'+lvCell(adEsc(r.name),1)+lvCell(lvStatus(r.status))+lvCell(bud)+lvCell(lvMoney(r.spend,cur))+lvCell(lvNum(r.results)+(r.results?' <small style="opacity:.6">'+adEsc(lvResultLabel(r.result_type))+'</small>':''))+lvCell(r.results?lvMoney(r.cost_per_result,cur):'—')+lvCell(r.spend?(r.roas||0).toFixed(2)+'x':'—')+lvCell((r.ctr||0).toFixed(2)+'%')+lvCell(r.clicks?lvMoney(r.cpc,cur):'—')+'</tr>';
+  });
+  box.innerHTML=html+'</tbody></table>';
+}
+function lvOpenScreen(){
+  const sec=document.getElementById('adsLiveSection');if(!sec)return;
+  closeClaudeScreen();closeAdsScreen();lvOpen=true;document.body.classList.add('cl-open');
+  sec.style.display='block';currentModule='ads-live';lvStack=[{view:'overview'}];
+  lvApplyTexts();window.scrollTo({top:0,behavior:'smooth'});lvLoad();
+}
+function lvCloseScreen(){
+  if(!lvOpen)return;lvOpen=false;document.body.classList.remove('cl-open');
+  const sec=document.getElementById('adsLiveSection');if(sec)sec.style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function lvAnalyze(){
+  const t=lvT();if(!lvData)return;
+  const ps=document.getElementById('lvPreset'),lab=ps.options[ps.selectedIndex].textContent;
+  let lines=[];
+  if(lvData._view==='overview'){(lvData.accounts||[]).forEach(a=>{if(!a.error)lines.push('- '+(a.business||t.noBM)+' / '+a.name+' | '+(a.account_status||'')+' | active campaigns '+(a.active_campaigns||0)+' | spend '+lvMoney(a.spend,a.currency)+' | results '+(a.results||0)+' ('+(a.result_type||'')+') | ROAS '+(a.roas||0).toFixed(2)+' | CTR '+(a.ctr||0).toFixed(2)+'%')})}
+  else{(lvData.rows||[]).slice(0,40).forEach(r=>lines.push('- '+r.name+' | '+r.status+' | spend '+lvMoney(r.spend,lvData.currency)+' | results '+(r.results||0)+' | ROAS '+(r.roas||0).toFixed(2)+' | CTR '+(r.ctr||0).toFixed(2)+'%'))}
+  if(!lines.length)return;
+  lvCloseScreen();
+  const pid=['analyze','results-analysis','analise','analyse'].find(k=>P[k]);
+  if(pid){currentModule=pid;currentSystemPrompt=P[pid]}else{currentModule='';currentSystemPrompt=''}
+  await sendChat(t.analyzePrompt.replace('{d}',lab)+'\n'+lines.join('\n'));
+}
+document.getElementById('lvClose').addEventListener('click',lvCloseScreen);
+document.getElementById('lvRefresh').addEventListener('click',lvLoad);
+document.getElementById('lvAnalyze').addEventListener('click',lvAnalyze);
+document.getElementById('lvPreset').addEventListener('change',e=>{lvPreset=e.target.value;lvLoad()});
+document.getElementById('lvActive').addEventListener('change',e=>{lvOnlyActive=e.target.checked;if(lvStack.length>1)lvLoad()});
+document.getElementById('lvBody').addEventListener('click',e=>{
+  const row=e.target.closest('tr.lv-row');if(!row)return;
+  const cur=lvStack[lvStack.length-1];
+  if(cur.view==='overview'){lvStack.push({view:'campaign',account_id:row.dataset.acc,label:row.dataset.name});lvLoad()}
+  else if(cur.view==='campaign'){lvStack.push({view:'adset',account_id:cur.account_id,parent:row.dataset.id,label:row.dataset.name});lvLoad()}
+  else if(cur.view==='adset'){lvStack.push({view:'ad',account_id:cur.account_id,parent:row.dataset.id,label:row.dataset.name});lvLoad()}
+});
+document.getElementById('lvCrumbs').addEventListener('click',e=>{
+  const a=e.target.closest('[data-lv-back]');if(!a)return;e.preventDefault();
+  lvStack=lvStack.slice(0,(+a.dataset.lvBack)+1);lvLoad();
+});
 
 // -------- Tracking screen (Meta Pixel + Conversions API + sales) --------
 const TRK_EVENT_NAMES=['PageView','ViewContent','AddToCart','InitiateCheckout','AddPaymentInfo','Purchase','Lead'];

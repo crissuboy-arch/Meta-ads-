@@ -140,11 +140,14 @@ def register(app, d):
             out["connected"] = True
             out["name"] = rows[0].get("name") or ""
             out["expires_at"] = rows[0].get("expires_at")
-            out["accounts"] = sb_req(
-                "GET", "ads_accounts",
-                params={"email": f"eq.{email}", "platform": "eq.meta",
-                        "select": "account_id,name,currency,status,selected,last_sync",
-                        "order": "name.asc"}) or []
+            ap = {"email": f"eq.{email}", "platform": "eq.meta",
+                  "select": "account_id,name,currency,status,selected,last_sync,business",
+                  "order": "name.asc"}
+            try:
+                out["accounts"] = sb_req("GET", "ads_accounts", params=ap) or []
+            except Exception:
+                ap["select"] = "account_id,name,currency,status,selected,last_sync"
+                out["accounts"] = sb_req("GET", "ads_accounts", params=ap) or []
         return out
 
     @app.post("/api/ads/meta/start")
@@ -223,7 +226,7 @@ def register(app, d):
             cur = found.get(aid)
             if cur and not biz:
                 return
-            found[aid] = {"name": (nm + " · " + biz) if biz else nm,
+            found[aid] = {"name": nm, "business": biz or (cur or {}).get("business", ""),
                           "currency": a.get("currency") or "", "status": str(a.get("account_status", ""))}
 
         for a in paged("/me/adaccounts", token, fields):
@@ -244,10 +247,15 @@ def register(app, d):
         except RuntimeError:
             pass
         rows = [{"email": email, "platform": "meta", "account_id": aid, "name": v["name"],
-                 "currency": v["currency"], "status": v["status"],
+                 "currency": v["currency"], "status": v["status"], "business": v["business"],
                  "selected": existing.get(aid, True)} for aid, v in found.items()]
         if rows:
-            sb_req("POST", "ads_accounts", params={"on_conflict": "email,platform,account_id"}, payload=rows)
+            try:
+                sb_req("POST", "ads_accounts", params={"on_conflict": "email,platform,account_id"}, payload=rows)
+            except Exception:  # coluna 'business' ainda não existe: salva sem ela
+                for r in rows:
+                    r.pop("business", None)
+                sb_req("POST", "ads_accounts", params={"on_conflict": "email,platform,account_id"}, payload=rows)
         return rows
 
     @app.post("/api/ads/accounts/refresh")
@@ -440,6 +448,139 @@ def register(app, d):
         users = sb_req("GET", "ads_connections", params={"platform": "eq.meta", "select": "email"}) or []
         done = [{"email": u["email"], **sync_user(u["email"], 7)} for u in users]
         return JSONResponse({"ok": True, "users": len(done)})
+
+    # ================================================================
+    # Painel ao vivo: todas as contas/BMs -> campanhas -> conjuntos -> anúncios
+    # ================================================================
+    from concurrent.futures import ThreadPoolExecutor
+
+    STATUS_NAMES = {"1": "ACTIVE", "2": "DISABLED", "3": "UNSETTLED", "7": "PENDING_RISK_REVIEW",
+                    "8": "PENDING_SETTLEMENT", "9": "IN_GRACE_PERIOD", "100": "PENDING_CLOSURE",
+                    "101": "CLOSED"}
+    PRESETS = {"today", "yesterday", "last_3d", "last_7d", "last_14d", "last_30d", "this_month", "last_month"}
+    INS_FIELDS = "spend,impressions,clicks,ctr,cpc,cpm,actions,action_values"
+
+    def act_sum(lst, types):
+        return sum(num(a.get("value")) for a in (lst or []) if a.get("action_type") in types)
+
+    def live_metrics(r):
+        spend = num(r.get("spend"))
+        acts, vals = r.get("actions"), r.get("action_values")
+        purchases = act_sum(acts, ("purchase", "omni_purchase"))
+        revenue = act_sum(vals, ("purchase", "omni_purchase"))
+        leads = act_sum(acts, ("lead", "onsite_conversion.lead_grouped"))
+        msgs = act_sum(acts, ("onsite_conversion.messaging_conversation_started_7d",))
+        link = act_sum(acts, ("link_click",))
+        if purchases:
+            res, kind = purchases, "purchase"
+        elif leads:
+            res, kind = leads, "lead"
+        elif msgs:
+            res, kind = msgs, "message"
+        else:
+            res, kind = link, "link_click"
+        return {"spend": spend, "impressions": int(num(r.get("impressions"))),
+                "clicks": int(num(r.get("clicks"))), "ctr": num(r.get("ctr")),
+                "cpc": num(r.get("cpc")), "cpm": num(r.get("cpm")),
+                "purchases": purchases, "revenue": revenue, "results": res, "result_type": kind,
+                "cost_per_result": (spend / res) if res else 0,
+                "roas": (revenue / spend) if spend else 0}
+
+    def selected_accounts(email, only_id=None):
+        params = {"email": f"eq.{email}", "platform": "eq.meta", "selected": "eq.true",
+                  "select": "account_id,name,currency,business", "order": "name.asc"}
+        if only_id:
+            params.pop("selected")
+            params["account_id"] = f"eq.{only_id}"
+        try:
+            return sb_req("GET", "ads_accounts", params=params) or []
+        except Exception:  # coluna 'business' ainda não criada no Supabase
+            params["select"] = "account_id,name,currency"
+            return sb_req("GET", "ads_accounts", params=params) or []
+
+    def account_overview(token, a, preset):
+        aid = a["account_id"]
+        out = {"account_id": aid, "name": a.get("name") or aid, "business": a.get("business") or "",
+               "currency": a.get("currency") or ""}
+        try:
+            info = gget(f"/act_{aid}", token, {"fields": "account_status,disable_reason,currency"})
+            out["account_status"] = STATUS_NAMES.get(str(info.get("account_status")), str(info.get("account_status")))
+            out["currency"] = info.get("currency") or out["currency"]
+            ins = gget(f"/act_{aid}/insights", token, {"level": "account", "date_preset": preset, "fields": INS_FIELDS})
+            rows = ins.get("data") or []
+            out.update(live_metrics(rows[0] if rows else {}))
+            camps = gget(f"/act_{aid}/campaigns", token, {
+                "fields": "id", "limit": 500,
+                "filtering": json.dumps([{"field": "effective_status", "operator": "IN", "value": ["ACTIVE"]}])})
+            out["active_campaigns"] = len(camps.get("data") or [])
+        except RuntimeError as exc:
+            out["error"] = str(exc)[:200]
+        return out
+
+    def overview_all(email, token, preset):
+        accts = selected_accounts(email)
+        with ThreadPoolExecutor(max_workers=6) as ex:
+            return list(ex.map(lambda a: account_overview(token, a, preset), accts))
+
+    def live_level(token, aid, level, parent, preset, only_active):
+        edge = {"campaign": "campaigns", "adset": "adsets", "ad": "ads"}[level]
+        fields = {"campaign": "id,name,status,effective_status,daily_budget,lifetime_budget,objective",
+                  "adset": "id,name,campaign_id,status,effective_status,daily_budget,optimization_goal",
+                  "ad": "id,name,adset_id,status,effective_status"}[level]
+        flt = []
+        if only_active:
+            flt.append({"field": "effective_status", "operator": "IN", "value": ["ACTIVE"]})
+        pflt = None
+        if parent and parent.isdigit():
+            pfield = {"adset": "campaign.id", "ad": "adset.id"}.get(level)
+            if pfield:
+                pflt = {"field": pfield, "operator": "IN", "value": [parent]}
+        params = {"fields": fields, "limit": 200}
+        f2 = flt + ([pflt] if pflt else [])
+        if f2:
+            params["filtering"] = json.dumps(f2)
+        objs = gget(f"/act_{aid}/{edge}", token, params).get("data") or []
+        ip = {"level": level, "date_preset": preset, "limit": 500, "fields": f"{level}_id," + INS_FIELDS}
+        if pflt:
+            ip["filtering"] = json.dumps([pflt])
+        irows = gget(f"/act_{aid}/insights", token, ip).get("data") or []
+        by_id = {r.get(f"{level}_id"): live_metrics(r) for r in irows}
+        out = []
+        for o in objs:
+            m = by_id.get(o["id"]) or live_metrics({})
+            row = {"id": o["id"], "name": o.get("name"), "status": o.get("effective_status") or o.get("status"),
+                   "daily_budget": int(o["daily_budget"]) if str(o.get("daily_budget") or "").isdigit() else None,
+                   "objective": o.get("objective") or o.get("optimization_goal")}
+            row.update(m)
+            out.append(row)
+        out.sort(key=lambda r: -r["spend"])
+        return out
+
+    @app.get("/api/ads/live")
+    def ads_live(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        token, _row = get_token(email)
+        if not token:
+            raise HTTPException(404, "not_connected")
+        qp = request.query_params
+        preset = qp.get("preset", "today")
+        if preset not in PRESETS:
+            raise HTTPException(400, "invalid_preset")
+        view = qp.get("view", "overview")
+        if view == "overview":
+            return {"preset": preset, "accounts": overview_all(email, token, preset)}
+        if view not in ("campaign", "adset", "ad"):
+            raise HTTPException(400, "invalid_view")
+        aid = str(qp.get("account_id") or "")
+        if not aid.isdigit() or not selected_accounts(email, aid):
+            raise HTTPException(400, "invalid_account")
+        try:
+            rows = live_level(token, aid, view, qp.get("parent") or "", preset, qp.get("only_active", "1") == "1")
+        except RuntimeError as exc:
+            raise HTTPException(502, str(exc)[:200])
+        cur = (selected_accounts(email, aid)[0].get("currency")) or ""
+        return {"preset": preset, "view": view, "currency": cur, "rows": rows}
 
     # ================================================================
     # Ferramentas MCP: ler e criar campanhas (SEMPRE pausadas) com o token
@@ -636,12 +777,21 @@ def register(app, d):
         d = gcall("POST", f"/{oid}", token, {"status": status})
         return {"object_id": oid, "status": status, "success": bool(d.get("success", True))}
 
+    def t_account_overview(email, token, a):
+        preset = a.get("date_preset") or "today"
+        if preset not in PRESETS:
+            raise ToolError("date_preset inválido: " + ", ".join(sorted(PRESETS)))
+        return {"preset": preset, "accounts": overview_all(email, token, preset),
+                "note": "Uma linha por conta de anúncio selecionada (agrupe por business/BM). spend/revenue na moeda de cada conta."}
+
     A = {"type": "string"}
     def schema(props, req):
         return {"type": "object", "properties": props, "required": req, "additionalProperties": True}
     ACC = {"type": "string", "description": "account_id retornado por list_ad_accounts (só números)."}
     tools = [
         ("list_ad_accounts", "Lista as contas de anúncio do Meta conectadas pelo usuário no app.", schema({}, []), t_list_ad_accounts),
+        ("account_overview", "Visão geral de TODAS as contas de anúncio conectadas (todas as BMs): gasto, resultados, ROAS, status da conta e nº de campanhas ativas no período. date_preset: today, yesterday, last_7d, last_30d. Use para acompanhar o desempenho de hoje.",
+         schema({"date_preset": A}, []), t_account_overview),
         ("list_pages", "Lista as Páginas do Facebook (e Instagram ligado) que o usuário pode usar nos anúncios.", schema({}, []), t_list_pages),
         ("list_pixels", "Lista os Pixels da conta de anúncio.", schema({"ad_account_id": ACC}, ["ad_account_id"]), t_list_pixels),
         ("list_objects", "Lista campanhas, conjuntos ou anúncios da conta com status e orçamento. Use para verificar o que foi criado.",
