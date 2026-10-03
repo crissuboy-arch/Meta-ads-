@@ -1,0 +1,598 @@
+"""Conectar contas de anúncios (Meta Ads) direto no app — sem Windsor.ai.
+
+Fluxo: o usuário clica em "Conectar com Facebook" -> OAuth do Meta -> o app troca o
+código por um token de longa duração (~60 dias), lista as contas de anúncio, guarda
+tudo no Supabase (token criptografado) e sincroniza os insights por campanha/dia.
+
+Usa só a Marketing API oficial (gratuita). Para contas em que VOCÊ tem papel no app
+Meta (admin/desenvolvedor/testador) funciona em modo Desenvolvimento, sem App Review.
+
+Variáveis de ambiente (Vercel):
+  META_APP_ID, META_APP_SECRET   -> do app em developers.facebook.com
+  META_REDIRECT_URI              -> opcional (padrão: <origem>/api/ads/meta/callback)
+  META_SCOPES                    -> opcional (padrão: ads_read,ads_management,pages_show_list,pages_read_engagement,business_management)
+  META_GRAPH_VERSION             -> opcional (padrão: v23.0)
+  CRON_SECRET                    -> opcional, protege /api/ads/cron (Vercel Cron envia sozinho)
+"""
+import base64
+import hashlib
+import hmac
+import json
+import os
+import secrets
+import sys
+import time
+import urllib.parse
+from datetime import date, timedelta
+
+from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse, RedirectResponse
+
+STATE_TTL = 600  # segundos
+
+
+def register(app, d):
+    """d = dict com: sb_req, sb_target, auth_secret, scrub, requests, b64u, b64u_dec."""
+    sb_req, sb_target = d["sb_req"], d["sb_target"]
+    auth_secret, scrub, requests = d["auth_secret"], d["scrub"], d["requests"]
+    b64u, b64u_dec = d["b64u"], d["b64u_dec"]
+
+    def graph_base():
+        return "https://graph.facebook.com/" + os.getenv("META_GRAPH_VERSION", "v23.0")
+
+    def configured():
+        return bool(os.getenv("META_APP_ID") and os.getenv("META_APP_SECRET"))
+
+    def need_supabase():
+        url, _ = sb_target()
+        if not url:
+            raise HTTPException(503, "supabase_required")
+
+    def redirect_uri(request: Request):
+        env = os.getenv("META_REDIRECT_URI")
+        if env:
+            return env
+        proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+        host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
+        return f"{proto}://{host}/api/ads/meta/callback"
+
+    # ---- criptografia do token (stdlib: keystream HMAC-SHA256 + MAC) ----
+    def _keys():
+        base = hashlib.sha256(b"ads-token|" + auth_secret()).digest()
+        return (hmac.new(base, b"enc", hashlib.sha256).digest(),
+                hmac.new(base, b"mac", hashlib.sha256).digest())
+
+    def enc(text: str) -> str:
+        ek, mk = _keys()
+        nonce = secrets.token_bytes(16)
+        raw = text.encode()
+        stream = b""
+        i = 0
+        while len(stream) < len(raw):
+            stream += hmac.new(ek, nonce + i.to_bytes(4, "big"), hashlib.sha256).digest()
+            i += 1
+        ct = bytes(a ^ b for a, b in zip(raw, stream))
+        tag = hmac.new(mk, nonce + ct, hashlib.sha256).digest()
+        return b64u(nonce + ct + tag)
+
+    def dec(blob: str):
+        try:
+            data = b64u_dec(blob)
+            nonce, ct, tag = data[:16], data[16:-32], data[-32:]
+            ek, mk = _keys()
+            if not hmac.compare_digest(tag, hmac.new(mk, nonce + ct, hashlib.sha256).digest()):
+                return None
+            stream = b""
+            i = 0
+            while len(stream) < len(ct):
+                stream += hmac.new(ek, nonce + i.to_bytes(4, "big"), hashlib.sha256).digest()
+                i += 1
+            return bytes(a ^ b for a, b in zip(ct, stream)).decode()
+        except Exception:
+            return None
+
+    # ---- state do OAuth (assinado, com validade) ----
+    def make_state(email):
+        payload = {"e": email, "n": secrets.token_hex(8), "x": int(time.time()) + STATE_TTL}
+        part = b64u(json.dumps(payload, separators=(",", ":")).encode())
+        sig = b64u(hmac.new(auth_secret(), b"ads-state|" + part.encode(), hashlib.sha256).digest())
+        return part + "." + sig
+
+    def read_state(state):
+        try:
+            part, sig = state.rsplit(".", 1)
+            good = b64u(hmac.new(auth_secret(), b"ads-state|" + part.encode(), hashlib.sha256).digest())
+            if not hmac.compare_digest(sig, good):
+                return None
+            p = json.loads(b64u_dec(part))
+            return p["e"] if int(p["x"]) >= time.time() else None
+        except Exception:
+            return None
+
+    def gget(path, token, params=None, timeout=25):
+        q = dict(params or {})
+        q["access_token"] = token
+        r = requests.get(graph_base() + path, params=q, timeout=timeout)
+        if r.status_code >= 400:
+            try:
+                msg = r.json().get("error", {}).get("message", "")
+            except Exception:
+                msg = r.text[:200]
+            raise RuntimeError(scrub(f"meta_api {r.status_code}: {msg}"))
+        return r.json()
+
+    def get_token(email):
+        rows = sb_req("GET", "ads_connections",
+                      params={"email": f"eq.{email}", "platform": "eq.meta", "select": "*"})
+        if not rows:
+            return None, None
+        return dec(rows[0].get("token_enc") or ""), rows[0]
+
+    # ---------------------------------------------------------------- rotas
+    @app.get("/api/ads/status")
+    async def ads_status(request: Request):
+        email = request.state.user_email
+        out = {"configured": configured(), "connected": False, "accounts": []}
+        if not configured():
+            return out
+        need_supabase()
+        rows = sb_req("GET", "ads_connections",
+                      params={"email": f"eq.{email}", "platform": "eq.meta", "select": "name,expires_at"})
+        if rows:
+            out["connected"] = True
+            out["name"] = rows[0].get("name") or ""
+            out["expires_at"] = rows[0].get("expires_at")
+            out["accounts"] = sb_req(
+                "GET", "ads_accounts",
+                params={"email": f"eq.{email}", "platform": "eq.meta",
+                        "select": "account_id,name,currency,status,selected,last_sync",
+                        "order": "name.asc"}) or []
+        return out
+
+    @app.post("/api/ads/meta/start")
+    async def ads_meta_start(request: Request):
+        if not configured():
+            raise HTTPException(503, "meta_not_configured")
+        email = request.state.user_email
+        q = {
+            "client_id": os.environ["META_APP_ID"],
+            "redirect_uri": redirect_uri(request),
+            "state": make_state(email),
+            "scope": os.getenv("META_SCOPES", "ads_read,ads_management,pages_show_list,pages_read_engagement,business_management"),
+            "response_type": "code",
+        }
+        url = "https://www.facebook.com/" + os.getenv("META_GRAPH_VERSION", "v23.0") + \
+              "/dialog/oauth?" + urllib.parse.urlencode(q)
+        return {"url": url}
+
+    @app.get("/api/ads/meta/callback")
+    async def ads_meta_callback(request: Request):
+        qp = request.query_params
+        if qp.get("error"):
+            return RedirectResponse("/?ads=denied", status_code=302)
+        email = read_state(qp.get("state") or "")
+        code = qp.get("code")
+        if not email or not code or not configured():
+            return RedirectResponse("/?ads=error", status_code=302)
+        try:
+            need_supabase()
+            app_id, secret = os.environ["META_APP_ID"], os.environ["META_APP_SECRET"]
+            short = requests.get(graph_base() + "/oauth/access_token", params={
+                "client_id": app_id, "client_secret": secret,
+                "redirect_uri": redirect_uri(request), "code": code}, timeout=25)
+            short.raise_for_status()
+            llt = requests.get(graph_base() + "/oauth/access_token", params={
+                "grant_type": "fb_exchange_token", "client_id": app_id,
+                "client_secret": secret, "fb_exchange_token": short.json()["access_token"]},
+                timeout=25)
+            llt.raise_for_status()
+            tok = llt.json()
+            token = tok["access_token"]
+            expires_at = int(time.time()) + int(tok.get("expires_in") or 5184000)
+            me = gget("/me", token, {"fields": "id,name"})
+            sb_req("POST", "ads_connections", params={"on_conflict": "email,platform"}, payload={
+                "email": email, "platform": "meta", "fb_user_id": me.get("id", ""),
+                "name": me.get("name", ""), "token_enc": enc(token), "expires_at": expires_at})
+            fetch_accounts(email, token)
+            return RedirectResponse("/?ads=connected", status_code=302)
+        except Exception as exc:
+            print(f"[ads] callback error: {scrub(str(exc))[:300]}", file=sys.stderr)
+            return RedirectResponse("/?ads=error", status_code=302)
+
+    def fetch_accounts(email, token):
+        existing = {r["account_id"]: r.get("selected") for r in (sb_req(
+            "GET", "ads_accounts",
+            params={"email": f"eq.{email}", "platform": "eq.meta", "select": "account_id,selected"}) or [])}
+        url_params = {"fields": "account_id,name,currency,account_status", "limit": 200}
+        rows, nxt = [], None
+        data = gget("/me/adaccounts", token, url_params)
+        while True:
+            for a in data.get("data", []):
+                aid = str(a.get("account_id"))
+                rows.append({"email": email, "platform": "meta", "account_id": aid,
+                             "name": a.get("name") or aid, "currency": a.get("currency") or "",
+                             "status": str(a.get("account_status", "")),
+                             "selected": existing.get(aid, len(rows) == 0)})
+            nxt = (data.get("paging") or {}).get("next")
+            if not nxt:
+                break
+            data = requests.get(nxt, timeout=25).json()
+        if rows:
+            sb_req("POST", "ads_accounts", params={"on_conflict": "email,platform,account_id"}, payload=rows)
+        return rows
+
+    @app.post("/api/ads/accounts/refresh")
+    async def ads_accounts_refresh(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        token, _ = get_token(email)
+        if not token:
+            raise HTTPException(404, "not_connected")
+        try:
+            return {"count": len(fetch_accounts(email, token))}
+        except RuntimeError as exc:
+            raise HTTPException(502, str(exc)[:200])
+
+    @app.post("/api/ads/accounts/select")
+    async def ads_accounts_select(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        body = await request.json()
+        aid = str(body.get("account_id") or "")
+        if not aid.isdigit():
+            raise HTTPException(400, "invalid_account")
+        sb_req("PATCH", "ads_accounts",
+               params={"email": f"eq.{email}", "platform": "eq.meta", "account_id": f"eq.{aid}"},
+               payload={"selected": bool(body.get("selected"))})
+        return {"ok": True}
+
+    def num(v):
+        try:
+            return float(v)
+        except Exception:
+            return 0.0
+
+    def sync_account(email, token, aid, days):
+        since = (date.today() - timedelta(days=days)).isoformat()
+        until = date.today().isoformat()
+        params = {
+            "level": "campaign", "time_increment": 1, "limit": 500,
+            "fields": "campaign_id,campaign_name,spend,impressions,clicks,ctr,actions,action_values",
+            "time_range": json.dumps({"since": since, "until": until}),
+        }
+        data = gget(f"/act_{aid}/insights", token, params, timeout=40)
+        out = []
+        while True:
+            for r in data.get("data", []):
+                purchases = sum(num(a.get("value")) for a in (r.get("actions") or [])
+                                if a.get("action_type") in ("purchase", "omni_purchase"))
+                value = sum(num(a.get("value")) for a in (r.get("action_values") or [])
+                            if a.get("action_type") in ("purchase", "omni_purchase"))
+                out.append({"email": email, "platform": "meta", "account_id": aid,
+                            "day": r.get("date_start"), "campaign_id": r.get("campaign_id") or "",
+                            "campaign_name": r.get("campaign_name") or "",
+                            "spend": num(r.get("spend")), "impressions": int(num(r.get("impressions"))),
+                            "clicks": int(num(r.get("clicks"))), "ctr": num(r.get("ctr")),
+                            "purchases": purchases, "purchase_value": value})
+            nxt = (data.get("paging") or {}).get("next")
+            if not nxt:
+                break
+            data = requests.get(nxt, timeout=40).json()
+        for i in range(0, len(out), 500):
+            sb_req("POST", "ads_insights",
+                   params={"on_conflict": "email,platform,account_id,day,campaign_id"},
+                   payload=out[i:i + 500])
+        sb_req("PATCH", "ads_accounts",
+               params={"email": f"eq.{email}", "platform": "eq.meta", "account_id": f"eq.{aid}"},
+               payload={"last_sync": int(time.time())})
+        return len(out)
+
+    def sync_user(email, days):
+        token, _ = get_token(email)
+        if not token:
+            return {"error": "not_connected"}
+        accts = sb_req("GET", "ads_accounts",
+                       params={"email": f"eq.{email}", "platform": "eq.meta",
+                               "selected": "eq.true", "select": "account_id"}) or []
+        total, errors = 0, []
+        for a in accts:
+            try:
+                total += sync_account(email, token, a["account_id"], days)
+            except Exception as exc:
+                errors.append(scrub(str(exc))[:160])
+        return {"rows": total, "accounts": len(accts), "errors": errors}
+
+    @app.post("/api/ads/sync")
+    async def ads_sync(request: Request):
+        need_supabase()
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        days = max(1, min(int(body.get("days") or 30), 90))
+        return sync_user(request.state.user_email, days)
+
+    @app.get("/api/ads/insights")
+    async def ads_insights(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        days = max(1, min(int(request.query_params.get("days") or 30), 90))
+        since = (date.today() - timedelta(days=days)).isoformat()
+        params = {"email": f"eq.{email}", "platform": "eq.meta", "day": f"gte.{since}",
+                  "select": "account_id,day,campaign_id,campaign_name,spend,impressions,clicks,purchases,purchase_value",
+                  "order": "day.desc", "limit": "5000"}
+        aid = request.query_params.get("account_id")
+        if aid and aid.isdigit():
+            params["account_id"] = f"eq.{aid}"
+        rows = sb_req("GET", "ads_insights", params=params) or []
+        camp = {}
+        for r in rows:
+            c = camp.setdefault(r["campaign_id"], {"campaign_id": r["campaign_id"],
+                                "campaign_name": r["campaign_name"], "spend": 0, "impressions": 0,
+                                "clicks": 0, "purchases": 0, "purchase_value": 0})
+            for k in ("spend", "impressions", "clicks", "purchases", "purchase_value"):
+                c[k] += r.get(k) or 0
+        camps = sorted(camp.values(), key=lambda c: -c["spend"])
+        tot = {k: sum(c[k] for c in camps) for k in ("spend", "impressions", "clicks", "purchases", "purchase_value")}
+        tot["ctr"] = (tot["clicks"] / tot["impressions"] * 100) if tot["impressions"] else 0
+        tot["roas"] = (tot["purchase_value"] / tot["spend"]) if tot["spend"] else 0
+        return {"days": days, "totals": tot, "campaigns": camps}
+
+    @app.post("/api/ads/disconnect")
+    async def ads_disconnect(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        for t in ("ads_insights", "ads_accounts", "ads_connections"):
+            sb_req("DELETE", t, params={"email": f"eq.{email}", "platform": "eq.meta"})
+        return {"ok": True}
+
+    @app.get("/api/ads/cron")
+    async def ads_cron(request: Request):
+        """Sincronização diária (Vercel Cron). Exige CRON_SECRET."""
+        secret = os.getenv("CRON_SECRET", "")
+        got = (request.headers.get("authorization") or "").removeprefix("Bearer ").strip()
+        if not secret or not hmac.compare_digest(got.encode(), secret.encode()):
+            raise HTTPException(401, "unauthorized")
+        need_supabase()
+        users = sb_req("GET", "ads_connections", params={"platform": "eq.meta", "select": "email"}) or []
+        done = [{"email": u["email"], **sync_user(u["email"], 7)} for u in users]
+        return JSONResponse({"ok": True, "users": len(done)})
+
+    # ================================================================
+    # Ferramentas MCP: ler e criar campanhas (SEMPRE pausadas) com o token
+    # guardado do usuário. O Claude nunca vê o token.
+    # ================================================================
+    ZERO_DEC = {"JPY", "KRW", "VND", "CLP", "PYG", "UGX", "ISK", "XAF", "XOF", "KMF", "RWF", "DJF", "GNF", "VUV", "XPF"}
+    OBJECTIVES = ["OUTCOME_SALES", "OUTCOME_LEADS", "OUTCOME_TRAFFIC", "OUTCOME_ENGAGEMENT",
+                  "OUTCOME_AWARENESS", "OUTCOME_APP_PROMOTION"]
+
+    class ToolError(Exception):
+        pass
+
+    def gcall(method, path, token, data=None, params=None, timeout=40):
+        form = {}
+        for k, v in (data or {}).items():
+            if v is None:
+                continue
+            form[k] = json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v
+        q = dict(params or {})
+        q["access_token"] = token
+        if method == "GET":
+            r = requests.get(graph_base() + path, params=q, timeout=timeout)
+        else:
+            r = requests.post(graph_base() + path, params={"access_token": token}, data=form, timeout=timeout)
+        try:
+            body = r.json()
+        except Exception:
+            body = {}
+        if r.status_code >= 400 or (isinstance(body, dict) and body.get("error")):
+            err = (body.get("error") if isinstance(body, dict) else None) or {}
+            msg = err.get("error_user_msg") or err.get("message") or r.text[:200]
+            title = err.get("error_user_title") or ""
+            if err.get("code") == 190:
+                msg = "Token do Meta expirou ou foi revogado. Peça ao usuário para abrir o app > Conectar contas de anúncio > Reconectar."
+            raise ToolError(scrub(f"Meta API: {title + ': ' if title else ''}{msg}"))
+        return body
+
+    def gcall_retry(method, path, token, data, fixes):
+        """Tenta; se o Meta pedir um campo novo conhecido, repete uma vez com ele."""
+        try:
+            return gcall(method, path, token, data)
+        except ToolError as exc:
+            text = str(exc)
+            for needle, patch in fixes:
+                if needle in text:
+                    return gcall(method, path, token, patch(dict(data)))
+            raise
+
+    def account_row(email, aid):
+        aid = str(aid or "").replace("act_", "").strip()
+        if not aid.isdigit():
+            raise ToolError("ad_account_id inválido. Use list_ad_accounts para ver os IDs.")
+        rows = sb_req("GET", "ads_accounts", params={"email": f"eq.{email}", "platform": "eq.meta",
+                                                     "account_id": f"eq.{aid}", "select": "account_id,name,currency"})
+        if not rows:
+            raise ToolError("Essa conta de anúncio não está conectada. Use list_ad_accounts.")
+        return rows[0]
+
+    def to_minor(currency, amount):
+        try:
+            v = float(amount)
+        except Exception:
+            raise ToolError("Valor de orçamento inválido.")
+        if v <= 0:
+            raise ToolError("O orçamento precisa ser maior que zero.")
+        return int(round(v * (1 if (currency or "").upper() in ZERO_DEC else 100)))
+
+    def need(args, *names):
+        miss = [n for n in names if args.get(n) in (None, "", [], {})]
+        if miss:
+            raise ToolError("Faltam campos obrigatórios: " + ", ".join(miss))
+
+    def t_list_ad_accounts(email, token, a):
+        rows = sb_req("GET", "ads_accounts", params={"email": f"eq.{email}", "platform": "eq.meta",
+                      "select": "account_id,name,currency,status,selected", "order": "name.asc"}) or []
+        return {"ad_accounts": rows, "note": "Use account_id como ad_account_id nas outras ferramentas."}
+
+    def t_list_pages(email, token, a):
+        d = gcall("GET", "/me/accounts", token, params={"fields": "id,name,instagram_business_account{id,username}", "limit": 100})
+        return {"pages": d.get("data", [])}
+
+    def t_list_pixels(email, token, a):
+        need(a, "ad_account_id")
+        row = account_row(email, a["ad_account_id"])
+        d = gcall("GET", f"/act_{row['account_id']}/adspixels", token, params={"fields": "id,name,last_fired_time", "limit": 50})
+        return {"pixels": d.get("data", [])}
+
+    def t_list_objects(email, token, a):
+        need(a, "ad_account_id", "level")
+        row = account_row(email, a["ad_account_id"])
+        level = a["level"]
+        if level not in ("campaigns", "adsets", "ads"):
+            raise ToolError("level deve ser campaigns, adsets ou ads.")
+        fields = {"campaigns": "id,name,status,effective_status,objective,daily_budget,created_time",
+                  "adsets": "id,name,campaign_id,status,effective_status,daily_budget,optimization_goal",
+                  "ads": "id,name,adset_id,status,effective_status,creative{id}"}[level]
+        d = gcall("GET", f"/act_{row['account_id']}/{level}", token,
+                  params={"fields": fields, "limit": min(int(a.get("limit") or 50), 100)})
+        return {"currency": row["currency"], "items": d.get("data", []),
+                "note": "daily_budget vem em unidade menor da moeda (5000 = 50,00)."}
+
+    def t_get_insights(email, token, a):
+        need(a, "ad_account_id")
+        row = account_row(email, a["ad_account_id"])
+        level = a.get("level") or "campaign"
+        if level not in ("account", "campaign", "adset", "ad"):
+            raise ToolError("level inválido.")
+        params = {"level": level, "limit": 200,
+                  "fields": "campaign_name,adset_name,ad_name,spend,impressions,reach,clicks,ctr,cpm,cpc,actions,cost_per_action_type"}
+        if a.get("since") and a.get("until"):
+            params["time_range"] = json.dumps({"since": a["since"], "until": a["until"]})
+        else:
+            params["date_preset"] = a.get("date_preset") or "last_7d"
+        d = gcall("GET", f"/act_{row['account_id']}/insights", token, params=params)
+        return {"currency": row["currency"], "rows": d.get("data", [])}
+
+    def t_create_campaign(email, token, a):
+        need(a, "ad_account_id", "name", "objective")
+        row = account_row(email, a["ad_account_id"])
+        if a["objective"] not in OBJECTIVES:
+            raise ToolError("objective deve ser um de: " + ", ".join(OBJECTIVES))
+        data = {"name": str(a["name"])[:200], "objective": a["objective"], "status": "PAUSED",
+                "special_ad_categories": a.get("special_ad_categories") or [], "buying_type": "AUCTION"}
+        if a.get("daily_budget"):
+            data["daily_budget"] = to_minor(row["currency"], a["daily_budget"])
+            data["bid_strategy"] = a.get("bid_strategy") or "LOWEST_COST_WITHOUT_CAP"
+        d = gcall_retry("POST", f"/act_{row['account_id']}/campaigns", token, data, [
+            ("is_adset_budget_sharing_enabled", lambda x: {**x, "is_adset_budget_sharing_enabled": False})])
+        return {"campaign_id": d.get("id"), "status": "PAUSED"}
+
+    def t_create_adset(email, token, a):
+        need(a, "ad_account_id", "campaign_id", "name", "optimization_goal", "targeting")
+        row = account_row(email, a["ad_account_id"])
+        data = {"name": str(a["name"])[:200], "campaign_id": str(a["campaign_id"]), "status": "PAUSED",
+                "optimization_goal": a["optimization_goal"],
+                "billing_event": a.get("billing_event") or "IMPRESSIONS",
+                "targeting": a["targeting"]}
+        if a.get("daily_budget"):
+            data["daily_budget"] = to_minor(row["currency"], a["daily_budget"])
+            data["bid_strategy"] = a.get("bid_strategy") or "LOWEST_COST_WITHOUT_CAP"
+        for k in ("promoted_object", "start_time", "end_time", "destination_type", "dsa_beneficiary", "dsa_payor",
+                  "regional_regulated_categories", "regional_regulation_identities", "bid_amount"):
+            if a.get(k) not in (None, "", [], {}):
+                data[k] = a[k]
+        d = gcall_retry("POST", f"/act_{row['account_id']}/adsets", token, data, [
+            ("advantage_audience", lambda x: {**x, "targeting": {**x["targeting"], "targeting_automation": {"advantage_audience": 0}}})])
+        return {"adset_id": d.get("id"), "status": "PAUSED"}
+
+    def t_create_ad(email, token, a):
+        need(a, "ad_account_id", "adset_id", "name", "page_id", "link", "message")
+        if not (a.get("image_url") or a.get("image_hash")):
+            raise ToolError("Informe image_url (link público https) ou image_hash.")
+        row = account_row(email, a["ad_account_id"])
+        link = str(a["link"])
+        if not link.startswith(("http://", "https://")):
+            raise ToolError("link precisa começar com http(s)://")
+        link_data = {"link": link, "message": a["message"],
+                     "call_to_action": {"type": a.get("call_to_action_type") or "LEARN_MORE", "value": {"link": link}}}
+        if a.get("headline"):
+            link_data["name"] = a["headline"]
+        if a.get("description"):
+            link_data["description"] = a["description"]
+        if a.get("image_hash"):
+            link_data["image_hash"] = a["image_hash"]
+        else:
+            link_data["picture"] = a["image_url"]
+        spec = {"page_id": str(a["page_id"]), "link_data": link_data}
+        if a.get("instagram_user_id"):
+            spec["instagram_user_id"] = str(a["instagram_user_id"])
+        cr = gcall("POST", f"/act_{row['account_id']}/adcreatives", token,
+                   {"name": str(a["name"])[:200], "object_story_spec": spec})
+        ad = gcall("POST", f"/act_{row['account_id']}/ads", token, {
+            "name": str(a["name"])[:200], "adset_id": str(a["adset_id"]),
+            "creative": {"creative_id": cr.get("id")}, "status": "PAUSED"})
+        return {"ad_id": ad.get("id"), "creative_id": cr.get("id"), "status": "PAUSED"}
+
+    def t_set_status(email, token, a):
+        need(a, "object_id", "status")
+        oid = str(a["object_id"])
+        if not oid.isdigit():
+            raise ToolError("object_id inválido.")
+        status = str(a["status"]).upper()
+        if status not in ("PAUSED", "ACTIVE"):
+            raise ToolError("status deve ser PAUSED ou ACTIVE. Não existe ferramenta para apagar.")
+        if status == "ACTIVE" and a.get("user_confirmed") is not True:
+            raise ToolError("Para ativar, o usuário precisa confirmar explicitamente o gasto diário total. "
+                            "Repita o orçamento diário em moeda normal, espere o 'sim' e chame de novo com user_confirmed=true.")
+        d = gcall("POST", f"/{oid}", token, {"status": status})
+        return {"object_id": oid, "status": status, "success": bool(d.get("success", True))}
+
+    A = {"type": "string"}
+    def schema(props, req):
+        return {"type": "object", "properties": props, "required": req, "additionalProperties": True}
+    ACC = {"type": "string", "description": "account_id retornado por list_ad_accounts (só números)."}
+    tools = [
+        ("list_ad_accounts", "Lista as contas de anúncio do Meta conectadas pelo usuário no app.", schema({}, []), t_list_ad_accounts),
+        ("list_pages", "Lista as Páginas do Facebook (e Instagram ligado) que o usuário pode usar nos anúncios.", schema({}, []), t_list_pages),
+        ("list_pixels", "Lista os Pixels da conta de anúncio.", schema({"ad_account_id": ACC}, ["ad_account_id"]), t_list_pixels),
+        ("list_objects", "Lista campanhas, conjuntos ou anúncios da conta com status e orçamento. Use para verificar o que foi criado.",
+         schema({"ad_account_id": ACC, "level": {"type": "string", "enum": ["campaigns", "adsets", "ads"]}, "limit": {"type": "integer"}}, ["ad_account_id", "level"]), t_list_objects),
+        ("get_insights", "Métricas ao vivo do Meta (gasto, impressões, cliques, CTR, CPM, ações). level: account|campaign|adset|ad; date_preset (ex. last_7d, last_30d, yesterday) ou since/until (YYYY-MM-DD).",
+         schema({"ad_account_id": ACC, "level": A, "date_preset": A, "since": A, "until": A}, ["ad_account_id"]), t_get_insights),
+        ("create_campaign", "Cria uma campanha SEMPRE PAUSADA. daily_budget (opcional) em moeda normal, ex. 10 = 10,00. special_ad_categories: [] salvo categoria regulada.",
+         schema({"ad_account_id": ACC, "name": A, "objective": {"type": "string", "enum": OBJECTIVES},
+                 "daily_budget": {"type": "number"}, "special_ad_categories": {"type": "array", "items": A}}, ["ad_account_id", "name", "objective"]), t_create_campaign),
+        ("create_adset", "Cria um conjunto de anúncios SEMPRE PAUSADO. daily_budget em moeda normal (omita se a campanha tem orçamento). targeting é o objeto do Meta (geo_locations, age_min, age_max, genders, interesses...). Para vendas: optimization_goal OFFSITE_CONVERSIONS + promoted_object {pixel_id, custom_event_type:PURCHASE}.",
+         schema({"ad_account_id": ACC, "campaign_id": A, "name": A, "optimization_goal": A, "billing_event": A,
+                 "daily_budget": {"type": "number"}, "targeting": {"type": "object"}, "promoted_object": {"type": "object"},
+                 "start_time": A, "end_time": A}, ["ad_account_id", "campaign_id", "name", "optimization_goal", "targeting"]), t_create_adset),
+        ("create_ad", "Cria o criativo e o anúncio SEMPRE PAUSADO. Imagem por image_url (link público https) ou image_hash. call_to_action_type ex. LEARN_MORE, SHOP_NOW.",
+         schema({"ad_account_id": ACC, "adset_id": A, "name": A, "page_id": A, "link": A, "message": A, "headline": A,
+                 "description": A, "image_url": A, "image_hash": A, "call_to_action_type": A, "instagram_user_id": A},
+                ["ad_account_id", "adset_id", "name", "page_id", "link", "message"]), t_create_ad),
+        ("set_status", "Pausa ou ativa uma campanha, conjunto ou anúncio. Para ACTIVE, o usuário precisa ter confirmado o gasto diário total: só então passe user_confirmed=true. Não existe exclusão.",
+         schema({"object_id": A, "status": {"type": "string", "enum": ["PAUSED", "ACTIVE"]}, "user_confirmed": {"type": "boolean"}}, ["object_id", "status"]), t_set_status),
+    ]
+    handlers = {n: h for n, _, _, h in tools}
+    d["mcp"]["tools"] = [{"name": n, "title": n.replace("_", " ").title(), "description": desc, "inputSchema": sch}
+                         for n, desc, sch, _ in tools]
+
+    def mcp_call(email, name, args):
+        h = handlers.get(name)
+        if not h:
+            return None
+        try:
+            need_supabase()
+            token, _row = get_token(email)
+            if not token and name != "list_ad_accounts":
+                raise ToolError("Conta Meta não conectada. Peça ao usuário para abrir o app > Conectar contas de anúncio > Conectar com Facebook.")
+            out = h(email, token, args if isinstance(args, dict) else {})
+            return {"content": [{"type": "text", "text": json.dumps(out, ensure_ascii=False, default=str)[:20000]}]}
+        except ToolError as exc:
+            return {"content": [{"type": "text", "text": str(exc)}], "isError": True}
+        except HTTPException:
+            return {"content": [{"type": "text", "text": "Supabase não configurado no app."}], "isError": True}
+        except Exception as exc:
+            print(f"[ads-mcp] {name} error: {scrub(str(exc))[:300]}", file=sys.stderr)
+            return {"content": [{"type": "text", "text": "Erro inesperado ao falar com o Meta. Tente de novo."}], "isError": True}
+    d["mcp"]["call"] = mcp_call

@@ -269,6 +269,7 @@
   .trk-status.ok{background:rgba(34,197,94,0.18);color:#4ADE80}
   .trk-status.err{background:rgba(239,68,68,0.18);color:#FCA5A5}
   body.cl-open #heroSection,body.cl-open #dashSection,body.cl-open #toolsSection,body.cl-open #utmSection,body.cl-open #importsSection,body.cl-open #nichesSection,body.cl-open #trackingSection{display:none !important}
+  #adTable th,#adTable td{padding:6px 8px;border-bottom:1px solid rgba(128,128,128,.25);text-align:right;white-space:nowrap}#adTable th:first-child,#adTable td:first-child{text-align:left;white-space:normal}
   .trk-block{margin-top:18px}
   .trk-block-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
   .trk-code{font-size:11px;line-height:1.55;color:var(--text);background:rgba(0,0,0,0.35);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:12px 14px;overflow:auto;max-height:300px;white-space:pre;margin:0}
@@ -421,6 +422,29 @@
           <button class="btn-s" id="trkSalesRefresh" type="button"></button>
         </div>
         <div id="trkSalesList"></div>
+      </div>
+    </section>
+
+    <section class="sec" id="adsSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="adTitle"></h3><span class="trk-status none" id="adStatus"></span><span class="ln"></span><button class="btn-s" id="adClose" type="button"></button></div>
+      <p class="utm-desc" id="adDesc"></p>
+      <div class="trk-block" id="adConnectBlock">
+        <div class="utm-hint" id="adNote" style="margin-bottom:10px"></div>
+        <button class="btn-p" id="adConnect" type="button"></button>
+      </div>
+      <div class="trk-block" id="adAccBlock" style="display:none">
+        <div class="trk-block-title" id="adAccTitle"></div>
+        <div id="adAccList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="adDays" class="app-select" style="width:auto"><option value="7">7</option><option value="30" selected>30</option><option value="90">90</option></select>
+          <button class="btn-p" id="adSync" type="button"></button>
+          <button class="btn-s" id="adDisc" type="button"></button>
+        </div>
+        <div class="utm-hint" id="adMsg" style="margin-top:8px"></div>
+      </div>
+      <div class="trk-block" id="adDataBlock" style="display:none">
+        <div id="adTotals" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;font-size:13px"></div>
+        <div style="overflow-x:auto"><table id="adTable" style="width:100%;border-collapse:collapse;font-size:12.5px"></table></div>
       </div>
     </section>
 
@@ -651,8 +675,9 @@ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventD
 
 document.querySelector('.app').addEventListener('click',async e=>{
   const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
-  if(btn.dataset.id==='claude-connect'){if(trkSavedDisplays)closeTrackingScreen();openClaudeScreen();return}
-  closeClaudeScreen();
+  if(btn.dataset.id==='ads-connect'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();openAdsScreen();return}
+  if(btn.dataset.id==='claude-connect'){if(trkSavedDisplays)closeTrackingScreen();closeAdsScreen();openClaudeScreen();return}
+  closeClaudeScreen();closeAdsScreen();
   if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'){openTrackingScreen();return}
   if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentModule=btn.dataset.id;currentSystemPrompt=p;syncUTMPanel();await sendChat(btn.dataset.label||btn.dataset.id)}return}
   const id=btn.dataset.id;if(!id)return;
@@ -725,6 +750,9 @@ function renderSidebar(cfg){
   cb.innerHTML='<span class="ico">\uD83D\uDD0C</span>'+clT().label;
   const dash=nav.querySelector('.side-item[data-id="dashboard"]');
   if(dash&&dash.nextSibling)nav.insertBefore(cb,dash.nextSibling);else nav.appendChild(cb);
+  const ab=document.createElement('button');ab.className='side-item';ab.dataset.id='ads-connect';ab.dataset.label=adT().label;
+  ab.innerHTML='<span class="ico">\uD83D\uDCCA</span>'+adT().label;
+  nav.insertBefore(ab,cb);
 }
 
 function renderTools(tools){
@@ -793,56 +821,56 @@ function syncUTMPanel(){
 const CL_I18N={
   en:{label:'Connect to Claude',title:'Connect to Claude',close:'Close',stepsTitle:'Setup in 4 steps',ok:'Access active',no:'Access required',
     desc:'Use Claude as your media buyer: it writes the strategy and creates your campaigns in Meta, always paused until you approve them.',
-    steps:['Generate your personal connector link below and copy it.','In Claude, open Settings → Connectors → Add custom connector and paste the link.','Add Windsor.ai there too and connect your Meta Ads account with your Facebook login.','Tell Claude: "Use Meta Ads Expert PRO: /start" and follow the guide.'],
+    steps:['Generate your personal connector link below and copy it.','In Claude, open Settings → Connectors → Add custom connector and paste the link.','Before that, connect your Meta account in this app: Connect ad accounts → Connect with Facebook.','Tell Claude: "Use Meta Ads Expert PRO: /start" and follow the guide.'],
     linkTitle:'Your personal connector link',gen:'Generate my link',regen:'Generate a new link',copy:'Copy',copied:'Copied',
     shownOnce:'Shown only once. Copy it now and paste it into Claude.',hasKey:'You already have a link. For safety it is shown only once. Generate a new one to see it again; the old one stops working.',
     regenConfirm:'Generate a new link? The old one will stop working and you will need to update it in Claude.',err:'Could not generate the link. Please try again.',
-    note:'The link is personal and works like a password: do not share it. If it leaks, generate a new one and the old one stops working. Everything is created paused. Windsor.ai is a separate service with its own plan and price. The specialists are in English.',
+    note:'The link is personal and works like a password: do not share it. If it leaks, generate a new one and the old one stops working. Everything is created paused. The specialists are in English.',
     pkgTitle:'Offline package (optional)',dl:'Download package',
     locked:'The connector is included with your Meta Ads Expert PRO subscription. If you already purchased, use the same e-mail you used at checkout.',missing:''},
   pt:{label:'Conectar ao Claude',title:'Conectar ao Claude',close:'Fechar',stepsTitle:'Configuração em 4 passos',ok:'Acesso ativo',no:'Acesso necessário',
     desc:'Use o Claude como seu gestor de tráfego: ele escreve a estratégia e cria suas campanhas na Meta, sempre pausadas até você aprovar.',
-    steps:['Gere abaixo o seu link pessoal do conector e copie.','No Claude, abra Configurações → Conectores → Adicionar conector personalizado e cole o link.','Adicione também o Windsor.ai e conecte sua conta do Meta Ads com o login do Facebook.','Diga ao Claude: "Use o Meta Ads Expert PRO: /start" e siga o guia.'],
+    steps:['Gere abaixo o seu link pessoal do conector e copie.','No Claude, abra Configurações → Conectores → Adicionar conector personalizado e cole o link.','Antes disso, conecte sua conta do Meta neste app: Conectar contas de anúncio → Conectar com Facebook.','Diga ao Claude: "Use o Meta Ads Expert PRO: /start" e siga o guia.'],
     linkTitle:'Seu link pessoal do conector',gen:'Gerar meu link',regen:'Gerar um novo link',copy:'Copiar',copied:'Copiado',
     shownOnce:'Aparece uma única vez. Copie agora e cole no Claude.',hasKey:'Você já tem um link. Por segurança ele aparece uma única vez. Gere um novo para vê-lo de novo; o antigo deixa de funcionar.',
     regenConfirm:'Gerar um novo link? O antigo deixa de funcionar e você precisará atualizá-lo no Claude.',err:'Não foi possível gerar o link. Tente novamente.',
-    note:'O link é pessoal e funciona como uma senha: não compartilhe. Se vazar, gere um novo e o antigo deixa de funcionar. Tudo é criado pausado. O Windsor.ai é um serviço separado, com plano e preço próprios. Os especialistas estão em inglês.',
+    note:'O link é pessoal e funciona como uma senha: não compartilhe. Se vazar, gere um novo e o antigo deixa de funcionar. Tudo é criado pausado. O Os especialistas estão em inglês.',
     pkgTitle:'Pacote offline (opcional)',dl:'Baixar pacote',
     locked:'O conector está incluído na sua assinatura do Meta Ads Expert PRO. Se você já comprou, use o mesmo e-mail da compra.',missing:''},
   es:{label:'Conectar con Claude',title:'Conectar con Claude',close:'Cerrar',stepsTitle:'Configuración en 4 pasos',ok:'Acceso activo',no:'Acceso requerido',
     desc:'Usa Claude como tu media buyer: escribe la estrategia y crea tus campañas en Meta, siempre en pausa hasta que las apruebes.',
-    steps:['Genera abajo tu enlace personal del conector y cópialo.','En Claude, abre Configuración → Conectores → Añadir conector personalizado y pega el enlace.','Añade también Windsor.ai y conecta tu cuenta de Meta Ads con tu login de Facebook.','Dile a Claude: "Usa Meta Ads Expert PRO: /start" y sigue la guía.'],
+    steps:['Genera abajo tu enlace personal del conector y cópialo.','En Claude, abre Configuración → Conectores → Añadir conector personalizado y pega el enlace.','Antes, conecta tu cuenta de Meta en esta app: Conectar cuentas publicitarias → Conectar con Facebook.','Dile a Claude: "Usa Meta Ads Expert PRO: /start" y sigue la guía.'],
     linkTitle:'Tu enlace personal del conector',gen:'Generar mi enlace',regen:'Generar un enlace nuevo',copy:'Copiar',copied:'Copiado',
     shownOnce:'Se muestra una sola vez. Cópialo ahora y pégalo en Claude.',hasKey:'Ya tienes un enlace. Por seguridad se muestra una sola vez. Genera uno nuevo para verlo de nuevo; el anterior deja de funcionar.',
     regenConfirm:'¿Generar un enlace nuevo? El anterior dejará de funcionar y tendrás que actualizarlo en Claude.',err:'No se pudo generar el enlace. Inténtalo de nuevo.',
-    note:'El enlace es personal y funciona como una contraseña: no lo compartas. Si se filtra, genera uno nuevo y el anterior deja de funcionar. Todo se crea en pausa. Windsor.ai es un servicio aparte, con su propio plan y precio. Los especialistas están en inglés.',
+    note:'El enlace es personal y funciona como una contraseña: no lo compartas. Si se filtra, genera uno nuevo y el anterior deja de funcionar. Todo se crea en pausa. Los especialistas están en inglés.',
     pkgTitle:'Paquete sin conexión (opcional)',dl:'Descargar paquete',
     locked:'El conector está incluido en tu suscripción a Meta Ads Expert PRO. Si ya compraste, usa el mismo e-mail de la compra.',missing:''},
   fr:{label:'Connecter à Claude',title:'Connecter à Claude',close:'Fermer',stepsTitle:'Configuration en 4 étapes',ok:'Accès actif',no:'Accès requis',
     desc:'Utilisez Claude comme media buyer : il rédige la stratégie et crée vos campagnes sur Meta, toujours en pause jusqu’à votre validation.',
-    steps:['Générez ci-dessous votre lien personnel de connecteur et copiez-le.','Dans Claude, ouvrez Paramètres → Connecteurs → Ajouter un connecteur personnalisé et collez le lien.','Ajoutez aussi Windsor.ai et connectez votre compte Meta Ads avec votre identifiant Facebook.','Dites à Claude : "Utilise Meta Ads Expert PRO : /start" et suivez le guide.'],
+    steps:['Générez ci-dessous votre lien personnel de connecteur et copiez-le.','Dans Claude, ouvrez Paramètres → Connecteurs → Ajouter un connecteur personnalisé et collez le lien.','Avant cela, connectez votre compte Meta dans cette app : Connecter les comptes publicitaires → Se connecter avec Facebook.','Dites à Claude : "Utilise Meta Ads Expert PRO : /start" et suivez le guide.'],
     linkTitle:'Votre lien personnel de connecteur',gen:'Générer mon lien',regen:'Générer un nouveau lien',copy:'Copier',copied:'Copié',
     shownOnce:'Affiché une seule fois. Copiez-le maintenant et collez-le dans Claude.',hasKey:'Vous avez déjà un lien. Par sécurité il n’est affiché qu’une fois. Générez-en un nouveau pour le revoir ; l’ancien cesse de fonctionner.',
     regenConfirm:'Générer un nouveau lien ? L’ancien cessera de fonctionner et vous devrez le mettre à jour dans Claude.',err:'Impossible de générer le lien. Réessayez.',
-    note:'Le lien est personnel et fonctionne comme un mot de passe : ne le partagez pas. En cas de fuite, générez-en un nouveau et l’ancien cesse de fonctionner. Tout est créé en pause. Windsor.ai est un service distinct, avec son propre forfait et son prix. Les spécialistes sont en anglais.',
+    note:'Le lien est personnel et fonctionne comme un mot de passe : ne le partagez pas. En cas de fuite, générez-en un nouveau et l’ancien cesse de fonctionner. Tout est créé en pause. Les spécialistes sont en anglais.',
     pkgTitle:'Pack hors ligne (optionnel)',dl:'Télécharger le pack',
     locked:'Le connecteur est inclus dans votre abonnement Meta Ads Expert PRO. Si vous avez déjà acheté, utilisez le même e-mail que lors de l’achat.',missing:''},
   tr:{label:'Claude’a Bağla',title:'Claude’a Bağla',close:'Kapat',stepsTitle:'4 adımda kurulum',ok:'Erişim aktif',no:'Erişim gerekli',
     desc:'Claude’u medya alıcınız olarak kullanın: stratejiyi yazar ve Meta’da kampanyalarınızı oluşturur; siz onaylamadan hep duraklatılmış kalır.',
-    steps:['Aşağıdan kişisel konnektör bağlantınızı oluşturun ve kopyalayın.','Claude’da Ayarlar → Konnektörler → Özel konnektör ekle yolunu izleyin ve bağlantıyı yapıştırın.','Windsor.ai’yi de ekleyin ve Meta Ads hesabınızı Facebook girişinizle bağlayın.','Claude’a şunu yazın: "Meta Ads Expert PRO’yu kullan: /start" ve kılavuzu izleyin.'],
+    steps:['Aşağıdan kişisel konnektör bağlantınızı oluşturun ve kopyalayın.','Claude’da Ayarlar → Konnektörler → Özel konnektör ekle yolunu izleyin ve bağlantıyı yapıştırın.','Bundan önce Meta hesabınızı bu uygulamada bağlayın: Reklam hesaplarını bağla → Facebook ile bağlan.','Claude’a şunu yazın: "Meta Ads Expert PRO’yu kullan: /start" ve kılavuzu izleyin.'],
     linkTitle:'Kişisel konnektör bağlantınız',gen:'Bağlantımı oluştur',regen:'Yeni bağlantı oluştur',copy:'Kopyala',copied:'Kopyalandı',
     shownOnce:'Yalnızca bir kez gösterilir. Şimdi kopyalayıp Claude’a yapıştırın.',hasKey:'Zaten bir bağlantınız var. Güvenlik için yalnızca bir kez gösterilir. Yeniden görmek için yeni bir tane oluşturun; eskisi çalışmaz.',
     regenConfirm:'Yeni bağlantı oluşturulsun mu? Eskisi çalışmayacak ve Claude’da güncellemeniz gerekecek.',err:'Bağlantı oluşturulamadı. Lütfen tekrar deneyin.',
-    note:'Bağlantı kişiseldir ve parola gibi çalışır: paylaşmayın. Sızarsa yenisini oluşturun, eskisi çalışmaz. Her şey duraklatılmış oluşturulur. Windsor.ai ayrı bir hizmettir; kendi planı ve fiyatı vardır. Uzmanlar İngilizcedir.',
+    note:'Bağlantı kişiseldir ve parola gibi çalışır: paylaşmayın. Sızarsa yenisini oluşturun, eskisi çalışmaz. Her şey duraklatılmış oluşturulur. Uzmanlar İngilizcedir.',
     pkgTitle:'Çevrimdışı paket (isteğe bağlı)',dl:'Paketi indir',
     locked:'Konnektör Meta Ads Expert PRO aboneliğinize dahildir. Satın aldıysanız, ödeme sırasında kullandığınız e-postayı kullanın.',missing:''},
   de:{label:'Mit Claude verbinden',title:'Mit Claude verbinden',close:'Schließen',stepsTitle:'Einrichtung in 4 Schritten',ok:'Zugang aktiv',no:'Zugang erforderlich',
     desc:'Nutzen Sie Claude als Media Buyer: Er schreibt die Strategie und legt Ihre Kampagnen in Meta an – immer pausiert, bis Sie sie freigeben.',
-    steps:['Erzeugen Sie unten Ihren persönlichen Konnektor-Link und kopieren Sie ihn.','Öffnen Sie in Claude Einstellungen → Konnektoren → Benutzerdefinierten Konnektor hinzufügen und fügen Sie den Link ein.','Fügen Sie auch Windsor.ai hinzu und verbinden Sie Ihr Meta-Ads-Konto mit Ihrem Facebook-Login.','Sagen Sie Claude: "Nutze Meta Ads Expert PRO: /start" und folgen Sie der Anleitung.'],
+    steps:['Erzeugen Sie unten Ihren persönlichen Konnektor-Link und kopieren Sie ihn.','Öffnen Sie in Claude Einstellungen → Konnektoren → Benutzerdefinierten Konnektor hinzufügen und fügen Sie den Link ein.','Verbinden Sie zuvor Ihr Meta-Konto in dieser App: Werbekonten verbinden → Mit Facebook verbinden.','Sagen Sie Claude: "Nutze Meta Ads Expert PRO: /start" und folgen Sie der Anleitung.'],
     linkTitle:'Ihr persönlicher Konnektor-Link',gen:'Meinen Link erzeugen',regen:'Neuen Link erzeugen',copy:'Kopieren',copied:'Kopiert',
     shownOnce:'Wird nur einmal angezeigt. Jetzt kopieren und in Claude einfügen.',hasKey:'Sie haben bereits einen Link. Aus Sicherheitsgründen wird er nur einmal angezeigt. Erzeugen Sie einen neuen, um ihn erneut zu sehen; der alte funktioniert dann nicht mehr.',
     regenConfirm:'Neuen Link erzeugen? Der alte funktioniert dann nicht mehr und Sie müssen ihn in Claude aktualisieren.',err:'Der Link konnte nicht erzeugt werden. Bitte erneut versuchen.',
-    note:'Der Link ist persönlich und funktioniert wie ein Passwort: nicht teilen. Bei einem Leck erzeugen Sie einen neuen, der alte funktioniert dann nicht mehr. Alles wird pausiert angelegt. Windsor.ai ist ein separater Dienst mit eigenem Tarif und Preis. Die Spezialisten sind auf Englisch.',
+    note:'Der Link ist persönlich und funktioniert wie ein Passwort: nicht teilen. Bei einem Leck erzeugen Sie einen neuen, der alte funktioniert dann nicht mehr. Alles wird pausiert angelegt. Die Spezialisten sind auf Englisch.',
     pkgTitle:'Offline-Paket (optional)',dl:'Paket herunterladen',
     locked:'Der Konnektor ist in Ihrem Meta-Ads-Expert-PRO-Abo enthalten. Wenn Sie bereits gekauft haben, nutzen Sie dieselbe E-Mail wie beim Kauf.',missing:''}
 };
@@ -905,6 +933,83 @@ function closeClaudeScreen(){
   const sec=document.getElementById('claudeSection');if(sec)sec.style.display='none';
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+// -------- Connect ad accounts (Meta, direct OAuth) --------
+const AD_I18N={"en": {"label": "Connect ad accounts", "title": "Connect ad accounts", "close": "Close", "desc": "Connect your Meta Ads account with your Facebook login. Your campaign data is synced into this app, with no third-party connector.", "notCfg": "Not set up yet: add META_APP_ID and META_APP_SECRET in the server settings.", "connect": "Connect with Facebook", "reconnect": "Reconnect", "ok": "Connected", "no": "Not connected", "note": "Claude can read your data and create campaigns, always paused, only when you ask. You can disconnect at any time.", "accs": "Ad accounts to sync", "sync": "Sync now", "syncing": "Syncing…", "done": "Synced rows: ", "disc": "Disconnect", "discConfirm": "Disconnect and delete the synced data?", "spend": "Spend", "impr": "Impressions", "clicks": "Clicks", "ctr": "CTR", "purch": "Purchases", "roas": "ROAS", "camp": "Campaign", "empty": "No data yet. Select an account and click Sync now.", "err": "Something went wrong. Please try again."}, "pt": {"label": "Conectar contas de anúncio", "title": "Conectar contas de anúncio", "close": "Fechar", "desc": "Conecte a sua conta do Meta Ads com o login do Facebook. Os dados das campanhas são sincronizados para dentro deste app, sem conector de terceiros.", "notCfg": "Ainda não configurado: adicione META_APP_ID e META_APP_SECRET nas variáveis do servidor.", "connect": "Conectar com Facebook", "reconnect": "Reconectar", "ok": "Conectado", "no": "Não conectado", "note": "O Claude pode ler seus dados e criar campanhas, sempre pausadas, só quando você pedir. Você pode desconectar quando quiser.", "accs": "Contas de anúncio a sincronizar", "sync": "Sincronizar agora", "syncing": "Sincronizando…", "done": "Linhas sincronizadas: ", "disc": "Desconectar", "discConfirm": "Desconectar e apagar os dados sincronizados?", "spend": "Gasto", "impr": "Impressões", "clicks": "Cliques", "ctr": "CTR", "purch": "Compras", "roas": "ROAS", "camp": "Campanha", "empty": "Ainda sem dados. Selecione uma conta e clique em Sincronizar agora.", "err": "Algo deu errado. Tente novamente."}, "es": {"label": "Conectar cuentas publicitarias", "title": "Conectar cuentas publicitarias", "close": "Cerrar", "desc": "Conecta tu cuenta de Meta Ads con tu inicio de sesión de Facebook. Los datos de tus campañas se sincronizan dentro de esta app, sin conectores de terceros.", "notCfg": "Aún no configurado: agrega META_APP_ID y META_APP_SECRET en las variables del servidor.", "connect": "Conectar con Facebook", "reconnect": "Reconectar", "ok": "Conectado", "no": "No conectado", "note": "Claude puede leer tus datos y crear campañas, siempre pausadas, solo cuando lo pidas. Puedes desconectar cuando quieras.", "accs": "Cuentas publicitarias a sincronizar", "sync": "Sincronizar ahora", "syncing": "Sincronizando…", "done": "Filas sincronizadas: ", "disc": "Desconectar", "discConfirm": "¿Desconectar y borrar los datos sincronizados?", "spend": "Gasto", "impr": "Impresiones", "clicks": "Clics", "ctr": "CTR", "purch": "Compras", "roas": "ROAS", "camp": "Campaña", "empty": "Aún sin datos. Selecciona una cuenta y pulsa Sincronizar ahora.", "err": "Algo salió mal. Inténtalo de nuevo."}, "fr": {"label": "Connecter les comptes publicitaires", "title": "Connecter les comptes publicitaires", "close": "Fermer", "desc": "Connectez votre compte Meta Ads avec votre identifiant Facebook. Les données de vos campagnes sont synchronisées dans cette app, sans connecteur tiers.", "notCfg": "Pas encore configuré : ajoutez META_APP_ID et META_APP_SECRET dans les variables du serveur.", "connect": "Se connecter avec Facebook", "reconnect": "Reconnecter", "ok": "Connecté", "no": "Non connecté", "note": "Claude peut lire vos données et créer des campagnes, toujours en pause, uniquement sur demande. Vous pouvez vous déconnecter à tout moment.", "accs": "Comptes publicitaires à synchroniser", "sync": "Synchroniser maintenant", "syncing": "Synchronisation…", "done": "Lignes synchronisées : ", "disc": "Déconnecter", "discConfirm": "Déconnecter et supprimer les données synchronisées ?", "spend": "Dépense", "impr": "Impressions", "clicks": "Clics", "ctr": "CTR", "purch": "Achats", "roas": "ROAS", "camp": "Campagne", "empty": "Pas encore de données. Sélectionnez un compte puis synchronisez.", "err": "Une erreur est survenue. Réessayez."}, "tr": {"label": "Reklam hesaplarını bağla", "title": "Reklam hesaplarını bağla", "close": "Kapat", "desc": "Meta Ads hesabınızı Facebook girişinizle bağlayın. Kampanya verileriniz üçüncü taraf bağlayıcı olmadan bu uygulamaya senkronize edilir.", "notCfg": "Henüz ayarlanmadı: sunucu ayarlarına META_APP_ID ve META_APP_SECRET ekleyin.", "connect": "Facebook ile bağlan", "reconnect": "Yeniden bağlan", "ok": "Bağlı", "no": "Bağlı değil", "note": "Claude verilerinizi okuyabilir ve yalnızca siz istediğinizde, her zaman duraklatılmış kampanyalar oluşturabilir. İstediğiniz zaman bağlantıyı kesebilirsiniz.", "accs": "Senkronize edilecek reklam hesapları", "sync": "Şimdi senkronize et", "syncing": "Senkronize ediliyor…", "done": "Senkronize satırlar: ", "disc": "Bağlantıyı kes", "discConfirm": "Bağlantı kesilsin ve senkronize veriler silinsin mi?", "spend": "Harcama", "impr": "Gösterim", "clicks": "Tıklama", "ctr": "TO", "purch": "Satın alma", "roas": "ROAS", "camp": "Kampanya", "empty": "Henüz veri yok. Bir hesap seçip senkronize edin.", "err": "Bir şeyler ters gitti. Tekrar deneyin."}, "de": {"label": "Werbekonten verbinden", "title": "Werbekonten verbinden", "close": "Schließen", "desc": "Verbinden Sie Ihr Meta-Ads-Konto per Facebook-Login. Ihre Kampagnendaten werden ohne Drittanbieter-Connector in diese App synchronisiert.", "notCfg": "Noch nicht eingerichtet: META_APP_ID und META_APP_SECRET in den Servereinstellungen hinzufügen.", "connect": "Mit Facebook verbinden", "reconnect": "Neu verbinden", "ok": "Verbunden", "no": "Nicht verbunden", "note": "Claude kann Ihre Daten lesen und nur auf Ihre Anfrage Kampagnen erstellen, immer pausiert. Sie können die Verbindung jederzeit trennen.", "accs": "Zu synchronisierende Werbekonten", "sync": "Jetzt synchronisieren", "syncing": "Synchronisiere…", "done": "Synchronisierte Zeilen: ", "disc": "Trennen", "discConfirm": "Trennen und synchronisierte Daten löschen?", "spend": "Ausgaben", "impr": "Impressionen", "clicks": "Klicks", "ctr": "CTR", "purch": "Käufe", "roas": "ROAS", "camp": "Kampagne", "empty": "Noch keine Daten. Konto wählen und synchronisieren.", "err": "Etwas ist schiefgelaufen. Bitte erneut versuchen."}};
+let adOpen=false,adState={configured:false,connected:false,accounts:[]};
+function adT(){return AD_I18N[LANG]||AD_I18N.en}
+function adEsc(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function adApply(){
+  const t=adT();
+  clSet('adTitle',t.title);clSet('adClose',t.close);clSet('adDesc',t.desc);clSet('adAccTitle',t.accs);
+  clSet('adSync',t.sync);clSet('adDisc',t.disc);
+  clSet('adNote',adState.configured?t.note:t.notCfg);
+  clSet('adConnect',adState.connected?t.reconnect:t.connect);
+  const c=document.getElementById('adConnect');if(c)c.disabled=!adState.configured;
+  const st=document.getElementById('adStatus');if(st){st.className='trk-status '+(adState.connected?'ok':'none');st.textContent=adState.connected?t.ok:t.no}
+  clShow('adAccBlock',adState.connected);
+  const l=document.getElementById('adAccList');if(l){l.innerHTML='';
+    (adState.accounts||[]).forEach(a=>{
+      const r=document.createElement('label');r.style.cssText='display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer';
+      const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!a.selected;
+      cb.onchange=async()=>{try{await fetch('/api/ads/accounts/select',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account_id:a.account_id,selected:cb.checked})});a.selected=cb.checked}catch(e){}};
+      r.appendChild(cb);r.appendChild(document.createTextNode(' '+(a.name||a.account_id)+' · '+(a.currency||'')+' · act_'+a.account_id));l.appendChild(r)})}
+}
+function adMoney(n){return (Number(n)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+async function adLoadData(){
+  const t=adT();
+  try{
+    const days=document.getElementById('adDays').value;
+    const r=await fetch('/api/ads/insights?days='+encodeURIComponent(days));if(!r.ok)return;
+    const d=await r.json(),T=d.totals||{};
+    const box=document.getElementById('adDataBlock');box.style.display='block';
+    if(!d.campaigns||!d.campaigns.length){document.getElementById('adTotals').textContent=t.empty;document.getElementById('adTable').innerHTML='';return}
+    document.getElementById('adTotals').innerHTML=
+      [[t.spend,adMoney(T.spend)],[t.impr,(T.impressions||0).toLocaleString()],[t.clicks,(T.clicks||0).toLocaleString()],[t.ctr,(T.ctr||0).toFixed(2)+'%'],[t.purch,T.purchases||0],[t.roas,(T.roas||0).toFixed(2)+'x']]
+      .map(x=>'<div><div style="opacity:.65;font-size:11px">'+adEsc(x[0])+'</div><b style="font-size:16px">'+adEsc(x[1])+'</b></div>').join('');
+    document.getElementById('adTable').innerHTML='<thead><tr><th>'+adEsc(t.camp)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(t.impr)+'</th><th>'+adEsc(t.clicks)+'</th><th>'+adEsc(t.purch)+'</th></tr></thead><tbody>'+
+      d.campaigns.map(c=>'<tr><td>'+adEsc(c.campaign_name||c.campaign_id)+'</td><td>'+adMoney(c.spend)+'</td><td>'+(c.impressions||0).toLocaleString()+'</td><td>'+(c.clicks||0).toLocaleString()+'</td><td>'+(c.purchases||0)+'</td></tr>').join('')+'</tbody>';
+  }catch(e){}
+}
+async function adLoad(){
+  try{const r=await fetch('/api/ads/status');if(r.ok)adState=await r.json()}catch(e){}
+  adApply();if(adState.connected)adLoadData();
+}
+async function adConnect(){
+  try{const r=await fetch('/api/ads/meta/start',{method:'POST'});if(!r.ok)throw 0;const d=await r.json();location.href=d.url}
+  catch(e){clSet('adMsg',adT().err)}
+}
+async function adSync(){
+  const t=adT(),b=document.getElementById('adSync');b.disabled=true;clSet('adSync',t.syncing);
+  try{
+    const r=await fetch('/api/ads/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:+document.getElementById('adDays').value})});
+    const d=await r.json();
+    clSet('adMsg',r.ok&&!(d.errors&&d.errors.length)?t.done+(d.rows||0):(d.errors&&d.errors[0])||t.err);
+    await adLoadData();
+  }catch(e){clSet('adMsg',t.err)}
+  b.disabled=false;clSet('adSync',t.sync);
+}
+async function adDisconnect(){
+  if(!window.confirm(adT().discConfirm))return;
+  try{await fetch('/api/ads/disconnect',{method:'POST'})}catch(e){}
+  document.getElementById('adDataBlock').style.display='none';adLoad();
+}
+function openAdsScreen(){
+  const sec=document.getElementById('adsSection');if(!sec)return;
+  closeClaudeScreen();adOpen=true;document.body.classList.add('cl-open');
+  sec.style.display='block';currentModule='ads-connect';
+  adApply();window.scrollTo({top:0,behavior:'smooth'});adLoad();
+}
+function closeAdsScreen(){
+  if(!adOpen)return;adOpen=false;document.body.classList.remove('cl-open');
+  const sec=document.getElementById('adsSection');if(sec)sec.style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('adClose').addEventListener('click',closeAdsScreen);
+document.getElementById('adConnect').addEventListener('click',adConnect);
+document.getElementById('adSync').addEventListener('click',adSync);
+document.getElementById('adDisc').addEventListener('click',adDisconnect);
+document.getElementById('adDays').addEventListener('change',adLoadData);
 
 // -------- Tracking screen (Meta Pixel + Conversions API + sales) --------
 const TRK_EVENT_NAMES=['PageView','ViewContent','AddToCart','InitiateCheckout','AddPaymentInfo','Purchase','Lead'];
@@ -1540,7 +1645,7 @@ async function boot(n){
   }catch(e){console.error('boot config fail',e)}
 }
 
-boot();input.focus();
+boot();input.focus();try{if(/[?&]ads=/.test(location.search)){setTimeout(openAdsScreen,600);history.replaceState(null,'',location.pathname)}}catch(e){}
 </script>
 </body>
 </html>

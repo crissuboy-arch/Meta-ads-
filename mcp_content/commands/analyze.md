@@ -7,7 +7,7 @@ Analyse real performance, never before the minimum test period set in the brief.
 
 ## Steps
 1. Read `campaign-[product].md` for the launch date and minimum test period. If it has not passed, say when reliable analysis becomes possible and do not draw conclusions from a small sample.
-2. Pull data with the Windsor connector: call `get_fields` for `facebook`, then `get_data` with campaign, ad set and ad names, spend, impressions, reach, clicks, CTR, CPM, results and cost per result for the test period.
+2. Pull data with `get_insights` (levels campaign, adset and ad; use `date_preset` or `since`/`until` for the test period): spend, impressions, reach, clicks, CTR, CPM, actions and cost per action.
 3. If the connector is not available, ask the user to paste the metrics from Ads Manager and use the `metrics-reading` skill on them.
 4. Compare audiences against each other and creatives against each other. Say objectively what performs better and why, using `metrics-reading`, `ad-fatigue-diagnosis` and `scaling-strategy`.
 5. Suggest the next step from the data, not guesses:

@@ -21,10 +21,11 @@ Look for `meta-ads-config.json`. If it exists, show a short summary and ask what
 - Publishing mode: `confirm` (default and recommended: confirm each level before it is created) — explain that everything is created paused either way, and that nothing is enabled without an explicit yes.
 
 ## 4. Meta account details (needed by /publish)
-- Call `get_connectors` and show the Meta Ads (`facebook`) accounts connected in Windsor. Ask which one to use and save its id and name.
+- Call `list_ad_accounts` and show the connected Meta ad accounts. Ask which one to use and save its id and name.
 - Ask for the **Facebook Page ID** that will run the ads and the **Pixel ID**. Tell the user where to find them: Page → About → Page transparency (Page ID); Events Manager → Data sources (Pixel ID).
 - If the ads will run in the EU or in Brazil, Taiwan, Singapore, Thailand, Australia or India, explain that Meta requires verified beneficiary/payer details and ask whether they are set up in Meta Business settings.
-- Never ask for a password or access token. If the connector or account is not connected, stop and send the user to START-HERE.md, step 2.
+- Call `list_pages` and `list_pixels` to show the user's Pages and Pixels and let them pick, instead of typing IDs.
+- Never ask for a password or access token. If the account is not connected, tell the user to open the app → Connect ad accounts → Connect with Facebook.
 
 ## 5. Save
 Write `meta-ads-config.json` in the connected folder:

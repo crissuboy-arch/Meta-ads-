@@ -1108,7 +1108,8 @@ _MCP_INSTRUCTIONS = (
     "Meta Ads Expert PRO: an AI media buyer for Facebook and Instagram ads. "
     "Start with the prompt 'start' (or call list_commands). Each command tells you which "
     "specialist skills to follow; load them with get_specialist. Campaigns are created "
-    "through the Windsor.ai connector and are always created paused."
+    "with this app's own tools (list_ad_accounts, create_campaign, create_adset, create_ad, "
+    "get_insights, set_status) and are always created paused."
 )
 
 
@@ -1245,7 +1246,12 @@ def _mcp_listing(kind):
     return "\n".join(lines)
 
 
-def _mcp_tool_call(name, args):
+_ADS_MCP = {"tools": [], "call": None}  # preenchido por ads_connect.register
+
+
+def _mcp_tool_call(name, args, email=None):
+    if _ADS_MCP["call"] and any(t["name"] == name for t in _ADS_MCP["tools"]):
+        return _ADS_MCP["call"](email, name, args)
     if name in ("list_commands", "list_specialists"):
         return _mcp_text(_mcp_listing("commands" if name == "list_commands" else "skills"))
     if name in ("get_command", "get_specialist"):
@@ -1267,7 +1273,7 @@ def _mcp_prompt(name, args):
     text = (f"You are running the Meta Ads Expert PRO command /{name}.\n"
             "Specialist skills named below are available through the get_specialist tool: "
             "call it with the skill name and follow the instructions it returns. "
-            "Ads are created through the Windsor.ai connector and always paused.\n\n"
+            "Ads are created with this server's own Meta tools (list_ad_accounts, list_pages, list_pixels, create_campaign, create_adset, create_ad, list_objects, get_insights, set_status) and are always paused.\n\n"
             f"{body}")
     if extra:
         text += f"\n\nUser arguments: {extra}"
@@ -1275,7 +1281,7 @@ def _mcp_prompt(name, args):
             "messages": [{"role": "user", "content": {"type": "text", "text": text}}]}
 
 
-def _mcp_rpc_one(msg):
+def _mcp_rpc_one(msg, email=None):
     """Handle one JSON-RPC message. Returns a response dict, or None for notifications."""
     if not isinstance(msg, dict) or msg.get("jsonrpc") != "2.0" or not isinstance(msg.get("method"), str):
         return _rpc_err(msg.get("id") if isinstance(msg, dict) else None, -32600, "Invalid Request")
@@ -1294,9 +1300,9 @@ def _mcp_rpc_one(msg):
     if method == "ping":
         return _rpc_ok(mid, {})
     if method == "tools/list":
-        return _rpc_ok(mid, {"tools": _MCP_TOOLS})
+        return _rpc_ok(mid, {"tools": _MCP_TOOLS + _ADS_MCP["tools"]})
     if method == "tools/call":
-        res = _mcp_tool_call(str(params.get("name") or ""), params.get("arguments"))
+        res = _mcp_tool_call(str(params.get("name") or ""), params.get("arguments"), email)
         return _rpc_ok(mid, res) if res is not None else _rpc_err(mid, -32602, "Unknown tool")
     if method == "prompts/list":
         prompts = []
@@ -1556,9 +1562,9 @@ def create_app():
     static_dir = ROOT / "static"
 
     _PUBLIC_PREFIXES = ("/api/auth/", "/api/branding", "/api/health",
-                        "/api/webhooks/")
+                        "/api/webhooks/", "/api/ads/meta/callback", "/api/ads/cron")
     _PROTECTED_PREFIXES = ("/api/chat", "/api/models", "/api/tracking/",
-                           "/api/sales", "/api/package", "/api/mcp")
+                           "/api/sales", "/api/package", "/api/mcp", "/api/ads")
 
     @app.middleware("http")
     async def _auth_gate(request, call_next):
@@ -1672,9 +1678,9 @@ def create_app():
         except Exception:
             return JSONResponse(_rpc_err(None, -32700, "Parse error"), status_code=400)
         if isinstance(msg, list):
-            out = [r for r in (_mcp_rpc_one(m) for m in msg) if r is not None]
+            out = [r for r in (_mcp_rpc_one(m, email) for m in msg) if r is not None]
             return JSONResponse(out) if out else Response(status_code=202)
-        out = _mcp_rpc_one(msg)
+        out = _mcp_rpc_one(msg, email)
         return JSONResponse(out) if out is not None else Response(status_code=202)
 
     @app.get("/mcp/{key}")
@@ -1716,6 +1722,13 @@ def create_app():
             raise HTTPException(400, "invalid_email")
         return {"ok": True, "status": status}
 
+
+    import ads_connect
+    ads_connect.register(app, {
+        "sb_req": _sb_req, "sb_target": _sb_target, "auth_secret": _auth_secret,
+        "scrub": _scrub_secrets, "requests": _requests, "b64u": _b64u, "b64u_dec": _b64u_dec,
+        "mcp": _ADS_MCP,
+    })
 
     @app.get("/")
     def index():

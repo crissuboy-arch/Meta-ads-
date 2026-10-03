@@ -14,7 +14,7 @@ Welcome the user to **Meta Ads Expert PRO** and find out where they are, so you 
 5. Do you have the Meta Pixel installed and the Purchase event working?
 6. Do you already have creatives (images/videos)?
 7. Goal: direct sales, leads, WhatsApp/Direct messages, or traffic?
-8. Is the Windsor.ai connector installed and is your Meta Ads account connected? (If not, point to START-HERE.md, step 2.)
+8. Is your Meta account connected in the app (Connect ad accounts)? Check with `list_ad_accounts`. If not, tell the user to connect it there.
 
 ## Recommend a sequence
 

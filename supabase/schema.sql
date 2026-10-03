@@ -56,3 +56,46 @@ create table if not exists public.mcp_keys (
 create index if not exists mcp_keys_email_idx on public.mcp_keys (email);
 
 alter table public.mcp_keys enable row level security;
+
+
+-- Contas de anúncios conectadas (Meta Ads). Token guardado CRIPTOGRAFADO.
+create table if not exists public.ads_connections (
+  email text not null,
+  platform text not null default 'meta',
+  fb_user_id text not null default '',
+  name text not null default '',
+  token_enc text not null,
+  expires_at bigint,
+  created_at timestamptz not null default now(),
+  primary key (email, platform)
+);
+create table if not exists public.ads_accounts (
+  email text not null,
+  platform text not null default 'meta',
+  account_id text not null,
+  name text not null default '',
+  currency text not null default '',
+  status text not null default '',
+  selected boolean not null default false,
+  last_sync bigint,
+  primary key (email, platform, account_id)
+);
+create table if not exists public.ads_insights (
+  email text not null,
+  platform text not null default 'meta',
+  account_id text not null,
+  day date not null,
+  campaign_id text not null default '',
+  campaign_name text not null default '',
+  spend numeric not null default 0,
+  impressions bigint not null default 0,
+  clicks bigint not null default 0,
+  ctr numeric not null default 0,
+  purchases numeric not null default 0,
+  purchase_value numeric not null default 0,
+  primary key (email, platform, account_id, day, campaign_id)
+);
+create index if not exists ads_insights_day_idx on public.ads_insights (email, day desc);
+alter table public.ads_connections enable row level security;
+alter table public.ads_accounts enable row level security;
+alter table public.ads_insights enable row level security;

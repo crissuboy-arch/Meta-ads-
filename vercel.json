@@ -14,5 +14,11 @@
       "destination": "/api/index/:path*",
       "source": "/:path*"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/ads/cron",
+      "schedule": "0 5 * * *"
+    }
   ]
 }
