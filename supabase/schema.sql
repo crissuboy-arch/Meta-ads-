@@ -36,3 +36,23 @@ create table if not exists public.app_users (
 );
 
 alter table public.app_users enable row level security;
+
+-- Buyers: who may download the Claude package. Filled by the Hotmart webhook
+-- (POST /api/webhooks/hotmart). Only the service_role key can read/write.
+create table if not exists public.app_buyers (
+  email text primary key,
+  status text not null default 'active',
+  updated_at timestamptz not null default now()
+);
+
+alter table public.app_buyers enable row level security;
+
+-- MCP access keys (one per buyer). Only the SHA-256 hash of the key is stored.
+create table if not exists public.mcp_keys (
+  key_hash text primary key,
+  email text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists mcp_keys_email_idx on public.mcp_keys (email);
+
+alter table public.mcp_keys enable row level security;

@@ -27,7 +27,7 @@ from config import (
 )
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request, UploadFile, File
+from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from openai import OpenAI
 
@@ -1046,6 +1046,271 @@ def _user_create(email, pass_hash):
     _sb_req("POST", "app_users", payload={"email": email, "pass_hash": pass_hash})
 
 
+# ----------------------- Buyers (who may download the package) -----------------------
+PACKAGE_FILE = ROOT / "downloads" / "meta-ads-expert-pro-v1.zip"
+_BUYER_ACTIVE_EVENTS = {"PURCHASE_APPROVED", "PURCHASE_COMPLETE"}
+_BUYER_INACTIVE_EVENTS = {"PURCHASE_REFUNDED", "PURCHASE_CHARGEBACK", "PURCHASE_CANCELED",
+                          "PURCHASE_EXPIRED", "SUBSCRIPTION_CANCELLATION"}
+
+
+def _buyers_path():
+    return _trk_data_dir() / "buyers.json"
+
+
+def _buyers_load():
+    try:
+        return json.loads(_buyers_path().read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _buyer_set(email, status):
+    """status: 'active' or 'inactive'. Supabase table app_buyers, local file as fallback."""
+    email = (email or "").strip().lower()
+    if not _EMAIL_RE.match(email):
+        return False
+    url, _ = _sb_target()
+    if not url:
+        store = _buyers_load()
+        store[email] = {"status": status, "updated_at": int(time.time())}
+        path = _buyers_path()
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(store, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(path)
+        return True
+    _sb_req("POST", "app_buyers", payload={"email": email, "status": status,
+                                           "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+    return True
+
+
+def _buyer_is_active(email):
+    email = (email or "").strip().lower()
+    admins = {a.strip().lower() for a in os.getenv("APP_ADMIN_EMAILS", "").split(",") if a.strip()}
+    if email in admins:
+        return True
+    url, _ = _sb_target()
+    if not url:
+        return (_buyers_load().get(email) or {}).get("status") == "active"
+    try:
+        rows = _sb_req("GET", "app_buyers", params={"email": f"eq.{email}", "select": "status"})
+        return bool(rows) and rows[0].get("status") == "active"
+    except Exception as exc:
+        print(f"[buyers] read error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
+        return False
+
+
+# ----------------------- MCP server (specialists + commands) -----------------------
+MCP_DIR = ROOT / "mcp_content"
+_MCP_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
+_MCP_KEY_RE = re.compile(r"^mk_[A-Za-z0-9_-]{20,80}$")
+_MCP_CACHE = None
+_MCP_INSTRUCTIONS = (
+    "Meta Ads Expert PRO: an AI media buyer for Facebook and Instagram ads. "
+    "Start with the prompt 'start' (or call list_commands). Each command tells you which "
+    "specialist skills to follow; load them with get_specialist. Campaigns are created "
+    "through the Windsor.ai connector and are always created paused."
+)
+
+
+def _mcp_split(text):
+    meta = {}
+    m = re.match(r"---\r?\n(.*?)\r?\n---\r?\n?", text, re.S)
+    if m:
+        for line in m.group(1).splitlines():
+            k, _, v = line.partition(":")
+            k = k.strip()
+            if k in ("name", "description", "argument-hint") and v.strip():
+                meta[k] = v.strip().strip('"').strip("'")
+        text = text[m.end():]
+    return meta, text
+
+
+def _mcp_content():
+    global _MCP_CACHE
+    if _MCP_CACHE is None:
+        out = {"skills": {}, "commands": {}}
+        for kind, pattern in (("skills", "skills/*/SKILL.md"), ("commands", "commands/*.md")):
+            for f in sorted(MCP_DIR.glob(pattern)):
+                name = f.parent.name if kind == "skills" else f.stem
+                meta, body = _mcp_split(f.read_text(encoding="utf-8"))
+                out[kind][name] = {"meta": meta, "body": body.strip()}
+        _MCP_CACHE = out
+    return _MCP_CACHE
+
+
+def _mcp_keys_path():
+    return _trk_data_dir() / "mcp_keys.json"
+
+
+def _mcp_keys_load():
+    try:
+        return json.loads(_mcp_keys_path().read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _mcp_keys_save(store):
+    path = _mcp_keys_path()
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(store, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
+def _mcp_hash(key):
+    return hashlib.sha256(key.encode()).hexdigest()
+
+
+def _mcp_key_create(email):
+    """One active key per e-mail. Only the SHA-256 hash is stored."""
+    email = email.strip().lower()
+    key = "mk_" + secrets.token_urlsafe(32)
+    h = _mcp_hash(key)
+    url, _ = _sb_target()
+    if not url:
+        store = {k: v for k, v in _mcp_keys_load().items() if v.get("email") != email}
+        store[h] = {"email": email, "created_at": int(time.time())}
+        _mcp_keys_save(store)
+    else:
+        _sb_req("DELETE", "mcp_keys", params={"email": f"eq.{email}"})
+        _sb_req("POST", "mcp_keys", payload={"key_hash": h, "email": email})
+    return key
+
+
+def _mcp_key_email(key):
+    h = _mcp_hash(key)
+    url, _ = _sb_target()
+    if not url:
+        rec = _mcp_keys_load().get(h)
+        return rec.get("email") if rec else None
+    try:
+        rows = _sb_req("GET", "mcp_keys", params={"key_hash": f"eq.{h}", "select": "email"})
+        return rows[0]["email"] if rows else None
+    except Exception as exc:
+        print(f"[mcp] key read error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
+        return None
+
+
+def _mcp_key_exists(email):
+    email = email.strip().lower()
+    url, _ = _sb_target()
+    if not url:
+        return any(v.get("email") == email for v in _mcp_keys_load().values())
+    try:
+        rows = _sb_req("GET", "mcp_keys", params={"email": f"eq.{email}", "select": "key_hash", "limit": "1"})
+        return bool(rows)
+    except Exception:
+        return False
+
+
+def _rpc_ok(mid, result):
+    return {"jsonrpc": "2.0", "id": mid, "result": result}
+
+
+def _rpc_err(mid, code, message):
+    return {"jsonrpc": "2.0", "id": mid, "error": {"code": code, "message": message}}
+
+
+def _mcp_text(text, is_error=False):
+    out = {"content": [{"type": "text", "text": text}]}
+    if is_error:
+        out["isError"] = True
+    return out
+
+
+_MCP_NAME_SCHEMA = {"type": "object", "properties": {"name": {"type": "string",
+                    "description": "Exact name as returned by the list tool."}},
+                    "required": ["name"], "additionalProperties": False}
+_MCP_TOOLS = [
+    {"name": "list_commands", "title": "List commands",
+     "description": "List the Meta Ads Expert PRO commands (start, setup, research, creative, campaign, publish, analyze, ...) with a one-line description each.",
+     "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
+    {"name": "get_command", "title": "Get a command",
+     "description": "Return the full instructions of one command (for example 'start' or 'publish'). Follow them step by step.",
+     "inputSchema": _MCP_NAME_SCHEMA},
+    {"name": "list_specialists", "title": "List specialists",
+     "description": "List the specialist skills (market research, ad copywriting, creative hooks, audience targeting, pixel tracking, campaign audit, scaling, ...) with a one-line description each.",
+     "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
+    {"name": "get_specialist", "title": "Get a specialist",
+     "description": "Return the full instructions of one specialist skill. Call this before doing the work the command asks for, and follow the instructions it returns.",
+     "inputSchema": _MCP_NAME_SCHEMA},
+]
+
+
+def _mcp_listing(kind):
+    items = _mcp_content()[kind]
+    lines = []
+    for name, it in items.items():
+        desc = (it["meta"].get("description") or "").replace("\n", " ")
+        lines.append(f"- {name}: {desc[:220]}")
+    return "\n".join(lines)
+
+
+def _mcp_tool_call(name, args):
+    if name in ("list_commands", "list_specialists"):
+        return _mcp_text(_mcp_listing("commands" if name == "list_commands" else "skills"))
+    if name in ("get_command", "get_specialist"):
+        kind = "commands" if name == "get_command" else "skills"
+        want = str((args or {}).get("name") or "").strip().lstrip("/").lower()
+        it = _mcp_content()[kind].get(want)
+        if not it:
+            return _mcp_text(f"Unknown {kind[:-1]} '{want}'. Available:\n" + _mcp_listing(kind), True)
+        return _mcp_text(f"# {want}\n\n{it['body']}")
+    return None
+
+
+def _mcp_prompt(name, args):
+    it = _mcp_content()["commands"].get(name)
+    if not it:
+        return None
+    extra = str((args or {}).get("arguments") or "").strip()
+    body = it["body"].replace("$ARGUMENTS", extra or "(none)")
+    text = (f"You are running the Meta Ads Expert PRO command /{name}.\n"
+            "Specialist skills named below are available through the get_specialist tool: "
+            "call it with the skill name and follow the instructions it returns. "
+            "Ads are created through the Windsor.ai connector and always paused.\n\n"
+            f"{body}")
+    if extra:
+        text += f"\n\nUser arguments: {extra}"
+    return {"description": it["meta"].get("description", ""),
+            "messages": [{"role": "user", "content": {"type": "text", "text": text}}]}
+
+
+def _mcp_rpc_one(msg):
+    """Handle one JSON-RPC message. Returns a response dict, or None for notifications."""
+    if not isinstance(msg, dict) or msg.get("jsonrpc") != "2.0" or not isinstance(msg.get("method"), str):
+        return _rpc_err(msg.get("id") if isinstance(msg, dict) else None, -32600, "Invalid Request")
+    method = msg["method"]
+    params = msg.get("params") if isinstance(msg.get("params"), dict) else {}
+    if "id" not in msg:
+        return None  # notification (e.g. notifications/initialized)
+    mid = msg["id"]
+    if method == "initialize":
+        asked = params.get("protocolVersion")
+        return _rpc_ok(mid, {
+            "protocolVersion": asked if asked in _MCP_PROTOCOLS else _MCP_PROTOCOLS[0],
+            "capabilities": {"tools": {"listChanged": False}, "prompts": {"listChanged": False}},
+            "serverInfo": {"name": "meta-ads-expert-pro", "title": "Meta Ads Expert PRO", "version": "1.0.0"},
+            "instructions": _MCP_INSTRUCTIONS})
+    if method == "ping":
+        return _rpc_ok(mid, {})
+    if method == "tools/list":
+        return _rpc_ok(mid, {"tools": _MCP_TOOLS})
+    if method == "tools/call":
+        res = _mcp_tool_call(str(params.get("name") or ""), params.get("arguments"))
+        return _rpc_ok(mid, res) if res is not None else _rpc_err(mid, -32602, "Unknown tool")
+    if method == "prompts/list":
+        prompts = []
+        for name, it in _mcp_content()["commands"].items():
+            prompts.append({"name": name, "description": it["meta"].get("description", ""),
+                            "arguments": [{"name": "arguments", "required": False,
+                                           "description": it["meta"].get("argument-hint", "")}]})
+        return _rpc_ok(mid, {"prompts": prompts})
+    if method == "prompts/get":
+        res = _mcp_prompt(str(params.get("name") or ""), params.get("arguments"))
+        return _rpc_ok(mid, res) if res is not None else _rpc_err(mid, -32602, "Unknown prompt")
+    return _rpc_err(mid, -32601, "Method not found")
+
+
 def create_app():
     skills = _load_skills()
     model_registry = _build_registry(skills)
@@ -1293,7 +1558,7 @@ def create_app():
     _PUBLIC_PREFIXES = ("/api/auth/", "/api/branding", "/api/health",
                         "/api/webhooks/")
     _PROTECTED_PREFIXES = ("/api/chat", "/api/models", "/api/tracking/",
-                           "/api/sales")
+                           "/api/sales", "/api/package", "/api/mcp")
 
     @app.middleware("http")
     async def _auth_gate(request, call_next):
@@ -1360,6 +1625,96 @@ def create_app():
         if not email:
             raise HTTPException(401, "unauthorized")
         return {"email": email}
+
+    @app.get("/api/package/status")
+    async def package_status(request: Request):
+        email = getattr(request.state, "user_email", "")
+        return {"buyer": _buyer_is_active(email), "available": PACKAGE_FILE.is_file()}
+
+    @app.get("/api/package/download")
+    async def package_download(request: Request):
+        email = getattr(request.state, "user_email", "")
+        if not _buyer_is_active(email):
+            raise HTTPException(403, "purchase_required")
+        if not PACKAGE_FILE.is_file():
+            raise HTTPException(404, "package_missing")
+        return FileResponse(PACKAGE_FILE, media_type="application/zip",
+                            filename=PACKAGE_FILE.name)
+
+    @app.get("/api/mcp/key")
+    async def mcp_key_status(request: Request):
+        email = getattr(request.state, "user_email", "")
+        return {"buyer": _buyer_is_active(email), "has_key": _mcp_key_exists(email)}
+
+    @app.post("/api/mcp/key")
+    async def mcp_key_new(request: Request):
+        email = getattr(request.state, "user_email", "")
+        if not _buyer_is_active(email):
+            raise HTTPException(403, "purchase_required")
+        return {"key": _mcp_key_create(email)}
+
+    @app.post("/mcp/{key}")
+    async def mcp_endpoint(key: str, request: Request):
+        """MCP over Streamable HTTP (stateless, JSON responses). The key in the URL
+        identifies the buyer; access ends when the purchase is refunded/cancelled."""
+        if not _MCP_KEY_RE.match(key):
+            raise HTTPException(404, "not_found")
+        email = _mcp_key_email(key)
+        if not email:
+            raise HTTPException(401, "invalid_key")
+        if not _buyer_is_active(email):
+            raise HTTPException(403, "purchase_required")
+        raw = await request.body()
+        if len(raw) > 1048576:
+            raise HTTPException(413, "payload_too_large")
+        try:
+            msg = json.loads(raw.decode("utf-8", "replace"))
+        except Exception:
+            return JSONResponse(_rpc_err(None, -32700, "Parse error"), status_code=400)
+        if isinstance(msg, list):
+            out = [r for r in (_mcp_rpc_one(m) for m in msg) if r is not None]
+            return JSONResponse(out) if out else Response(status_code=202)
+        out = _mcp_rpc_one(msg)
+        return JSONResponse(out) if out is not None else Response(status_code=202)
+
+    @app.get("/mcp/{key}")
+    @app.delete("/mcp/{key}")
+    async def mcp_no_stream(key: str):
+        return Response(status_code=405, headers={"Allow": "POST"})
+
+    @app.post("/api/webhooks/hotmart")
+    async def hotmart_access_webhook(request: Request):
+        """Hotmart (webhook v2) -> grants or revokes package access by buyer e-mail.
+        Refuses everything unless HOTMART_HOTTOK is set and matches."""
+        expected = os.getenv("HOTMART_HOTTOK", "")
+        if not expected:
+            raise HTTPException(503, "webhook_not_configured")
+        raw = await request.body()
+        if len(raw) > 262144:
+            raise HTTPException(413, "payload_too_large")
+        try:
+            body = json.loads(raw.decode("utf-8", "replace"))
+        except Exception:
+            raise HTTPException(400, "invalid_json")
+        if not isinstance(body, dict):
+            raise HTTPException(400, "invalid_json")
+        got = request.headers.get("x-hotmart-hottok") or str(body.get("hottok") or "")
+        if not hmac.compare_digest(got.encode(), expected.encode()):
+            raise HTTPException(401, "invalid_hottok")
+        event = str(body.get("event") or "").upper()
+        data = body.get("data") if isinstance(body.get("data"), dict) else {}
+        person = (data.get("buyer") if isinstance(data.get("buyer"), dict) else None) \
+            or (data.get("subscriber") if isinstance(data.get("subscriber"), dict) else {})
+        email = str(person.get("email") or "").strip().lower()
+        if event in _BUYER_ACTIVE_EVENTS:
+            status = "active"
+        elif event in _BUYER_INACTIVE_EVENTS:
+            status = "inactive"
+        else:
+            return {"ok": True, "ignored": event or "unknown_event"}
+        if not _buyer_set(email, status):
+            raise HTTPException(400, "invalid_email")
+        return {"ok": True, "status": status}
 
 
     @app.get("/")

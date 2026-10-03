@@ -1,1 +1,18 @@
-{"functions":{"api/index.py":{"maxDuration":60}},"rewrites":[{"destination":"/api/index/api/:path*","source":"/api/:path*"},{"destination":"/api/index/:path*","source":"/:path*"}]}
+{
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "includeFiles": "downloads/**"
+    }
+  },
+  "rewrites": [
+    {
+      "destination": "/api/index/api/:path*",
+      "source": "/api/:path*"
+    },
+    {
+      "destination": "/api/index/:path*",
+      "source": "/:path*"
+    }
+  ]
+}
