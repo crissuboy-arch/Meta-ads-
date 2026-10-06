@@ -960,7 +960,7 @@ function libRenderList(){
   const mb=el.querySelector('#libManage');
   if(mb)mb.addEventListener('click',()=>{libManage=!libManage;bibBodyRender()});
   el.querySelectorAll('[data-libtoggle]').forEach(b=>b.addEventListener('click',async()=>{
-    const cur=libData.find(x=>x.id===b.dataset.libtoggle);
+    const cur=libData.find(x=>String(x.id)===String(b.dataset.libtoggle));
     try{await fetch('/api/library/structures/'+encodeURIComponent(b.dataset.libtoggle),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:!cur.active})})}catch(e){}
     bibBodyRender();
   }));
@@ -974,7 +974,7 @@ function libRenderList(){
     }catch(e){if(msg)msg.textContent=String(e)}
   });
   el.querySelectorAll('[data-libuse]').forEach(b=>b.addEventListener('click',()=>{
-    const x=libData.find(y=>y.id===b.dataset.libuse);
+    const x=libData.find(y=>String(y.id)===String(b.dataset.libuse));
     try{sessionStorage.setItem('v2struct',JSON.stringify(x))}catch(e){}
     const nb=document.querySelector('#sideNav .side-item[data-id="criar"]');if(nb)nb.click();
   }));
@@ -1946,14 +1946,16 @@ async function refreshTrackingDash(){
   }
 }
 let authMode='login',authUser=null;
+const AUTH_FALLBACK={en:{subtitle:'Sign in to your account to continue.',email:'Email',password:'Password',login:'Sign in',register:'Create account',no_account:"Don't have an account?",have_account:'Already have an account?',to_register:'Create account',to_login:'Sign in',logout:'Sign out'},pt:{subtitle:'Entre na sua conta para continuar.',email:'E-mail',password:'Senha',login:'Entrar',register:'Criar conta',no_account:'Ainda não tem conta?',have_account:'Já tem conta?',to_register:'Criar conta',to_login:'Entrar',logout:'Sair'},es:{subtitle:'Inicia sesión para continuar.',email:'Correo',password:'Contraseña',login:'Entrar',register:'Crear cuenta',no_account:'¿Aún no tienes cuenta?',have_account:'¿Ya tienes cuenta?',to_register:'Crear cuenta',to_login:'Entrar',logout:'Salir'},fr:{subtitle:'Connectez-vous pour continuer.',email:'E-mail',password:'Mot de passe',login:'Se connecter',register:'Créer un compte',no_account:"Pas encore de compte ?",have_account:'Déjà un compte ?',to_register:'Créer un compte',to_login:'Se connecter',logout:'Déconnexion'},de:{subtitle:'Melden Sie sich an, um fortzufahren.',email:'E-Mail',password:'Passwort',login:'Anmelden',register:'Konto erstellen',no_account:'Noch kein Konto?',have_account:'Schon ein Konto?',to_register:'Konto erstellen',to_login:'Anmelden',logout:'Abmelden'},tr:{subtitle:'Devam etmek için giriş yapın.',email:'E-posta',password:'Şifre',login:'Giriş yap',register:'Hesap oluştur',no_account:'Hesabınız yok mu?',have_account:'Zaten hesabınız var mı?',to_register:'Hesap oluştur',to_login:'Giriş yap',logout:'Çıkış yap'}};
 function applyAuthTexts(){
+  const fb=AUTH_FALLBACK[LANG]||AUTH_FALLBACK.en;
   const st=function(id,v){const el=document.getElementById(id);if(el)el.textContent=v||''};
-  st('authSubtitle',UI.auth_subtitle);st('authEmailLabel',UI.auth_email);st('authPasswordLabel',UI.auth_password);
+  st('authSubtitle',UI.auth_subtitle||fb.subtitle);st('authEmailLabel',UI.auth_email||fb.email);st('authPasswordLabel',UI.auth_password||fb.password);
   const isLogin=authMode==='login';
-  st('authSubmit',isLogin?UI.auth_login_btn:UI.auth_register_btn);
-  st('authSwitchText',isLogin?UI.auth_no_account:UI.auth_have_account);
-  st('authSwitchBtn',isLogin?UI.auth_to_register:UI.auth_to_login);
-  const lo=document.getElementById('logoutBtn');if(lo)lo.textContent=UI.auth_logout||'';
+  st('authSubmit',isLogin?(UI.auth_login_btn||fb.login):(UI.auth_register_btn||fb.register));
+  st('authSwitchText',isLogin?(UI.auth_no_account||fb.no_account):(UI.auth_have_account||fb.have_account));
+  st('authSwitchBtn',isLogin?(UI.auth_to_register||fb.to_register):(UI.auth_to_login||fb.to_login));
+  const lo=document.getElementById('logoutBtn');if(lo)lo.textContent=UI.auth_logout||fb.logout;
 }
 function authError(msg){const e=document.getElementById('authError');if(!e)return;if(!msg){e.style.display='none';return}e.textContent=msg;e.style.display='block'}
 function showAuth(){const o=document.getElementById('authOverlay');if(o)o.classList.remove('hidden');applyAuthTexts();const em=document.getElementById('authEmail');if(em)setTimeout(function(){em.focus()},60)}
@@ -2277,12 +2279,14 @@ function applyConfig(cfg){
   const hs=document.getElementById('heroSubtitle');if(hs)hs.textContent=(cfg.hero&&cfg.hero.subtitle)||'';
 
   setColors(cfg.colors||{});
+  try{
   renderSidebar(cfg);
   v2ApplyTexts();
   renderHero(cfg.hero||{});
   renderDashboardMetrics(cfg.dashboard_metrics||[]);
   applyTrackingTexts();
   refreshTrackingDash();
+  }catch(e){try{console.error('applyConfig render fail',e)}catch(x){}}
   applyAuthTexts();
 
   V2H=(cfg&&cfg.v2home)||{};
@@ -2345,6 +2349,11 @@ async function switchLang(code){
     config=await r.json();
     if(config.app_id)currentAppId=config.app_id;
     applyConfig(config);
+    try{
+      if(currentModule==='biblioteca')bibBodyRender();
+      else if(currentModule==='criar')criarBodyRender();
+      else if(currentModule==='provedores')provBodyRender();
+    }catch(e){}
     clearBtn.click();
     S('online','status_connected');
   }catch(e){S('error','status_error_switch')}
