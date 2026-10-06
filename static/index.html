@@ -297,7 +297,8 @@
   .trk-status.ok{background:rgba(34,197,94,0.18);color:#4ADE80}
   .trk-status.err{background:rgba(239,68,68,0.18);color:#FCA5A5}
   body.cl-open #heroSection,body.cl-open #dashSection,body.cl-open #toolsSection,body.cl-open #utmSection,body.cl-open #importsSection,body.cl-open #nichesSection,body.cl-open #trackingSection{display:none !important}
-  .lv-table{width:100%;border-collapse:collapse;font-size:12.5px}.lv-table th,.lv-table td{padding:7px 8px;border-bottom:1px solid rgba(128,128,128,.25);text-align:right;white-space:nowrap}.lv-table th:first-child,.lv-table td:first-child{text-align:left;white-space:normal}.lv-bm td{background:rgba(96,165,250,.12);font-weight:700;text-align:left !important}.lv-row{cursor:pointer}.lv-row:hover td{background:rgba(128,128,128,.12)}
+  .lv-table{width:100%;border-collapse:collapse;font-size:12.5px}.lv-table th,.lv-table td{padding:7px 8px;border-bottom:1px solid rgba(128,128,128,.25);text-align:right;white-space:nowrap}.lv-table th:first-child,.lv-table td:first-child{text-align:left;white-space:normal}.lv-bm td{background:rgba(255,138,31,.12);font-weight:700;text-align:left !important}
+  #lvBody{overflow-x:auto}.lv-row{cursor:pointer}.lv-row:hover td{background:rgba(128,128,128,.12)}
   #adTable th,#adTable td{padding:6px 8px;border-bottom:1px solid rgba(128,128,128,.25);text-align:right;white-space:nowrap}#adTable th:first-child,#adTable td:first-child{text-align:left;white-space:normal}
   .trk-block{margin-top:18px}
   .trk-block-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
@@ -1284,7 +1285,8 @@ function lvStatus(st){
   const t=lvT(),map=t.st||{};const label=map[st]||st||'—';
   const good=st==='ACTIVE',bad=['DISAPPROVED','WITH_ISSUES','DISABLED','UNSETTLED','PENDING_RISK_REVIEW','IN_GRACE_PERIOD'].includes(st);
   const c=good?'#22c55e':bad?'#ef4444':'#9ca3af';
-  return '<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid '+c+';color:'+c+'">'+adEsc(label)+'</span>';
+  const hint=lvStatusHint(st);
+  return '<span title="'+adEsc(hint)+'" style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid '+c+';color:'+c+'">'+adEsc(label)+'</span>';
 }
 function lvResultLabel(k){const t=lvT();return ({purchase:t.rPurchase,lead:t.rLead,message:t.rMessage,link_click:t.rClick})[k]||''}
 function lvCrumbs(){
@@ -1313,20 +1315,51 @@ async function lvLoad(){
   }catch(e){document.getElementById('lvBody').innerHTML='<div class="utm-hint">'+adEsc(t.err)+'</div>'}
   lvBusy=false;
 }
+const LV_RN={en:{purchase:["purchase","purchases"],lead:["lead","leads"],message:["message","messages"],link_click:["click","clicks"]},
+pt:{purchase:["compra","compras"],lead:["lead","leads"],message:["mensagem","mensagens"],link_click:["clique","cliques"]},
+es:{purchase:["compra","compras"],lead:["lead","leads"],message:["mensaje","mensajes"],link_click:["clic","clics"]},
+fr:{purchase:["achat","achats"],lead:["lead","leads"],message:["message","messages"],link_click:["clic","clics"]},
+tr:{purchase:["sat\u0131n alma","sat\u0131n alma"],lead:["potansiyel m\u00fc\u015fteri","potansiyel m\u00fc\u015fteri"],message:["mesaj","mesaj"],link_click:["t\u0131klama","t\u0131klama"]},
+de:{purchase:["Kauf","K\u00e4ufe"],lead:["Lead","Leads"],message:["Nachricht","Nachrichten"],link_click:["Klick","Klicks"]}};
+function lvRN(n,kind){const d=(LV_RN[LANG]||LV_RN.en)[kind]||(LV_RN[LANG]||LV_RN.en).link_click;return lvNum(n)+' <small style="opacity:.6">'+adEsc(n===1?d[0]:d[1])+'</small>'}
+const LV_COLS={en:{impr:"Impressions",reach:"Reach",freq:"Frequency",cpm:"CPM",noPurchases:"No purchases yet"},
+pt:{impr:"Impress\u00f5es",reach:"Alcance",freq:"Frequ\u00eancia",cpm:"CPM",noPurchases:"Sem compras ainda"},
+es:{impr:"Impresiones",reach:"Alcance",freq:"Frecuencia",cpm:"CPM",noPurchases:"Sin compras a\u00fan"},
+fr:{impr:"Impressions",reach:"Couverture",freq:"Fr\u00e9quence",cpm:"CPM",noPurchases:"Aucun achat pour l'instant"},
+tr:{impr:"G\u00f6sterim",reach:"Eri\u015fim",freq:"S\u0131kl\u0131k",cpm:"CPM",noPurchases:"Hen\u00fcz sat\u0131n alma yok"},
+de:{impr:"Impressionen",reach:"Reichweite",freq:"Frequenz",cpm:"CPM",noPurchases:"Noch keine K\u00e4ufe"}};
+function lvC(k){return (LV_COLS[LANG]||LV_COLS.en)[k]||k}
+const LV_STH={en:{UNSETTLED:"Payment pending \u2014 ads may stop delivering until billing is resolved.",DISABLED:"Account disabled.",DISAPPROVED:"Account disapproved.",WITH_ISSUES:"Account has issues.",PENDING_RISK_REVIEW:"Under risk review.",IN_GRACE_PERIOD:"Grace period \u2014 resolve billing soon.",PENDING_BILLING_INFO:"Billing info pending."},
+pt:{UNSETTLED:"Pagamento pendente \u2014 os an\u00fancios podem parar at\u00e9 regularizar a cobran\u00e7a.",DISABLED:"Conta desativada.",DISAPPROVED:"Conta reprovada.",WITH_ISSUES:"Conta com problemas.",PENDING_RISK_REVIEW:"Em an\u00e1lise de risco.",IN_GRACE_PERIOD:"Per\u00edodo de car\u00eancia \u2014 regularize a cobran\u00e7a em breve.",PENDING_BILLING_INFO:"Dados de cobran\u00e7a pendentes."},
+es:{UNSETTLED:"Pago pendiente \u2014 los anuncios pueden detenerse hasta resolver la facturaci\u00f3n.",DISABLED:"Cuenta deshabilitada.",DISAPPROVED:"Cuenta rechazada.",WITH_ISSUES:"Cuenta con problemas.",PENDING_RISK_REVIEW:"En revisi\u00f3n de riesgo.",IN_GRACE_PERIOD:"Periodo de gracia \u2014 resuelve la facturaci\u00f3n pronto.",PENDING_BILLING_INFO:"Datos de facturaci\u00f3n pendientes."},
+fr:{UNSETTLED:"Paiement en attente \u2014 les annonces peuvent s'arr\u00eater jusqu'\u00e0 r\u00e9gularisation.",DISABLED:"Compte d\u00e9sactiv\u00e9.",DISAPPROVED:"Compte refus\u00e9.",WITH_ISSUES:"Compte avec probl\u00e8mes.",PENDING_RISK_REVIEW:"Examen de risque en cours.",IN_GRACE_PERIOD:"P\u00e9riode de gr\u00e2ce \u2014 r\u00e9gularisez bient\u00f4t.",PENDING_BILLING_INFO:"Infos de facturation en attente."},
+tr:{UNSETTLED:"\u00d6deme bekliyor \u2014 faturalama \u00e7\u00f6z\u00fclene kadar reklamlar durabilir.",DISABLED:"Hesap devre d\u0131\u015f\u0131.",DISAPPROVED:"Hesap reddedildi.",WITH_ISSUES:"Hesapta sorun var.",PENDING_RISK_REVIEW:"Risk incelemesinde.",IN_GRACE_PERIOD:"Ek s\u00fcre \u2014 faturaland\u0131rmay\u0131 yak\u0131nda \u00e7\u00f6z\u00fcn.",PENDING_BILLING_INFO:"Faturalama bilgisi bekleniyor."},
+de:{UNSETTLED:"Zahlung ausstehend \u2014 Anzeigen k\u00f6nnen stoppen, bis die Abrechnung gekl\u00e4rt ist.",DISABLED:"Konto deaktiviert.",DISAPPROVED:"Konto abgelehnt.",WITH_ISSUES:"Konto mit Problemen.",PENDING_RISK_REVIEW:"Risikopr\u00fcfung l\u00e4uft.",IN_GRACE_PERIOD:"Kulanzfrist \u2014 kl\u00e4ren Sie die Abrechnung bald.",PENDING_BILLING_INFO:"Abrechnungsdaten ausstehend."}};
+/* Padrões configuráveis para extrair a BM do nome da conta quando a API não devolver */
+const BM_NAME_PATTERNS=[/^(.+?)\s*[\u00B7|]\s*/, /^(.+?)\s+-\s+/];
+function guessBM(name){name=String(name||'');for(const rx of BM_NAME_PATTERNS){const m=name.match(rx);if(m&&m[1]&&m[1].trim().length>1)return m[1].trim()}return ''}
+function lvStatusHint(st){return (LV_STH[LANG]||LV_STH.en)[st]||''}
 function lvCell(x,left){return '<td'+(left?' style="text-align:left"':'')+'>'+x+'</td>'}
+function lvBmOf(a,t){return a.business||guessBM(a.name)||t.noBM}
+function lvRoasCell(a){
+  const c=lvC('noPurchases');
+  if(a.spend>0&&a.revenue>0)return lvCell(((a.roas||0).toFixed(2))+'x');
+  if(a.spend>0)return lvCell('<span title="'+adEsc(c)+'">\u2014</span>');
+  return lvCell('\u2014');
+}
 function lvRender(){
   const t=lvT(),box=document.getElementById('lvBody');
   if(lvData._view==='overview'){
     const accs=lvData.accounts||[];
     if(!accs.length){box.innerHTML='<div class="utm-hint">'+adEsc(t.noAccounts)+'</div>';return}
-    const groups={};accs.forEach(a=>{const k=a.business||t.noBM;(groups[k]=groups[k]||[]).push(a)});
-    let html='<table class="lv-table"><thead><tr><th>'+adEsc(t.account)+'</th><th>'+adEsc(t.status)+'</th><th>'+adEsc(t.activeCamps)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(t.results)+'</th><th>'+adEsc(t.cpr)+'</th><th>ROAS</th><th>CTR</th></tr></thead><tbody>';
+    const groups={};accs.forEach(a=>{const k=lvBmOf(a,t);(groups[k]=groups[k]||[]).push(a)});
+    let html='<table class="lv-table"><thead><tr><th>'+adEsc(t.account)+'</th><th>'+adEsc(t.status)+'</th><th>'+adEsc(t.activeCamps)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(lvC('impr'))+'</th><th>'+adEsc(lvC('reach'))+'</th><th>'+adEsc(lvC('freq'))+'</th><th>'+adEsc(lvC('cpm'))+'</th><th>'+adEsc(t.results)+'</th><th>'+adEsc(t.cpr)+'</th><th>ROAS</th><th>CTR</th></tr></thead><tbody>';
     const tot=k=>groups[k].reduce((s,a)=>s+(a.spend||0),0);Object.keys(groups).sort((x,y)=>tot(y)-tot(x)||x.localeCompare(y)).forEach(bm=>{
       const sub={};groups[bm].forEach(a=>{const c=a.currency||'';sub[c]=(sub[c]||0)+(a.spend||0)});
-      html+='<tr class="lv-bm"><td colspan="8">'+adEsc(bm)+' · '+Object.keys(sub).map(c=>lvMoney(sub[c],c)).join(' + ')+'</td></tr>';
+      html+='<tr class="lv-bm"><td colspan="12">'+adEsc(bm)+' \u00b7 '+Object.keys(sub).map(c=>lvMoney(sub[c],c)).join(' + ')+'</td></tr>';
       groups[bm].forEach(a=>{
-        if(a.error){html+='<tr><td style="text-align:left">'+adEsc(a.name)+'</td><td colspan="7" style="text-align:left;color:#ef4444">'+adEsc(a.error)+'</td></tr>';return}
-        html+='<tr class="lv-row" data-acc="'+adEsc(a.account_id)+'" data-name="'+adEsc(a.name)+'" data-cur="'+adEsc(a.currency)+'">'+lvCell(adEsc(a.name),1)+lvCell(lvStatus(a.account_status))+lvCell(lvNum(a.active_campaigns))+lvCell(lvMoney(a.spend,a.currency))+lvCell(lvNum(a.results)+(a.results?' <small style="opacity:.6">'+adEsc(lvResultLabel(a.result_type))+'</small>':''))+lvCell(a.results?lvMoney(a.cost_per_result,a.currency):'—')+lvCell(a.spend?(a.roas||0).toFixed(2)+'x':'—')+lvCell((a.ctr||0).toFixed(2)+'%')+'</tr>';
+        if(a.error){html+='<tr><td style="text-align:left">'+adEsc(a.name)+'</td><td colspan="11" style="text-align:left;color:#ef4444">'+adEsc(a.error)+'</td></tr>';return}
+        html+='<tr class="lv-row" data-acc="'+adEsc(a.account_id)+'" data-name="'+adEsc(a.name)+'" data-cur="'+adEsc(a.currency)+'">'+lvCell(adEsc(a.name),1)+lvCell(lvStatus(a.account_status))+lvCell(lvNum(a.active_campaigns))+lvCell(lvMoney(a.spend,a.currency))+lvCell(lvNum(a.impressions))+lvCell(lvNum(a.reach))+lvCell(a.frequency?Number(a.frequency).toFixed(2):'\u2014')+lvCell(a.impressions?lvMoney(a.cpm,a.currency):'\u2014')+lvCell(lvRN(a.results,a.result_type))+lvCell(a.results?lvMoney(a.cost_per_result,a.currency):'\u2014')+lvRoasCell(a)+lvCell((a.ctr||0).toFixed(2)+'%')+'</tr>';
       });
     });
     box.innerHTML=html+'</tbody></table><div class="utm-hint" style="margin-top:8px">'+adEsc(t.clickHint)+'</div>';
@@ -1334,10 +1367,10 @@ function lvRender(){
   }
   const rows=lvData.rows||[],cur=lvData.currency,nextView={campaign:'adset',adset:'ad'}[lvData._view];
   if(!rows.length){box.innerHTML='<div class="utm-hint">'+adEsc(t.empty)+'</div>';return}
-  let html='<table class="lv-table"><thead><tr><th>'+adEsc(t[lvData._view])+'</th><th>'+adEsc(t.status)+'</th><th>'+adEsc(t.budget)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(t.results)+'</th><th>'+adEsc(t.cpr)+'</th><th>ROAS</th><th>CTR</th><th>CPC</th></tr></thead><tbody>';
+  let html='<table class="lv-table"><thead><tr><th>'+adEsc(t[lvData._view])+'</th><th>'+adEsc(t.status)+'</th><th>'+adEsc(t.budget)+'</th><th>'+adEsc(t.spend)+'</th><th>'+adEsc(lvC('impr'))+'</th><th>'+adEsc(lvC('reach'))+'</th><th>'+adEsc(lvC('freq'))+'</th><th>'+adEsc(lvC('cpm'))+'</th><th>'+adEsc(t.results)+'</th><th>'+adEsc(t.cpr)+'</th><th>ROAS</th><th>CTR</th><th>CPC</th></tr></thead><tbody>';
   rows.forEach(r=>{
-    const bud=r.daily_budget!=null?lvMoney(r.daily_budget/100,cur):'—';
-    html+='<tr class="'+(nextView?'lv-row':'')+'" data-id="'+adEsc(r.id)+'" data-name="'+adEsc(r.name)+'">'+lvCell(adEsc(r.name),1)+lvCell(lvStatus(r.status))+lvCell(bud)+lvCell(lvMoney(r.spend,cur))+lvCell(lvNum(r.results)+(r.results?' <small style="opacity:.6">'+adEsc(lvResultLabel(r.result_type))+'</small>':''))+lvCell(r.results?lvMoney(r.cost_per_result,cur):'—')+lvCell(r.spend?(r.roas||0).toFixed(2)+'x':'—')+lvCell((r.ctr||0).toFixed(2)+'%')+lvCell(r.clicks?lvMoney(r.cpc,cur):'—')+'</tr>';
+    const bud=r.daily_budget!=null?lvMoney(r.daily_budget/100,cur):'\u2014';
+    html+='<tr class="'+(nextView?'lv-row':'')+'" data-id="'+adEsc(r.id)+'" data-name="'+adEsc(r.name)+'">'+lvCell(adEsc(r.name),1)+lvCell(lvStatus(r.status))+lvCell(bud)+lvCell(lvMoney(r.spend,cur))+lvCell(lvNum(r.impressions))+lvCell(lvNum(r.reach))+lvCell(r.frequency?Number(r.frequency).toFixed(2):'\u2014')+lvCell(r.impressions?lvMoney(r.cpm,cur):'\u2014')+lvCell(lvRN(r.results,r.result_type))+lvCell(r.results?lvMoney(r.cost_per_result,cur):'\u2014')+lvRoasCell(r)+lvCell((r.ctr||0).toFixed(2)+'%')+lvCell(r.clicks?lvMoney(r.cpc,cur):'\u2014')+'</tr>';
   });
   box.innerHTML=html+'</tbody></table>';
 }
@@ -1356,7 +1389,7 @@ async function lvAnalyze(){
   const t=lvT();if(!lvData)return;
   const ps=document.getElementById('lvPreset'),lab=ps.options[ps.selectedIndex].textContent;
   let lines=[];
-  if(lvData._view==='overview'){(lvData.accounts||[]).forEach(a=>{if(!a.error)lines.push('- '+(a.business||t.noBM)+' / '+a.name+' | '+(a.account_status||'')+' | active campaigns '+(a.active_campaigns||0)+' | spend '+lvMoney(a.spend,a.currency)+' | results '+(a.results||0)+' ('+(a.result_type||'')+') | ROAS '+(a.roas||0).toFixed(2)+' | CTR '+(a.ctr||0).toFixed(2)+'%')})}
+  if(lvData._view==='overview'){(lvData.accounts||[]).forEach(a=>{if(!a.error)lines.push('- '+lvBmOf(a,t)+' / '+a.name+' | '+(a.account_status||'')+' | active campaigns '+(a.active_campaigns||0)+' | spend '+lvMoney(a.spend,a.currency)+' | results '+(a.results||0)+' ('+(a.result_type||'')+') | ROAS '+(a.roas||0).toFixed(2)+' | CTR '+(a.ctr||0).toFixed(2)+'%')})}
   else{(lvData.rows||[]).slice(0,40).forEach(r=>lines.push('- '+r.name+' | '+r.status+' | spend '+lvMoney(r.spend,lvData.currency)+' | results '+(r.results||0)+' | ROAS '+(r.roas||0).toFixed(2)+' | CTR '+(r.ctr||0).toFixed(2)+'%'))}
   if(!lines.length)return;
   lvCloseScreen();

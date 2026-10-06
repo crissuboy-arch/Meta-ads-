@@ -458,7 +458,7 @@ def register(app, d):
                     "8": "PENDING_SETTLEMENT", "9": "IN_GRACE_PERIOD", "100": "PENDING_CLOSURE",
                     "101": "CLOSED"}
     PRESETS = {"today", "yesterday", "last_3d", "last_7d", "last_14d", "last_30d", "this_month", "last_month"}
-    INS_FIELDS = "spend,impressions,clicks,ctr,cpc,cpm,actions,action_values"
+    INS_FIELDS = "spend,impressions,reach,frequency,clicks,ctr,cpc,cpm,actions,action_values"
 
     def act_sum(lst, types):
         return sum(num(a.get("value")) for a in (lst or []) if a.get("action_type") in types)
@@ -480,6 +480,7 @@ def register(app, d):
         else:
             res, kind = link, "link_click"
         return {"spend": spend, "impressions": int(num(r.get("impressions"))),
+                "reach": int(num(r.get("reach"))), "frequency": num(r.get("frequency")),
                 "clicks": int(num(r.get("clicks"))), "ctr": num(r.get("ctr")),
                 "cpc": num(r.get("cpc")), "cpm": num(r.get("cpm")),
                 "purchases": purchases, "revenue": revenue, "results": res, "result_type": kind,
