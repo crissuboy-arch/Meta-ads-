@@ -1878,6 +1878,16 @@ def create_app():
     def index():
         return FileResponse(static_dir / "index.html")
 
+    @app.get("/img/{fname}")
+    def login_img(fname: str):
+        safe = "".join(c for c in fname if c.isalnum() or c in ("-", "_", "."))
+        p = static_dir / "img" / safe
+        if not safe or p.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
+            return JSONResponse({"error": "not_found"}, status_code=404)
+        if not p.is_file():
+            return JSONResponse({"error": "not_found"}, status_code=404)
+        return FileResponse(p)
+
     @app.get("/api/models")
     def list_models():
         return JSONResponse([

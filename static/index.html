@@ -343,42 +343,79 @@
   .auth-overlay.light{background:radial-gradient(120% 140% at 20% 0%,#FFE0B8 0%,#FFF3E0 55%,#FBEEDC 100%);--auth-shadow:0 24px 60px rgba(130,75,10,0.20);--card:#FFFFFF;--line:rgba(70,40,5,.10);--line2:rgba(70,40,5,.18);--text:#231503;--text-dim:#8A7660;--text-faint:#A89880;--glass-border:rgba(70,40,5,.16)}
   .auth-overlay.light .url-input{background:rgba(70,40,5,.045)}
   .auth-overlay.light .url-input::placeholder{color:#B7A88F}
-  .auth-overlay.light .auth-theme-btn{background:rgba(70,40,5,.06)}
-  .auth-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line2);border-radius:20px;padding:30px 28px 26px;box-shadow:var(--auth-shadow);position:relative;overflow:hidden}
-  .auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--gold))}
-  .auth-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-  .auth-logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque','DM Sans',sans-serif;font-weight:800;font-size:17px;color:var(--text)}
-  .auth-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,138,31,0.18)}
+  .auth-split{position:relative;width:100%;max-width:920px;display:flex;border-radius:22px;overflow:hidden;background:var(--card);border:1px solid var(--line2);box-shadow:var(--auth-shadow);opacity:0;transform:scale(.96) translateY(12px);transition:opacity .5s ease,transform .5s ease}
+  .auth-overlay.ready .auth-split{opacity:1;transform:none}
+  .auth-visual{flex:1.25;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:26px;background:linear-gradient(150deg,#241305 0%,#160D04 70%);border-right:1px solid var(--line2);min-width:0}
+  .auth-overlay.light .auth-visual{background:linear-gradient(150deg,#FFE9C8 0%,#FFF6E4 70%)}
+  .auth-brand{padding:2px 4px}
+  .auth-logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque','DM Sans',sans-serif;font-weight:800;font-size:19px;color:#fff}
+  .auth-overlay.light .auth-logo{color:#231503}
+  .auth-logo .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,138,31,0.18);flex:none}
   .v2pill{font-size:10px;font-weight:800;letter-spacing:.1em;background:linear-gradient(135deg,var(--accent),var(--gold));color:#1A1208;border-radius:999px;padding:3px 10px;margin-left:4px}
-  .auth-theme-btn{background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--text);width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:transform .15s}
-  .auth-theme-btn:hover{transform:scale(1.06)}
-  .auth-sub{color:var(--text-dim);font-size:13px;margin:10px 0 20px;line-height:1.5}
-  .auth-card label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text-dim);text-transform:uppercase;margin:14px 0 6px}
+  .auth-tagline{color:rgba(255,244,230,.72);font-size:13px;margin:10px 0 0;line-height:1.6;max-width:340px}
+  .auth-overlay.light .auth-tagline{color:#8A7660}
+  .auth-tiles{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,118px);gap:10px}
+  .auth-tile{border-radius:14px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:12px;text-align:center;opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+  .auth-overlay.ready .auth-tile{opacity:1;transform:none}
+  .auth-overlay.ready .auth-tile:nth-child(2){transition-delay:.12s}
+  .auth-overlay.ready .auth-tile:nth-child(3){transition-delay:.2s}
+  .auth-overlay.ready .auth-tile:nth-child(4){transition-delay:.28s}
+  .auth-overlay.ready .auth-tile:nth-child(5){transition-delay:.36s}
+  .auth-overlay.ready .auth-tile:nth-child(6){transition-delay:.44s}
+  .auth-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.92}
+  .auth-tile.at-stat1{background:linear-gradient(135deg,#E07B00,#F2A93B);color:#fff}
+  .auth-tile.at-stat2{background:linear-gradient(135deg,#1E9E6A,#37C98E);color:#fff}
+  .at-big{font-size:30px;font-weight:800;font-family:'Bricolage Grotesque',sans-serif;line-height:1}
+  .at-small{font-size:11.5px;line-height:1.45;opacity:.95;max-width:190px}
+  .auth-form{flex:1;padding:40px 38px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+  .auth-title{font-family:'Bricolage Grotesque','DM Sans',sans-serif;font-size:23px;font-weight:800;color:var(--text);margin:0 0 4px}
+  .auth-title .hl{color:var(--accent)}
+  .auth-sub{color:var(--text-dim);font-size:13px;margin:8px 0 22px;line-height:1.5}
+  .auth-form label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text-dim);text-transform:uppercase;margin:14px 0 6px}
+  .auth-form label:first-of-type{margin-top:0}
   .auth-err{display:none;margin-top:14px;font-size:12.5px;color:#FCA5A5;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);padding:9px 11px;border-radius:9px}
   .auth-overlay.light .auth-err{color:#B3261E;background:rgba(239,68,68,.08)}
-  .auth-submit{width:100%;margin-top:20px;padding:12px;font-size:14px}
-  .auth-switch{margin-top:16px;text-align:center;font-size:12.5px;color:var(--text-dim)}
-  .auth-switch button{background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-size:12.5px;padding:0}
+  .auth-submit{width:100%;margin-top:22px;padding:13px;font-size:14.5px}
+  .auth-switch{margin-top:18px;text-align:center;font-size:12.5px;color:var(--text-dim)}
+  .auth-switch button{background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-size:12.5px;padding:0;margin-left:4px}
+  .auth-theme-btn{position:absolute;top:14px;right:14px;z-index:3;background:rgba(0,0,0,.35);border:1px solid var(--line2);color:#FFC857;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:transform .15s;backdrop-filter:blur(4px)}
+  .auth-overlay.light .auth-theme-btn{background:rgba(255,255,255,.7);color:#8A6A20}
+  .auth-theme-btn:hover{transform:scale(1.08)}
   .logout-btn{display:block;width:100%;margin-top:10px;padding:8px;font-size:12px}
+  @media(max-width:820px){.auth-visual{display:none}.auth-split{max-width:400px}.auth-form{padding:32px 28px}}
 </style>
 </head>
 <body>
 <div class="auth-overlay hidden" id="authOverlay">
-  <div class="auth-card">
-    <div class="auth-top">
-      <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span><span class="v2pill">V2</span></div>
-      <button type="button" id="authThemeToggle" class="auth-theme-btn" aria-label="theme">🌙</button>
+  <div class="auth-split" id="authSplit">
+    <button type="button" id="authThemeToggle" class="auth-theme-btn" aria-label="theme">🌙</button>
+    <div class="auth-visual">
+      <div class="auth-brand">
+        <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span><span class="v2pill">V2</span></div>
+        <p class="auth-tagline" id="authTagline"></p>
+      </div>
+      <div class="auth-tiles">
+        <div class="auth-tile"><img src="/img/auth-1.jpg" alt="" loading="lazy"></div>
+        <div class="auth-tile at-stat1"><span class="at-big">PRO</span><span class="at-small" data-at="tile_pro"></span></div>
+        <div class="auth-tile"><img src="/img/auth-2.jpg" alt="" loading="lazy"></div>
+        <div class="auth-tile"><img src="/img/auth-3.jpg" alt="" loading="lazy"></div>
+        <div class="auth-tile at-stat2"><span class="at-big">6</span><span class="at-small" data-at="tile_lang"></span></div>
+        <div class="auth-tile"><img src="/img/auth-4.jpg" alt="" loading="lazy"></div>
+      </div>
     </div>
-    <div class="auth-sub" id="authSubtitle"></div>
-    <form id="authForm" autocomplete="on">
-      <label for="authEmail" id="authEmailLabel"></label>
-      <input id="authEmail" type="email" class="url-input" autocomplete="email" required>
-      <label for="authPassword" id="authPasswordLabel"></label>
-      <div style="position:relative"><input id="authPassword" type="password" class="url-input" autocomplete="current-password" required minlength="8" style="padding-right:44px"><button type="button" id="authPwToggle" aria-label="show password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;line-height:1;opacity:.75">👁️</button></div>
-      <div class="auth-err" id="authError"></div>
-      <button type="submit" class="btn-p auth-submit" id="authSubmit"></button>
-    </form>
-    <div class="auth-switch"><span id="authSwitchText"></span> <button type="button" id="authSwitchBtn"></button></div>
+    <div class="auth-form">
+      <h2 class="auth-title" id="authTitle"></h2>
+      <div class="auth-sub" id="authSubtitle"></div>
+      <form id="authForm" autocomplete="on">
+        <label for="authEmail" id="authEmailLabel"></label>
+        <input id="authEmail" type="email" class="url-input" autocomplete="email" required>
+        <label for="authPassword" id="authPasswordLabel"></label>
+        <div style="position:relative"><input id="authPassword" type="password" class="url-input" autocomplete="current-password" required minlength="8" style="padding-right:44px"><button type="button" id="authPwToggle" aria-label="show password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;line-height:1;opacity:.75">👁️</button></div>
+        <div class="auth-err" id="authError"></div>
+        <button type="submit" class=\"btn-p auth-submit\" id="authSubmit"></button>
+      </form>
+      <div class="auth-switch"><span id="authSwitchText"></span> <button type="button" id="authSwitchBtn"></button></div>
+    </div>
   </div>
 </div>
 <div class="app">
@@ -1958,20 +1995,23 @@ async function refreshTrackingDash(){
   }
 }
 let authMode='login',authUser=null;
-const AUTH_FALLBACK={en:{subtitle:'Sign in to your account to continue.',email:'Email',password:'Password',login:'Sign in',register:'Create account',no_account:"Don't have an account?",have_account:'Already have an account?',to_register:'Create account',to_login:'Sign in',logout:'Sign out'},pt:{subtitle:'Entre na sua conta para continuar.',email:'E-mail',password:'Senha',login:'Entrar',register:'Criar conta',no_account:'Ainda não tem conta?',have_account:'Já tem conta?',to_register:'Criar conta',to_login:'Entrar',logout:'Sair'},es:{subtitle:'Inicia sesión para continuar.',email:'Correo',password:'Contraseña',login:'Entrar',register:'Crear cuenta',no_account:'¿Aún no tienes cuenta?',have_account:'¿Ya tienes cuenta?',to_register:'Crear cuenta',to_login:'Entrar',logout:'Salir'},fr:{subtitle:'Connectez-vous pour continuer.',email:'E-mail',password:'Mot de passe',login:'Se connecter',register:'Créer un compte',no_account:"Pas encore de compte ?",have_account:'Déjà un compte ?',to_register:'Créer un compte',to_login:'Se connecter',logout:'Déconnexion'},de:{subtitle:'Melden Sie sich an, um fortzufahren.',email:'E-Mail',password:'Passwort',login:'Anmelden',register:'Konto erstellen',no_account:'Noch kein Konto?',have_account:'Schon ein Konto?',to_register:'Konto erstellen',to_login:'Anmelden',logout:'Abmelden'},tr:{subtitle:'Devam etmek için giriş yapın.',email:'E-posta',password:'Şifre',login:'Giriş yap',register:'Hesap oluştur',no_account:'Hesabınız yok mu?',have_account:'Zaten hesabınız var mı?',to_register:'Hesap oluştur',to_login:'Giriş yap',logout:'Çıkış yap'}};
+const AUTH_FALLBACK={en:{subtitle:'Sign in to your account to continue.',email:'Email',password:'Password',login:'Sign in',register:'Create account',no_account:"Don't have an account?",have_account:'Already have an account?',to_register:'Create account',to_login:'Sign in',logout:'Sign out',title_login:'Welcome back',title_register:'Create your account',tagline:'Your Meta ads hub with AI — dashboard, library and tracking.',tile_pro:'Dashboard, library and tracking with AI',tile_lang:'interface languages'},pt:{subtitle:'Entre na sua conta para continuar.',email:'E-mail',password:'Senha',login:'Entrar',register:'Criar conta',no_account:'Ainda não tem conta?',have_account:'Já tem conta?',to_register:'Criar conta',to_login:'Entrar',logout:'Sair',title_login:'Bem-vindo de volta',title_register:'Crie a sua conta',tagline:'A sua central de anúncios Meta com IA — painel, biblioteca e rastreamento.',tile_pro:'Painel, biblioteca e rastreamento com IA',tile_lang:'idiomas na interface'},es:{subtitle:'Inicia sesión para continuar.',email:'Correo',password:'Contraseña',login:'Entrar',register:'Crear cuenta',no_account:'¿Aún no tienes cuenta?',have_account:'¿Ya tienes cuenta?',to_register:'Crear cuenta',to_login:'Entrar',logout:'Salir',title_login:'Bienvenido de nuevo',title_register:'Crea tu cuenta',tagline:'Tu central de anuncios Meta con IA — panel, biblioteca y seguimiento.',tile_pro:'Panel, biblioteca y seguimiento con IA',tile_lang:'idiomas en la interfaz'},fr:{subtitle:'Connectez-vous pour continuer.',email:'E-mail',password:'Mot de passe',login:'Se connecter',register:'Créer un compte',no_account:"Pas encore de compte ?",have_account:'Déjà un compte ?',to_register:'Créer un compte',to_login:'Se connecter',logout:'Déconnexion',title_login:'Bon retour',title_register:'Créez votre compte',tagline:"Votre hub publicitaire Meta avec IA — tableau de bord, bibliothèque et suivi.",tile_pro:'Tableau de bord, bibliothèque et suivi avec IA',tile_lang:"langues d'interface"},de:{subtitle:'Melden Sie sich an, um fortzufahren.',email:'E-Mail',password:'Passwort',login:'Anmelden',register:'Konto erstellen',no_account:'Noch kein Konto?',have_account:'Schon ein Konto?',to_register:'Konto erstellen',to_login:'Anmelden',logout:'Abmelden',title_login:'Willkommen zurück',title_register:'Konto erstellen',tagline:'Ihre Meta-Anzeigenzentrale mit KI — Dashboard, Bibliothek und Tracking.',tile_pro:'Dashboard, Bibliothek und Tracking mit KI',tile_lang:'Oberflächensprachen'},tr:{subtitle:'Devam etmek için giriş yapın.',email:'E-posta',password:'Şifre',login:'Giriş yap',register:'Hesap oluştur',no_account:'Hesabınız yok mu?',have_account:'Zaten hesabınız var mı?',to_register:'Hesap oluştur',to_login:'Giriş yap',logout:'Çıkış yap',title_login:'Tekrar hoş geldiniz',title_register:'Hesabınızı oluşturun',tagline:"YZ ile Meta reklam merkeziniz — pano, kütüphane ve takip.",tile_pro:'YZ ile pano, kütüphane ve takip',tile_lang:'arayüz dili'}};
 function applyAuthTexts(){
   const fb=AUTH_FALLBACK[LANG]||AUTH_FALLBACK.en;
   const st=function(id,v){const el=document.getElementById(id);if(el)el.textContent=v||''};
   st('authSubtitle',UI.auth_subtitle||fb.subtitle);st('authEmailLabel',UI.auth_email||fb.email);st('authPasswordLabel',UI.auth_password||fb.password);
   const isLogin=authMode==='login';
+  st('authTitle',isLogin?(UI.auth_title_login||fb.title_login):(UI.auth_title_register||fb.title_register));
   st('authSubmit',isLogin?(UI.auth_login_btn||fb.login):(UI.auth_register_btn||fb.register));
   st('authSwitchText',isLogin?(UI.auth_no_account||fb.no_account):(UI.auth_have_account||fb.have_account));
   st('authSwitchBtn',isLogin?(UI.auth_to_register||fb.to_register):(UI.auth_to_login||fb.to_login));
+  st('authTagline',fb.tagline);
+  document.querySelectorAll('[data-at]').forEach(function(el){el.textContent=fb[el.dataset.at]||''});
   const lo=document.getElementById('logoutBtn');if(lo)lo.textContent=UI.auth_logout||fb.logout;
 }
 function authError(msg){const e=document.getElementById('authError');if(!e)return;if(!msg){e.style.display='none';return}e.textContent=msg;e.style.display='block'}
-function showAuth(){const o=document.getElementById('authOverlay');if(o)o.classList.remove('hidden');applyAuthTexts();const em=document.getElementById('authEmail');if(em)setTimeout(function(){em.focus()},60)}
-function hideAuth(){const o=document.getElementById('authOverlay');if(o)o.classList.add('hidden');authError(null)}
+function showAuth(){const o=document.getElementById('authOverlay');if(o){o.classList.remove('hidden');setTimeout(function(){o.classList.add('ready')},60)}applyAuthTexts();const em=document.getElementById('authEmail');if(em)setTimeout(function(){em.focus()},120)}
+function hideAuth(){const o=document.getElementById('authOverlay');if(o){o.classList.add('hidden');o.classList.remove('ready')}authError(null)}
 async function authCheck(){
   try{const r=await fetch('/api/auth/me');if(r.ok){const d=await r.json();authUser=d.email;hideAuth();ensureLogoutBtn();return true}}catch(e){}
   showAuth();return false;
