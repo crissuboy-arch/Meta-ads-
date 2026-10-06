@@ -14,6 +14,9 @@ body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);margin:0}
 h2{font:800 clamp(28px,4vw,44px)/1.05 var(--display);letter-spacing:-.02em;margin:10px 0 12px}
 .lead{color:var(--muted);font-size:18px;max-width:640px;margin:0 0 24px}
 .head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+body.embedded .head{display:none}
+body.embedded .wrap{padding:0}
+body.embedded{overflow:hidden}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 .bar button{font:500 13px var(--mono);padding:7px 12px;border-radius:99px;border:1px solid var(--line2);background:transparent;color:var(--muted);cursor:pointer}
 .bar button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -123,6 +126,12 @@ function draw(){
    try{navigator.clipboard.writeText(txt).then(ok,function(){btn.textContent=u.manual})}catch(e){btn.textContent=u.manual}};
   g.appendChild(el)});
  document.getElementById("count").textContent=n+u.of+A.length+u.models;
+}
+if(new URLSearchParams(location.search).get("embed")==="1"){
+document.body.classList.add("embedded");
+var _sendH=function(){try{parent.postMessage({type:"libHeight",h:Math.ceil(document.documentElement.scrollHeight)},location.origin)}catch(e){}};
+if("ResizeObserver" in window){new ResizeObserver(_sendH).observe(document.body)}
+window.addEventListener("load",_sendH);setTimeout(_sendH,400);setTimeout(_sendH,1500);
 }
 draw();
 </script>

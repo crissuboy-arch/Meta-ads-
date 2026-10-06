@@ -198,7 +198,7 @@ footer{padding-block:32px;color:var(--dim);font-size:13px;border-top:1px solid v
 
 <section id="library"><div class="wrap">
   <div class="head"><p class="eyebrow">Ad library</p><h2>See 20 ads the AI can write for you.</h2><p>Real example ads with AI-generated images. Switch between English and Portuguese inside, filter by niche and funnel stage, and copy any ad with one click.</p></div>
-  <iframe src="/biblioteca.html" title="Ad library" style="width:100%;height:1600px;border:1px solid var(--line);border-radius:16px;background:var(--card)" loading="lazy"></iframe>
+  <iframe id="libFrame" src="/biblioteca.html?embed=1" title="Ad library" scrolling="no" style="width:100%;height:1400px;border:0;overflow:hidden;display:block;background:transparent" loading="lazy"></iframe>
   <p class="fine" style="text-align:center"><a href="/biblioteca.html" target="_blank" rel="noopener" style="color:var(--gold)">Open the full library in a new tab →</a></p>
 </div></section>
 
@@ -269,6 +269,12 @@ document.querySelectorAll(".langs button").forEach(function(b){
     document.querySelectorAll(".langs button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
     document.documentElement.lang=b.dataset.l;
   });
+});
+window.addEventListener("message",function(e){
+  if(e.origin!==location.origin)return;
+  if(e.data&&e.data.type==="libHeight"&&e.data.h>200){
+    document.getElementById("libFrame").style.height=e.data.h+"px";
+  }
 });
 </script>
 </body>
