@@ -86,6 +86,29 @@
   .t-card.t-sub .ico{font-size:18px}
   @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.t-sub-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.kpis{grid-template-columns:1fr}.t-sub-grid{grid-template-columns:1fr}.reco{padding:22px}}
+  /* redesign-v2: biblioteca */
+  .lib-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:6px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{border:1px solid var(--line2);background:var(--card);color:var(--muted);border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:600;cursor:pointer;min-height:40px;font-family:var(--body)}
+  .pill.on{background:var(--tint);border-color:var(--accent);color:var(--amber)}
+  .lib-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .lib-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;display:flex;flex-direction:column;gap:10px}
+  .lib-card.off{opacity:.55}
+  .lib-card h3{font-family:var(--display);font-size:18px;margin:0}
+  .lib-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.55;flex:1}
+  .lib-top{display:flex;justify-content:space-between;align-items:center}
+  .lib-meta{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.04em;background:var(--tint);color:var(--amber);border:1px solid var(--line2)}
+  .badge.ok{background:var(--okbg);color:var(--ok);border-color:transparent}
+  .badge.bad{background:var(--badbg);color:var(--bad);border-color:transparent}
+  .chk{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  @media(max-width:900px){.lib-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.lib-grid{grid-template-columns:1fr}}
+  /* redesign-v2: provedores */
+  .prov-row{display:grid;grid-template-columns:90px 140px 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:12px}
+  .prov-row b{font-size:13px}
+  @media(max-width:900px){.prov-row{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.prov-row{grid-template-columns:1fr}}
   .side-premium .ico{font-size:16px}
   .side-premium .txt{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.04em}
   .side-premium .sub{font-size:9.5px;color:var(--text-faint)}
@@ -891,9 +914,128 @@ function v2ApplyTexts(){
   document.querySelectorAll('.v2-back').forEach(el=>{el.textContent='\u2190 '+(t('back')||'')});
 }
 function v2EmptyHTML(){const t=v2T();return '<div class="empty-box"><h3>'+(t.empty_title||'')+'</h3><p>'+(t.empty_desc||'')+'</p></div>'}
-function bibBodyRender(){const el=document.getElementById('bibBody');if(el)el.innerHTML=v2EmptyHTML()}
+const LIB={"en": {"f_all": "All", "f_topo": "Top", "f_meio": "Middle", "f_fundo": "Bottom", "search_ph": "Search structures…", "use_product": "Use with my product", "count_n": "{n} structures", "active": "Active", "inactive": "Inactive", "manage": "Manage", "add_new": "New structure", "name_l": "Name", "desc_l": "Description", "stage_l": "Funnel stage", "category_l": "Category", "trigger_l": "Trigger", "save": "Save", "cancel": "Cancel", "err_load": "Could not load the library", "close": "Close", "st_topo": "Top of funnel", "st_meio": "Middle of funnel", "st_fundo": "Bottom of funnel"}, "pt": {"f_all": "Todas", "f_topo": "Topo", "f_meio": "Meio", "f_fundo": "Fundo", "search_ph": "Buscar estruturas…", "use_product": "Usar com o meu produto", "count_n": "{n} estruturas", "active": "Ativa", "inactive": "Inativa", "manage": "Gerenciar", "add_new": "Nova estrutura", "name_l": "Nome", "desc_l": "Descrição", "stage_l": "Etapa do funil", "category_l": "Categoria", "trigger_l": "Gatilho", "save": "Salvar", "cancel": "Cancelar", "err_load": "Não foi possível carregar a biblioteca", "close": "Fechar", "st_topo": "Topo de funil", "st_meio": "Meio de funil", "st_fundo": "Fundo de funil"}, "es": {"f_all": "Todas", "f_topo": "Arriba", "f_meio": "Medio", "f_fundo": "Abajo", "search_ph": "Buscar estructuras…", "use_product": "Usar con mi producto", "count_n": "{n} estructuras", "active": "Activa", "inactive": "Inactiva", "manage": "Gestionar", "add_new": "Nueva estructura", "name_l": "Nombre", "desc_l": "Descripción", "stage_l": "Etapa del embudo", "category_l": "Categoría", "trigger_l": "Disparador", "save": "Guardar", "cancel": "Cancelar", "err_load": "No se pudo cargar la biblioteca", "close": "Cerrar", "st_topo": "Parte alta del embudo", "st_meio": "Parte media del embudo", "st_fundo": "Parte baja del embudo"}, "fr": {"f_all": "Toutes", "f_topo": "Haut", "f_meio": "Milieu", "f_fundo": "Bas", "search_ph": "Rechercher…", "use_product": "Utiliser avec mon produit", "count_n": "{n} structures", "active": "Active", "inactive": "Inactive", "manage": "Gérer", "add_new": "Nouvelle structure", "name_l": "Nom", "desc_l": "Description", "stage_l": "Étape de l'entonnoir", "category_l": "Catégorie", "trigger_l": "Déclencheur", "save": "Enregistrer", "cancel": "Annuler", "err_load": "Bibliothèque introuvable", "close": "Fermer", "st_topo": "Haut de l'entonnoir", "st_meio": "Milieu de l'entonnoir", "st_fundo": "Bas de l'entonnoir"}, "tr": {"f_all": "Tümü", "f_topo": "Üst", "f_meio": "Orta", "f_fundo": "Alt", "search_ph": "Yapı ara…", "use_product": "Ürünümle kullan", "count_n": "{n} yapı", "active": "Aktif", "inactive": "Pasif", "manage": "Yönet", "add_new": "Yeni yapı", "name_l": "Ad", "desc_l": "Açıklama", "stage_l": "Huni aşaması", "category_l": "Kategori", "trigger_l": "Tetikleyici", "save": "Kaydet", "cancel": "İptal", "err_load": "Kitaplık yüklenemedi", "close": "Kapat", "st_topo": "Huni üstü", "st_meio": "Huni ortası", "st_fundo": "Huni altı"}, "de": {"f_all": "Alle", "f_topo": "Top", "f_meio": "Mitte", "f_fundo": "Bottom", "search_ph": "Strukturen suchen…", "use_product": "Mit meinem Produkt nutzen", "count_n": "{n} Strukturen", "active": "Aktiv", "inactive": "Inaktiv", "manage": "Verwalten", "add_new": "Neue Struktur", "name_l": "Name", "desc_l": "Beschreibung", "stage_l": "Funnel-Stufe", "category_l": "Kategorie", "trigger_l": "Trigger", "save": "Speichern", "cancel": "Abbrechen", "err_load": "Bibliothek konnte nicht geladen werden", "close": "Schließen", "st_topo": "Oberer Funnel", "st_meio": "Mittlerer Funnel", "st_fundo": "Unterer Funnel"}};
+function libT(){return LIB[LANG]||LIB.en}
+let libData=[],libStage='',libQuery='',libManage=false;
+async function bibBodyRender(){
+  const t=libT(),el=document.getElementById('bibBody');if(!el)return;
+  el.innerHTML='<div class="utm-hint">'+adEsc(t.search_ph)+'…</div>';
+  try{
+    const r=await fetch('/api/library/structures?lang='+LANG+(libManage?'&include_inactive=1':''));
+    if(!r.ok)throw 0;const d=await r.json();libData=d.structures||[];libCounts=d.counts||{};
+  }catch(e){el.innerHTML='<div class="utm-hint" style="color:var(--bad)">'+adEsc(t.err_load)+'</div>';return}
+  libRenderList();
+}
+function libRenderList(){
+  const t=libT(),el=document.getElementById('bibBody');if(!el)return;
+  const q=libQuery.trim().toLowerCase();
+  let list=libData.filter(x=>(!libStage||x.funnel_stage===libStage)&&(!q||(x.name+' '+x.description+' '+x.category+' '+x.trigger).toLowerCase().includes(q)));
+  const c=libCounts||{};
+  let html='<div class="lib-bar"><div class="pills">'
+    +[['',t.f_all],['topo',t.f_topo+' ('+(c.topo||0)+')'],['meio',t.f_meio+' ('+(c.meio||0)+')'],['fundo',t.f_fundo+' ('+(c.fundo||0)+')']].map(p=>'<button class="pill'+(libStage===p[0]?' on':'')+'" data-libstage="'+p[0]+'" type="button">'+adEsc(p[1])+'</button>').join('')
+    +'</div><input id="libSearch" class="url-input" style="max-width:260px" placeholder="'+adEsc(t.search_ph)+'" value="'+adEsc(libQuery)+'"><button class="btn-s" id="libManage" type="button">'+adEsc(t.manage)+'</button></div>';
+  html+='<div class="utm-hint" style="margin:4px 0 12px">'+adEsc(t.count_n.replace('{n}',list.length))+'</div>';
+  if(libManage){
+    html+='<div class="box" style="margin-bottom:16px"><h2 style="font-size:16px;margin-bottom:10px">'+adEsc(t.add_new)+'</h2><div class="utm-grid">'
+      +'<div class="utm-field"><label>'+adEsc(t.name_l)+'</label><input id="libF_name" class="url-input"></div>'
+      +'<div class="utm-field"><label>'+adEsc(t.stage_l)+'</label><select id="libF_stage" class="url-input"><option value="topo">'+adEsc(t.f_topo)+'</option><option value="meio">'+adEsc(t.f_meio)+'</option><option value="fundo">'+adEsc(t.f_fundo)+'</option></select></div>'
+      +'<div class="utm-field"><label>'+adEsc(t.category_l)+'</label><input id="libF_cat" class="url-input"></div>'
+      +'<div class="utm-field"><label>'+adEsc(t.trigger_l)+'</label><input id="libF_trig" class="url-input"></div></div>'
+      +'<div class="utm-field" style="margin-top:10px"><label>'+adEsc(t.desc_l)+'</label><textarea id="libF_desc" class="url-input" rows="2"></textarea></div>'
+      +'<div style="margin-top:10px;display:flex;gap:8px"><button class="btn-p" id="libF_save" type="button">'+adEsc(t.save)+'</button></div><div id="libF_msg" class="utm-hint"></div></div>';
+  }
+  html+='<div class="lib-grid">'+list.map(x=>{
+    const st=x.funnel_stage==='topo'?t.st_topo:x.funnel_stage==='meio'?t.st_meio:t.st_fundo;
+    return '<div class="lib-card'+(x.active?'':' off')+'"><div class="lib-top"><span class="badge '+(x.funnel_stage==='topo'?'ok':x.funnel_stage==='meio'?'':'bad')+'">'+adEsc(st)+'</span>'
+      +(libManage?'<button class="btn-s" data-libtoggle="'+x.id+'" type="button" style="min-height:32px;padding:4px 10px;font-size:11px">'+adEsc(x.active?t.active:t.inactive)+'</button>':'')
+      +'</div><h3>'+adEsc(x.name)+'</h3>'
+      +'<div class="lib-meta">'+adEsc(x.category)+(x.trigger?' · '+adEsc(x.trigger):'')+'</div>'
+      +'<p>'+adEsc(x.description)+'</p>'
+      +'<button class="btn-p lib-use" data-libuse="'+x.id+'" type="button" style="min-height:40px;padding:8px 16px;font-size:12.5px">'+adEsc(t.use_product)+'</button></div>'}).join('')+'</div>';
+  el.innerHTML=html;
+  el.querySelectorAll('[data-libstage]').forEach(b=>b.addEventListener('click',()=>{libStage=b.dataset.libstage;libRenderList()}));
+  const si=el.querySelector('#libSearch');
+  if(si)si.addEventListener('input',()=>{libQuery=si.value;clearTimeout(si._t);si._t=setTimeout(()=>{const v=si.value;libRenderList();const n=el.querySelector('#libSearch');if(n){n.focus();n.setSelectionRange(v.length,v.length)}},350)});
+  const mb=el.querySelector('#libManage');
+  if(mb)mb.addEventListener('click',()=>{libManage=!libManage;bibBodyRender()});
+  el.querySelectorAll('[data-libtoggle]').forEach(b=>b.addEventListener('click',async()=>{
+    const cur=libData.find(x=>x.id===b.dataset.libtoggle);
+    try{await fetch('/api/library/structures/'+encodeURIComponent(b.dataset.libtoggle),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:!cur.active})})}catch(e){}
+    bibBodyRender();
+  }));
+  const sv=el.querySelector('#libF_save');
+  if(sv)sv.addEventListener('click',async()=>{
+    const msg=el.querySelector('#libF_msg');
+    const body={name:el.querySelector('#libF_name').value.trim(),description:el.querySelector('#libF_desc').value.trim(),funnel_stage:el.querySelector('#libF_stage').value,category:el.querySelector('#libF_cat').value.trim(),trigger:el.querySelector('#libF_trig').value.trim()};
+    if(!body.name){if(msg)msg.textContent='!';return}
+    try{const r=await fetch('/api/library/structures',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(r.ok){bibBodyRender()}else if(msg){msg.textContent='HTTP '+r.status}
+    }catch(e){if(msg)msg.textContent=String(e)}
+  });
+  el.querySelectorAll('[data-libuse]').forEach(b=>b.addEventListener('click',()=>{
+    const x=libData.find(y=>y.id===b.dataset.libuse);
+    try{sessionStorage.setItem('v2struct',JSON.stringify(x))}catch(e){}
+    const nb=document.querySelector('#sideNav .side-item[data-id="criar"]');if(nb)nb.click();
+  }));
+}
 function criarBodyRender(){const el=document.getElementById('criarBody');if(el)el.innerHTML=v2EmptyHTML()}
-function provBodyRender(){const el=document.getElementById('provBody');if(el)el.innerHTML=v2EmptyHTML()}
+const PROV={"en": {"p_title": "AI providers", "k_text": "Text", "k_image": "Image", "primary": "Primary", "backup": "Backup", "provider_l": "Provider", "model_l": "Model", "key_l": "API key", "key_ph": "Paste the API key", "save": "Save", "test": "Test", "testing": "Testing…", "remove": "Remove", "saved": "Saved", "test_ok": "Test passed", "test_fail": "Test failed", "no_key": "No key saved yet", "hint": "Configure one primary and one backup per type. Keys are encrypted server-side and never shown again."}, "pt": {"p_title": "Provedores de IA", "k_text": "Texto", "k_image": "Imagem", "primary": "Principal", "backup": "Reserva", "provider_l": "Provedor", "model_l": "Modelo", "key_l": "Chave de API", "key_ph": "Cole a chave de API", "save": "Salvar", "test": "Testar", "testing": "Testando…", "remove": "Remover", "saved": "Salvo", "test_ok": "Teste passou", "test_fail": "Teste falhou", "no_key": "Nenhuma chave salva ainda", "hint": "Configure um principal e uma reserva por tipo. As chaves são criptografadas no servidor e nunca exibidas de novo."}, "es": {"p_title": "Proveedores de IA", "k_text": "Texto", "k_image": "Imagen", "primary": "Principal", "backup": "Reserva", "provider_l": "Proveedor", "model_l": "Modelo", "key_l": "Clave de API", "key_ph": "Pega la clave de API", "save": "Guardar", "test": "Probar", "testing": "Probando…", "remove": "Eliminar", "saved": "Guardado", "test_ok": "Prueba exitosa", "test_fail": "Prueba fallida", "no_key": "Aún sin clave", "hint": "Configure un principal y una reserva por tipo. Las claves se cifran en el servidor y nunca se muestran de nuevo."}, "fr": {"p_title": "Fournisseurs d'IA", "k_text": "Texte", "k_image": "Image", "primary": "Principal", "backup": "Secours", "provider_l": "Fournisseur", "model_l": "Modèle", "key_l": "Clé API", "key_ph": "Collez la clé API", "save": "Enregistrer", "test": "Tester", "testing": "Test en cours…", "remove": "Supprimer", "saved": "Enregistré", "test_ok": "Test réussi", "test_fail": "Échec du test", "no_key": "Aucune clé enregistrée", "hint": "Configurez un principal et un secours par type. Les clés sont chiffrées côté serveur et ne sont plus jamais affichées."}, "tr": {"p_title": "YZ sağlayıcıları", "k_text": "Metin", "k_image": "Görsel", "primary": "Birincil", "backup": "Yedek", "provider_l": "Sağlayıcı", "model_l": "Model", "key_l": "API anahtarı", "key_ph": "API anahtarını yapıştırın", "save": "Kaydet", "test": "Test et", "testing": "Test ediliyor…", "remove": "Kaldır", "saved": "Kaydedildi", "test_ok": "Test geçti", "test_fail": "Test başarısız", "no_key": "Henüz anahtar yok", "hint": "Tür başına bir birincil ve bir yedek yapılandırın. Anahtarlar sunucuda şifrelenir ve bir daha gösterilmez."}, "de": {"p_title": "KI-Anbieter", "k_text": "Text", "k_image": "Bild", "primary": "Primär", "backup": "Backup", "provider_l": "Anbieter", "model_l": "Modell", "key_l": "API-Schlüssel", "key_ph": "API-Schlüssel einfügen", "save": "Speichern", "test": "Testen", "testing": "Teste läuft…", "remove": "Entfernen", "saved": "Gespeichert", "test_ok": "Test bestanden", "test_fail": "Test fehlgeschlagen", "no_key": "Noch kein Schlüssel", "hint": "Konfigurieren Sie je Typ einen primären und einen Backup-Anbieter. Schlüssel werden serverseitig verschlüsselt und nie wieder angezeigt."}};
+function provT(){return PROV[LANG]||PROV.en}
+let provData=[];
+async function provBodyRender(){
+  const t=provT(),el=document.getElementById('provBody');if(!el)return;
+  el.innerHTML='<div class="utm-hint">'+adEsc(t.testing)+'</div>';
+  try{const r=await fetch('/api/providers');if(r.ok)provData=(await r.json()).providers||[]}catch(e){}
+  provRender();
+}
+function provRender(){
+  const t=provT(),el=document.getElementById('provBody');if(!el)return;
+  const byKey={};provData.forEach(x=>byKey[x.kind+'|'+x.role]=x);
+  let html='<p class="utm-desc" style="margin-bottom:16px">'+adEsc(t.hint)+'</p>';
+  [['text',t.k_text],['image',t.k_image]].forEach(g=>{
+    const kind=g[0];
+    html+='<div class="box" style="margin-bottom:16px"><h2 style="font-size:18px;margin-bottom:12px">'+adEsc(g[1])+'</h2>';
+    [['primary',t.primary],['backup',t.backup]].forEach(rl=>{
+      const role=rl[0],p=byKey[kind+'|'+role],slot=kind+'|'+role;
+      const st=p?('<span class="badge '+(p.last_test_ok?'ok':'')+'">'+adEsc(p.has_key?(p.last_test_ok?t.test_ok:t.no_key):t.no_key)+'</span>'):'';
+      html+='<div class="prov-row"><b>'+adEsc(rl[1])+'</b>'
+        +'<select data-p="prov" data-slot="'+slot+'" class="url-input">'+['gemini','openai','openrouter'].map(v=>'<option value="'+v+'"'+(p&&p.provider===v?' selected':'')+'>'+v+'</option>').join('')+'</select>'
+        +'<input data-p="model" data-slot="'+slot+'" class="url-input" placeholder="'+adEsc(t.model_l)+'" value="'+adEsc(p?p.model:'')+'">'
+        +'<input data-p="key" data-slot="'+slot+'" type="password" class="url-input" autocomplete="new-password" placeholder="'+adEsc(p&&p.has_key?p.key_hint:t.key_ph)+'">'
+        +'<span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-s" data-pv="save" data-slot="'+slot+'" type="button">'+adEsc(t.save)+'</button>'
+        +'<button class="btn-s" data-pv="test" data-slot="'+slot+'" type="button">'+adEsc(t.test)+'</button>'
+        +(p?'<button class="btn-s" data-pv="del" data-slot="'+slot+'" data-pid="'+p.id+'" type="button">'+adEsc(t.remove)+'</button>':'')+'</span>'
+        +'<span data-pvmsg="'+slot+'" class="utm-hint" style="margin:0">'+st+'</span></div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+  const val=(slot,f)=>{const i=el.querySelector('[data-p="'+f+'"][data-slot="'+slot+'"]');return i?i.value.trim():''};
+  el.querySelectorAll('[data-pv]').forEach(b=>b.addEventListener('click',async()=>{
+    const slot=b.dataset.slot,msg=el.querySelector('[data-pvmsg="'+slot+'"]');
+    const kind=slot.split('|')[0],role=slot.split('|')[1];
+    const say=(txt,ok)=>{if(msg){msg.textContent=txt;msg.style.color=ok?'var(--ok)':ok===false?'var(--bad)':''}};
+    if(b.dataset.pv==='save'){
+      say(t.testing);
+      try{const r=await fetch('/api/providers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:val(slot,'prov'),kind:kind,role:role,model:val(slot,'model'),api_key:val(slot,'key')})});
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        say(t.saved,true);provBodyRender();
+      }catch(e){say(t.test_fail+' — '+e.message,false)}
+    }else if(b.dataset.pv==='test'){
+      say(t.testing);
+      const p=byKey[slot];
+      const body=p&&!val(slot,'key')?{id:p.id,kind:kind}:{provider:val(slot,'prov'),api_key:val(slot,'key'),kind:kind,model:val(slot,'model')};
+      try{const r=await fetch('/api/providers/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        const d=await r.json();
+        say(d.ok?t.test_ok:(t.test_fail+(d.error?' — '+d.error:'')),d.ok);
+        if(p)provBodyRender();
+      }catch(e){say(t.test_fail,false)}
+    }else if(b.dataset.pv==='del'){
+      try{await fetch('/api/providers/'+encodeURIComponent(b.dataset.pid),{method:'DELETE'})}catch(e){}
+      provBodyRender();
+    }
+  }));
+}
 
 let V2H={};
 function hT(){return V2H||{}}
