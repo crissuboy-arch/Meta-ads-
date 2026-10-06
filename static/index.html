@@ -338,25 +338,37 @@
   @media(max-width:1200px){.app{grid-template-columns:var(--sidebar-w) 1fr}.chat-panel{display:none}}
   @media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.hero{grid-template-columns:1fr}.hero-right{display:none}.dash-grid{grid-template-columns:repeat(3,1fr)}.tool-grid{grid-template-columns:repeat(2,1fr)}.import-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:600px){.main{padding:0 14px 14px}.dash-grid{grid-template-columns:repeat(2,1fr)}.tool-grid{grid-template-columns:1fr}.import-grid{grid-template-columns:1fr}.hero-left h2{font-size:22px}.topbar-left .sub{display:none}}
-  .auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 140% at 20% 0%,#3A220A 0,#1B130B 55%,#0E0C0A 100%);padding:20px}
+  .auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 140% at 20% 0%,#3A220A 0,#1B130B 55%,#0E0C0A 100%);padding:20px;--auth-shadow:0 24px 60px rgba(0,0,0,0.45)}
   .auth-overlay.hidden{display:none}
-  .auth-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:30px 28px;box-shadow:0 24px 60px rgba(0,0,0,0.45)}
-  .auth-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;color:var(--text)}
+  .auth-overlay.light{background:radial-gradient(120% 140% at 20% 0%,#FFE0B8 0%,#FFF3E0 55%,#FBEEDC 100%);--auth-shadow:0 24px 60px rgba(130,75,10,0.20);--card:#FFFFFF;--line:rgba(70,40,5,.10);--line2:rgba(70,40,5,.18);--text:#231503;--text-dim:#8A7660;--text-faint:#A89880;--glass-border:rgba(70,40,5,.16)}
+  .auth-overlay.light .url-input{background:rgba(70,40,5,.045)}
+  .auth-overlay.light .url-input::placeholder{color:#B7A88F}
+  .auth-overlay.light .auth-theme-btn{background:rgba(70,40,5,.06)}
+  .auth-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line2);border-radius:20px;padding:30px 28px 26px;box-shadow:var(--auth-shadow);position:relative;overflow:hidden}
+  .auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--gold))}
+  .auth-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .auth-logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque','DM Sans',sans-serif;font-weight:800;font-size:17px;color:var(--text)}
   .auth-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,138,31,0.18)}
   .v2pill{font-size:10px;font-weight:800;letter-spacing:.1em;background:linear-gradient(135deg,var(--accent),var(--gold));color:#1A1208;border-radius:999px;padding:3px 10px;margin-left:4px}
+  .auth-theme-btn{background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--text);width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+  .auth-theme-btn:hover{transform:scale(1.06)}
   .auth-sub{color:var(--text-dim);font-size:13px;margin:10px 0 20px;line-height:1.5}
   .auth-card label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text-dim);text-transform:uppercase;margin:14px 0 6px}
   .auth-err{display:none;margin-top:14px;font-size:12.5px;color:#FCA5A5;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);padding:9px 11px;border-radius:9px}
+  .auth-overlay.light .auth-err{color:#B3261E;background:rgba(239,68,68,.08)}
   .auth-submit{width:100%;margin-top:20px;padding:12px;font-size:14px}
   .auth-switch{margin-top:16px;text-align:center;font-size:12.5px;color:var(--text-dim)}
-  .auth-switch button{background:none;border:none;color:#60A5FA;font-weight:700;cursor:pointer;font-size:12.5px;padding:0}
+  .auth-switch button{background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-size:12.5px;padding:0}
   .logout-btn{display:block;width:100%;margin-top:10px;padding:8px;font-size:12px}
 </style>
 </head>
 <body>
 <div class="auth-overlay hidden" id="authOverlay">
   <div class="auth-card">
-    <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span><span class="v2pill">V2</span></div>
+    <div class="auth-top">
+      <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span><span class="v2pill">V2</span></div>
+      <button type="button" id="authThemeToggle" class="auth-theme-btn" aria-label="theme">🌙</button>
+    </div>
     <div class="auth-sub" id="authSubtitle"></div>
     <form id="authForm" autocomplete="on">
       <label for="authEmail" id="authEmailLabel"></label>
@@ -1991,6 +2003,11 @@ async function authSubmit(ev){
 (function(){
   const form=document.getElementById('authForm');if(form)form.addEventListener('submit',authSubmit);
   const sw=document.getElementById('authSwitchBtn');if(sw)sw.addEventListener('click',function(){authMode=authMode==='login'?'register':'login';authError(null);applyAuthTexts();const pw=document.getElementById('authPassword');if(pw)pw.setAttribute('autocomplete',authMode==='login'?'current-password':'new-password')});
+  const ov=document.getElementById('authOverlay'),tg=document.getElementById('authThemeToggle');
+  const setTg=function(){if(tg)tg.textContent=ov&&ov.classList.contains('light')?'☀️':'🌙'};
+  try{if(localStorage.getItem('maepAuthTheme')==='light'&&ov)ov.classList.add('light')}catch(e){}
+  setTg();
+  if(tg)tg.addEventListener('click',function(){if(!ov)return;const l=ov.classList.toggle('light');try{localStorage.setItem('maepAuthTheme',l?'light':'dark')}catch(e){}setTg()});
   authCheck();
 })();
 
