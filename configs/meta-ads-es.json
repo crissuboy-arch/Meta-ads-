@@ -15,14 +15,14 @@
     "assistant_name": "Meta Ads AI"
   },
   "colors": {
-    "primary": "#2563EB",
-    "secondary": "#1D4ED8",
-    "accent": "#3B82F6",
-    "gold": "#F6C453",
-    "bg_deep": "#08142E",
-    "bg": "#0B1E3C",
-    "bg_mid": "#0F2447",
-    "bg_light": "#1A3359"
+    "primary": "#FF8A1F",
+    "secondary": "#E56F0A",
+    "accent": "#FFB547",
+    "gold": "#FFC857",
+    "bg_deep": "#0E0C0A",
+    "bg": "#0E0C0A",
+    "bg_mid": "#120F0B",
+    "bg_light": "#17130F"
   },
   "models": {
     "default": "meta/llama-3.1-70b-instruct",
