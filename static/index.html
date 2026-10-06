@@ -80,6 +80,8 @@
   .box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px}
   .kpi span{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
   .kpi b{display:block;font-family:var(--display);font-size:26px;margin:8px 0 4px;color:var(--text);letter-spacing:-.01em}
+  .kpi.clickable{cursor:pointer;transition:transform .15s,border-color .15s}
+  .kpi.clickable:hover{transform:translateY(-2px);border-color:var(--tintline)}
   .kpi em{font-style:normal;color:var(--dim);font-size:12px}
   .tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
   .tbl th{text-align:left;color:var(--dim);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:10px 8px}
@@ -478,10 +480,10 @@
 
     <section class="sec" id="kpiSection" style="display:none">
       <div class="kpis" id="kpiGrid">
-        <div class="box kpi"><span id="kpiSpendL"></span><b id="kpiSpendV">—</b><em id="kpiSpendS"></em></div>
-        <div class="box kpi"><span id="kpiAccL"></span><b id="kpiAccV">—</b><em id="kpiAccS"></em></div>
-        <div class="box kpi"><span id="kpiCampL"></span><b id="kpiCampV">—</b><em id="kpiCampS"></em></div>
-        <div class="box kpi"><span id="kpiAlertL"></span><b id="kpiAlertV">—</b><em id="kpiAlertS"></em></div>
+        <div class="box kpi clickable" data-kpi="spend" role="button" tabindex="0"><span id="kpiSpendL"></span><b id="kpiSpendV">—</b><em id="kpiSpendS"></em></div>
+        <div class="box kpi clickable" data-kpi="accounts" role="button" tabindex="0"><span id="kpiAccL"></span><b id="kpiAccV">—</b><em id="kpiAccS"></em></div>
+        <div class="box kpi clickable" data-kpi="campaigns" role="button" tabindex="0"><span id="kpiCampL"></span><b id="kpiCampV">—</b><em id="kpiCampS"></em></div>
+        <div class="box kpi clickable" data-kpi="alerts" role="button" tabindex="0"><span id="kpiAlertL"></span><b id="kpiAlertV">—</b><em id="kpiAlertS"></em></div>
       </div>
     </section>
 
@@ -1353,6 +1355,12 @@ function homeRender(){
       void bad;
     }
   }
+  document.querySelectorAll('#kpiGrid .kpi.clickable').forEach(k=>{
+    if(k._bound)return;k._bound=true;
+    const go=()=>{const nb=document.querySelector('#sideNav .side-item[data-id="ads-live"]');if(nb)nb.click()};
+    k.addEventListener('click',go);
+    k.addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+  });
   if(!acc){
     hSet('kpiSpendV','—');hSet('kpiAccV','—');hSet('kpiCampV','—');hSet('kpiAlertV','—');
     hSet('kpiSpendS','');hSet('kpiAccS','');hSet('kpiCampS','');hSet('kpiAlertS','');
