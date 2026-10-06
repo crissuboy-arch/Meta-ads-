@@ -1517,7 +1517,8 @@
     "soon_melhorar_ebook": "Mejorar un ebook",
     "empty_title": "En camino en esta versión",
     "empty_desc": "Esta pantalla es parte del rediseño y estará lista pronto.",
-    "back": "Volver"
+    "back": "Volver",
+    "chat": "Chat"
   },
   "v2home": {
     "reco_title": "Próximo paso recomendado",

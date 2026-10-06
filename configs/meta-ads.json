@@ -1517,7 +1517,8 @@
     "soon_melhorar_ebook": "Improve an ebook",
     "empty_title": "Coming in this version",
     "empty_desc": "This screen is part of the redesign and will be ready soon.",
-    "back": "Back"
+    "back": "Back",
+    "chat": "Chat"
   },
   "v2home": {
     "reco_title": "Recommended next step",

@@ -2391,12 +2391,24 @@ def create_app():
     def _criar_director_prompt(briefing, structure, lang):
         b = briefing or {}
         lines = []
-        for k in ("name", "niche", "description", "price", "avatar", "pain",
-                  "desire", "offer", "bonus", "guarantee", "urgency",
-                  "objective", "cta"):
+        _FIELD_LABELS = {
+            "name": "Produto", "niche": "Nicho", "country": "País/moeda",
+            "avatar": "Avatar (quem compra)", "awareness": "Nível de consciência",
+            "pain": "Dor", "desire": "Desejo", "objections": "Objeções",
+            "emotion": "Emoção dominante", "promise": "Promessa principal",
+            "mechanism": "Mecanismo único", "proof": "Provas",
+            "price": "Preço e garantia", "urgency": "Urgência",
+            "restrictions": "Restrições (não dizer)",
+            "funnel": "Etapa do funil", "tone": "Tom/agressividade",
+            "platform": "Plataforma/formato", "variations": "Variações",
+        }
+        for k in ("name", "niche", "country", "avatar", "awareness", "pain",
+                  "desire", "objections", "emotion", "promise", "mechanism",
+                  "proof", "price", "urgency", "restrictions",
+                  "funnel", "tone", "platform", "variations"):
             v = str(b.get(k) or "").strip()
             if v:
-                lines.append("- " + k + ": " + v)
+                lines.append("- " + _FIELD_LABELS.get(k, k) + ": " + v)
         st = ""
         if structure:
             st = ("\nEstrutura de anúncio escolhida: "
@@ -2441,9 +2453,10 @@ def create_app():
             raise RuntimeError("empty_result")
         return out
 
-    _AUTOFILL_FIELDS = ("name", "niche", "description", "price", "avatar",
-                        "pain", "desire", "offer", "bonus", "guarantee",
-                        "urgency", "cta")
+    _AUTOFILL_FIELDS = ("name", "niche", "country", "avatar", "awareness",
+                        "pain", "desire", "objections", "emotion", "promise",
+                        "mechanism", "proof", "price", "urgency",
+                        "restrictions", "funnel", "tone", "platform")
 
     @app.post("/api/library/autofill")
     async def criar_autofill(request: Request):
@@ -2463,16 +2476,17 @@ def create_app():
                "text": str(page.get("text") or "")[:4000]}
         empty_briefing = {k: "" for k in _AUTOFILL_FIELDS}
         empty_briefing["name"] = raw["title"]
-        empty_briefing["description"] = raw["description"]
         chain = _prov_chain(email, "text")
         if not chain:
             return {"ok": True, "source": "page", "briefing": empty_briefing}
         prompt = (
             "Extraia deste conteúdo de página de produto um briefing de anúncio. "
             "Responda SOMENTE com JSON válido, sem markdown: "
-            '{"name":"...","niche":"...","description":"...","price":"...",'
-            '"avatar":"...","pain":"...","desire":"...","offer":"...",'
-            '"bonus":"...","guarantee":"...","urgency":"...","cta":"..."} '
+            '{"name":"...","niche":"...","country":"...","avatar":"...",'
+            '"awareness":"...","pain":"...","desire":"...","objections":"...",'
+            '"emotion":"...","promise":"...","mechanism":"...","proof":"...",'
+            '"price":"...","urgency":"...","restrictions":"...",'
+            '"funnel":"...","tone":"...","platform":"..."} '
             "Campos vazios quando não houver informação. Não invente nada.\n\n"
             "TÍTULO: " + raw["title"] + "\nDESCRIÇÃO: " + raw["description"]
             + "\nTEXTO: " + raw["text"])
