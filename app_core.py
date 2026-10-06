@@ -1904,6 +1904,10 @@ def create_app():
     def sales():
         return FileResponse(static_dir / "sales.html")
 
+    @app.get("/biblioteca.html")
+    def biblioteca():
+        return FileResponse(static_dir / "biblioteca.html")
+
     @app.get("/api/health")
     def health():
         return JSONResponse({
