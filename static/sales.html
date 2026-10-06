@@ -268,6 +268,8 @@ document.querySelectorAll(".langs button").forEach(function(b){
     document.getElementById("cta").textContent=t[2];
     document.querySelectorAll(".langs button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
     document.documentElement.lang=b.dataset.l;
+    var _fr=document.getElementById("libFrame");
+    if(_fr){_fr.src="/biblioteca.html?embed=1&lang="+b.dataset.l;}
   });
 });
 window.addEventListener("message",function(e){
