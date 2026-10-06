@@ -1908,6 +1908,30 @@ def create_app():
     def biblioteca():
         return FileResponse(static_dir / "biblioteca.html")
 
+    @app.get("/privacy")
+    def privacy():
+        return FileResponse(static_dir / "privacy.html")
+
+    @app.get("/privacy.html")
+    def privacy_html():
+        return FileResponse(static_dir / "privacy.html")
+
+    @app.get("/terms")
+    def terms():
+        return FileResponse(static_dir / "terms.html")
+
+    @app.get("/terms.html")
+    def terms_html():
+        return FileResponse(static_dir / "terms.html")
+
+    @app.get("/data-deletion")
+    def data_deletion():
+        return FileResponse(static_dir / "data-deletion.html")
+
+    @app.get("/data-deletion.html")
+    def data_deletion_html():
+        return FileResponse(static_dir / "data-deletion.html")
+
     @app.get("/api/health")
     def health():
         return JSONResponse({
