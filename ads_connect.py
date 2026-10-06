@@ -19,10 +19,12 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import sys
 import time
 import urllib.parse
+import uuid
 from datetime import date, timedelta
 
 from fastapi import HTTPException, Request
@@ -36,6 +38,7 @@ def register(app, d):
     sb_req, sb_target = d["sb_req"], d["sb_target"]
     auth_secret, scrub, requests = d["auth_secret"], d["scrub"], d["requests"]
     b64u, b64u_dec = d["b64u"], d["b64u_dec"]
+    trk_load, capi_send = d.get("trk_load"), d.get("capi_send")
 
     def graph_base():
         return "https://graph.facebook.com/" + os.getenv("META_GRAPH_VERSION", "v23.0")
@@ -436,6 +439,105 @@ def register(app, d):
         for t in ("ads_insights", "ads_accounts", "ads_connections"):
             sb_req("DELETE", t, params={"email": f"eq.{email}", "platform": "eq.meta"})
         return {"ok": True}
+
+    def _capi_by_pixel():
+        """pixel_id -> {domain, has_token, last_test_ok} from stored tracking configs."""
+        out = {}
+        try:
+            rows = sb_req("GET", "trk_configs",
+                          params={"select": "pixel_id,domain,last_test_ok,token"}) or []
+            for r in rows:
+                px = str(r.get("pixel_id") or "").strip()
+                if px:
+                    out[px] = {"domain": r.get("domain") or "",
+                               "has_token": bool(r.get("token")),
+                               "last_test_ok": r.get("last_test_ok")}
+        except Exception:
+            pass
+        if not out and trk_load:
+            try:
+                for _k, rec in (trk_load() or {}).items():
+                    cfg = (rec or {}).get("config") or {}
+                    px = str(cfg.get("pixel_id") or "").strip()
+                    if px:
+                        out[px] = {"domain": cfg.get("domain") or "",
+                                   "has_token": bool(cfg.get("token")),
+                                   "last_test_ok": (rec or {}).get("last_test_ok")}
+            except Exception:
+                pass
+        return out
+
+    @app.get("/api/ads/tracking-status")
+    def ads_tracking_status(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        token, _row = get_token(email)
+        if not token:
+            raise HTTPException(404, "not_connected")
+        capi = _capi_by_pixel()
+        out = []
+        for a in selected_accounts(email):
+            aid = a["account_id"]
+            acc = {"account_id": aid, "name": a.get("name") or aid,
+                   "business": a.get("business") or "", "pixels": []}
+            try:
+                d = gget(f"/act_{aid}/adspixels", token,
+                         {"fields": "id,name,last_fired_time", "limit": 50})
+                for px in d.get("data") or []:
+                    pid = str(px.get("id"))
+                    c = capi.get(pid, {})
+                    acc["pixels"].append({
+                        "id": pid, "name": px.get("name") or pid,
+                        "last_fired": px.get("last_fired_time") or None,
+                        "capi_configured": bool(c.get("has_token")),
+                        "capi_last_test_ok": c.get("last_test_ok"),
+                        "domain": c.get("domain") or ""})
+            except RuntimeError as exc:
+                acc["error"] = str(exc)[:200]
+            out.append(acc)
+        return {"accounts": out}
+
+    @app.post("/api/ads/tracking-test")
+    async def ads_tracking_test(request: Request):
+        need_supabase()
+        email = request.state.user_email
+        token, _row = get_token(email)
+        if not token:
+            raise HTTPException(404, "not_connected")
+        body = await request.json()
+        pixel = re.sub(r"\D", "", str(body.get("pixel_id") or ""))[:32]
+        if not pixel:
+            raise HTTPException(400, "invalid_pixel")
+        capi = _capi_by_pixel().get(pixel)
+        if not capi or not capi.get("has_token"):
+            raise HTTPException(400, "capi_not_configured")
+        if not capi_send:
+            raise HTTPException(500, "no_sender")
+        # rebuild minimal cfg from store (token never leaves the server)
+        cfg = {"pixel_id": pixel, "token": None, "test_code": None}
+        try:
+            rows = sb_req("GET", "trk_configs",
+                          params={"pixel_id": f"eq.{pixel}", "select": "token,test_code"}) or []
+            if rows:
+                cfg["token"] = rows[0].get("token")
+                cfg["test_code"] = rows[0].get("test_code")
+        except Exception:
+            pass
+        if not cfg["token"] and trk_load:
+            try:
+                for _k, rec in (trk_load() or {}).items():
+                    c2 = (rec or {}).get("config") or {}
+                    if str(c2.get("pixel_id") or "").strip() == pixel and c2.get("token"):
+                        cfg["token"] = c2["token"]
+                        cfg["test_code"] = c2.get("test_code")
+                        break
+            except Exception:
+                pass
+        if not cfg["token"]:
+            raise HTTPException(400, "capi_not_configured")
+        eid = "test-" + uuid.uuid4().hex[:24]
+        ok, detail = capi_send(cfg, "PageView", eid, test_code=cfg.get("test_code"))
+        return {"ok": ok, "detail": detail, "event_id": eid}
 
     @app.get("/api/ads/cron")
     async def ads_cron(request: Request):

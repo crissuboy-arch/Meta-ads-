@@ -432,6 +432,7 @@
     <section class="sec" id="trackingSection" style="display:none">
       <div class="sec-h"><span class="gd"></span><h3 id="trkTitle"></h3><span class="trk-status none" id="trkStatus"></span><span class="ln"></span><button class="btn-s" id="trkClose" type="button"></button></div>
       <p class="utm-desc" id="trkDesc"></p>
+      <div id="trk2Block"></div>
       <div class="utm-grid">
         <div class="utm-field"><label id="trkPixelLabel"></label><input id="trkPixel" class="url-input" inputmode="numeric" autocomplete="off"><div class="utm-hint" id="trkPixelHint"></div></div>
         <div class="utm-field"><label id="trkTokenLabel"></label><div style="display:flex;gap:6px"><input id="trkToken" type="password" class="url-input" autocomplete="off" style="flex:1"><button class="btn-s" id="trkTokenToggle" type="button"></button></div><div class="utm-hint" id="trkTokenHint"></div></div>
@@ -1428,12 +1429,75 @@ function trkRefreshStatus(){if(!trkConfigured){trkSetStatus('none');return}if(tr
 function trkSelectedEvents(){return TRK_EVENT_NAMES.filter(function(n){const c=document.getElementById('trkEv_'+n);return c&&c.checked})}
 function trkMsg(t,ok){const m=document.getElementById('trkMsg');if(!m)return;m.textContent=t||'';m.style.color=ok===false?'#fca5a5':''}
 
+const TRK2={"en": {"t_perAccount": "Per account", "t_alert": "Accounts without Conversions API: {n}", "t_pixel": "Pixel", "t_capi": "Conversions API", "t_dedup": "Deduplication", "t_last": "Last event", "t_active": "Active", "t_missing": "Missing", "t_configured": "Configured", "t_off": "Off", "t_pending": "Pending", "t_never": "Never", "t_eventMap": "Event map", "t_event": "Event", "t_purpose": "Purpose", "t_browser": "Browser", "t_server": "Server", "ev_PageView": "Page visit", "ev_ViewContent": "Viewed product/content", "ev_AddToCart": "Added to cart", "ev_InitiateCheckout": "Started checkout", "ev_Lead": "Left contact info", "ev_Purchase": "Completed purchase", "t_qa": "Quality checklist", "qa1": "Same event_id on browser and server (avoids double-counting)", "qa2": "Value and currency on every purchase", "qa3": "Email and phone sent hashed", "qa4": "Domain verified (manual check in Business Settings)", "qa5": "Test event received without errors", "t_ok": "OK", "t_review": "Review", "t_manual": "Manual", "t_runTest": "Run quality test", "t_testing": "Testing…", "t_testOk": "Test event received", "t_testFail": "Test failed", "t_claude": "Configure with Claude", "t_noPixel": "No pixels on this account", "t_err": "could not load tracking status"}, "pt": {"t_perAccount": "Por conta", "t_alert": "Contas sem API de Conversões: {n}", "t_pixel": "Pixel", "t_capi": "API de Conversões", "t_dedup": "Deduplicação", "t_last": "Último evento", "t_active": "Ativo", "t_missing": "Faltando", "t_configured": "Configurada", "t_off": "Desligada", "t_pending": "Pendente", "t_never": "Nunca", "t_eventMap": "Mapa de eventos", "t_event": "Evento", "t_purpose": "Para que serve", "t_browser": "Navegador", "t_server": "Servidor", "ev_PageView": "Visita à página", "ev_ViewContent": "Visualizou produto/conteúdo", "ev_AddToCart": "Adicionou ao carrinho", "ev_InitiateCheckout": "Iniciou o checkout", "ev_Lead": "Deixou contato", "ev_Purchase": "Compra concluída", "t_qa": "Checklist de qualidade", "qa1": "Mesmo event_id no navegador e no servidor (evita contar duas vezes)", "qa2": "Valor e moeda em toda compra", "qa3": "E-mail e telefone enviados com hash", "qa4": "Domínio verificado (conferência manual nas Configurações do Negócio)", "qa5": "Evento de teste recebido sem erros", "t_ok": "OK", "t_review": "Revisar", "t_manual": "Manual", "t_runTest": "Rodar teste de qualidade", "t_testing": "Testando…", "t_testOk": "Evento de teste recebido", "t_testFail": "Teste falhou", "t_claude": "Configurar com o Claude", "t_noPixel": "Nenhum pixel nesta conta", "t_err": "não foi possível carregar o rastreamento"}, "es": {"t_perAccount": "Por cuenta", "t_alert": "Cuentas sin API de conversiones: {n}", "t_pixel": "Píxel", "t_capi": "API de conversiones", "t_dedup": "Deduplicación", "t_last": "Último evento", "t_active": "Activo", "t_missing": "Faltante", "t_configured": "Configurada", "t_off": "Desactivada", "t_pending": "Pendiente", "t_never": "Nunca", "t_eventMap": "Mapa de eventos", "t_event": "Evento", "t_purpose": "Para qué sirve", "t_browser": "Navegador", "t_server": "Servidor", "ev_PageView": "Visita a la página", "ev_ViewContent": "Vio producto/contenido", "ev_AddToCart": "Añadió al carrito", "ev_InitiateCheckout": "Inició el checkout", "ev_Lead": "Dejó contacto", "ev_Purchase": "Compra completada", "t_qa": "Lista de calidad", "qa1": "Mismo event_id en navegador y servidor (evita duplicar)", "qa2": "Valor y moneda en cada compra", "qa3": "Email y teléfono con hash", "qa4": "Dominio verificado (revisión manual en Configuración del negocio)", "qa5": "Evento de prueba recibido sin errores", "t_ok": "OK", "t_review": "Revisar", "t_manual": "Manual", "t_runTest": "Ejecutar prueba", "t_testing": "Probando…", "t_testOk": "Evento de prueba recibido", "t_testFail": "La prueba falló", "t_claude": "Configurar con Claude", "t_noPixel": "Sin píxeles en esta cuenta", "t_err": "no se pudo cargar el seguimiento"}, "fr": {"t_perAccount": "Par compte", "t_alert": "Comptes sans API Conversions : {n}", "t_pixel": "Pixel", "t_capi": "API Conversions", "t_dedup": "Déduplication", "t_last": "Dernier événement", "t_active": "Actif", "t_missing": "Manquant", "t_configured": "Configurée", "t_off": "Désactivée", "t_pending": "En attente", "t_never": "Jamais", "t_eventMap": "Plan des événements", "t_event": "Événement", "t_purpose": "Utilité", "t_browser": "Navigateur", "t_server": "Serveur", "ev_PageView": "Visite de page", "ev_ViewContent": "Contenu vu", "ev_AddToCart": "Ajout au panier", "ev_InitiateCheckout": "Checkout démarré", "ev_Lead": "Contact laissé", "ev_Purchase": "Achat terminé", "t_qa": "Liste de qualité", "qa1": "Même event_id navigateur et serveur (évite les doublons)", "qa2": "Valeur et devise sur chaque achat", "qa3": "Email et téléphone hachés", "qa4": "Domaine vérifié (vérification manuelle dans les paramètres)", "qa5": "Événement de test reçu sans erreur", "t_ok": "OK", "t_review": "À revoir", "t_manual": "Manuel", "t_runTest": "Lancer le test", "t_testing": "Test en cours…", "t_testOk": "Événement de test reçu", "t_testFail": "Échec du test", "t_claude": "Configurer avec Claude", "t_noPixel": "Aucun pixel sur ce compte", "t_err": "suivi introuvable"}, "tr": {"t_perAccount": "Hesap başına", "t_alert": "Conversions API olmayan hesaplar: {n}", "t_pixel": "Piksel", "t_capi": "Conversions API", "t_dedup": "Tekilleştirme", "t_last": "Son etkinlik", "t_active": "Aktif", "t_missing": "Eksik", "t_configured": "Yapılandırıldı", "t_off": "Kapalı", "t_pending": "Bekliyor", "t_never": "Hiç", "t_eventMap": "Etkinlik haritası", "t_event": "Etkinlik", "t_purpose": "Amacı", "t_browser": "Tarayıcı", "t_server": "Sunucu", "ev_PageView": "Sayfa ziyareti", "ev_ViewContent": "Ürün/içerik görüntülendi", "ev_AddToCart": "Sepete eklendi", "ev_InitiateCheckout": "Ödeme başlatıldı", "ev_Lead": "İletişim bırakıldı", "ev_Purchase": "Satın alma tamamlandı", "t_qa": "Kalite kontrol listesi", "qa1": "Tarayıcıda ve sunucuda aynı event_id (çift sayımı önler)", "qa2": "Her satın almada değer ve para birimi", "qa3": "E-posta ve telefon hash'li gönderilir", "qa4": "Alan adı doğrulandı (İşletme Ayarlarında manuel kontrol)", "qa5": "Test etkinliği hatasız alındı", "t_ok": "Tamam", "t_review": "İncele", "t_manual": "Manuel", "t_runTest": "Testi çalıştır", "t_testing": "Test ediliyor…", "t_testOk": "Test etkinliği alındı", "t_testFail": "Test başarısız", "t_claude": "Claude ile yapılandır", "t_noPixel": "Bu hesapta piksel yok", "t_err": "izleme durumu yüklenemedi"}, "de": {"t_perAccount": "Pro Konto", "t_alert": "Konten ohne Conversions API: {n}", "t_pixel": "Pixel", "t_capi": "Conversions API", "t_dedup": "Deduplizierung", "t_last": "Letztes Event", "t_active": "Aktiv", "t_missing": "Fehlt", "t_configured": "Konfiguriert", "t_off": "Aus", "t_pending": "Ausstehend", "t_never": "Nie", "t_eventMap": "Event-Übersicht", "t_event": "Event", "t_purpose": "Zweck", "t_browser": "Browser", "t_server": "Server", "ev_PageView": "Seitenaufruf", "ev_ViewContent": "Produkt/Inhalt angesehen", "ev_AddToCart": "In den Warenkorb gelegt", "ev_InitiateCheckout": "Checkout gestartet", "ev_Lead": "Kontakt hinterlassen", "ev_Purchase": "Kauf abgeschlossen", "t_qa": "Qualitäts-Checkliste", "qa1": "Gleiche event_id in Browser und Server (vermeidet Doppelzählung)", "qa2": "Wert und Währung bei jedem Kauf", "qa3": "E-Mail und Telefon gehasht", "qa4": "Domain verifiziert (manuell in den Business-Einstellungen prüfen)", "qa5": "Test-Event fehlerfrei empfangen", "t_ok": "OK", "t_review": "Prüfen", "t_manual": "Manuell", "t_runTest": "Test starten", "t_testing": "Teste läuft…", "t_testOk": "Test-Event empfangen", "t_testFail": "Test fehlgeschlagen", "t_claude": "Mit Claude konfigurieren", "t_noPixel": "Keine Pixel in diesem Konto", "t_err": "Tracking-Status konnte nicht geladen werden"}};
+function trk2T(){return TRK2[LANG]||TRK2.en}
+function trk2Badge(ok,txt){return '<span class="badge '+(ok?'ok':'bad')+'">'+adEsc(txt)+'</span>'}
+function trk2Last(ts){if(!ts)return '\u2014';try{const d=new Date(ts);return isNaN(d)?adEsc(ts):d.toLocaleString(lvLoc())}catch(e){return adEsc(ts)}}
+async function trk2Load(){
+  const t=trk2T(),box=document.getElementById('trk2Block');if(!box)return;
+  box.innerHTML='<div class="utm-hint">'+adEsc(t.t_testing)+'</div>';
+  let data=null;
+  try{const r=await fetch('/api/ads/tracking-status');if(r.ok)data=await r.json()}catch(e){}
+  if(!data){box.innerHTML='<div class="utm-hint" style="color:var(--bad)">'+adEsc(t.t_err)+'</div>';return}
+  const accs=data.accounts||[];
+  const noCapi=accs.filter(a=>!a.error&&(a.pixels||[]).length&&(a.pixels||[]).every(p=>!p.capi_configured));
+  let html='';
+  if(noCapi.length)html+='<div class="reco" style="padding:18px 22px;margin-bottom:16px"><div style="flex:1;min-width:0"><div class="reco-k"><i></i>'+adEsc(t.t_perAccount)+'</div><h3 style="font-size:18px">'+adEsc(t.t_alert.replace('{n}',noCapi.map(a=>a.name).join(', ')))+'</h3></div><div><button class="btn-p" id="trk2Claude" type="button">'+adEsc(t.t_claude)+'</button></div></div>';
+  else html+='<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn-s" id="trk2Claude" type="button">'+adEsc(t.t_claude)+'</button></div>';
+  html+='<div class="box" style="margin-bottom:16px"><h2 style="margin-bottom:12px;font-size:18px">'+adEsc(t.t_perAccount)+'</h2><div class="scroll-x"><table class="tbl"><thead><tr><th>'+adEsc(t.t_perAccount)+'</th><th>'+adEsc(t.t_pixel)+'</th><th>'+adEsc(t.t_capi)+'</th><th>'+adEsc(t.t_dedup)+'</th><th>'+adEsc(t.t_last)+'</th></tr></thead><tbody>';
+  const EVS=[['PageView','ev_PageView'],['ViewContent','ev_ViewContent'],['AddToCart','ev_AddToCart'],['InitiateCheckout','ev_InitiateCheckout'],['Lead','ev_Lead'],['Purchase','ev_Purchase']];
+  let evRows='';
+  const qaDone={};
+  accs.forEach((a,ai)=>{
+    if(a.error){html+='<tr><td><b>'+adEsc(a.name)+'</b></td><td colspan="4" style="color:var(--bad)">'+adEsc(a.error)+'</td></tr>';return}
+    const pxs=a.pixels||[];
+    if(!pxs.length){html+='<tr><td><b>'+adEsc(a.name)+'</b></td><td colspan="4" style="color:var(--dim)">'+adEsc(t.t_noPixel)+'</td></tr>';return}
+    pxs.forEach((p,pi)=>{
+      const pxOk=!!p.last_fired, capiOk=!!p.capi_configured;
+      html+='<tr><td><b>'+adEsc(a.name)+'</b>'+(pxs.length>1?'<br><small style="color:var(--dim)">'+adEsc(p.name)+'</small>':'')+'</td><td>'+trk2Badge(pxOk,pxOk?t.t_active:t.t_missing)+'</td><td>'+trk2Badge(capiOk,capiOk?t.t_configured:t.t_off)+'</td><td>'+trk2Badge(capiOk,capiOk?t.t_configured:t.t_pending)+'</td><td>'+trk2Last(p.last_fired)+'</td></tr>';
+      if(pi===0){
+        evRows+='<tr><td colspan="5" style="text-align:left;color:var(--amber);font-weight:700">'+adEsc(a.name)+'</td></tr>';
+        EVS.forEach(ev=>{evRows+='<tr><td><b>'+ev[0]+'</b></td><td>'+adEsc(t[ev[1]])+'</td><td>'+trk2Badge(pxOk,pxOk?t.t_active:t.t_missing)+'</td><td>'+trk2Badge(capiOk,capiOk?t.t_configured:t.t_off)+'</td></tr>'});
+        qaDone[ai]={pixel:p.id,capiOk:capiOk};
+      }
+    });
+  });
+  html+='</tbody></table></div></div>';
+  html+='<div class="box" style="margin-bottom:16px"><h2 style="margin-bottom:12px;font-size:18px">'+adEsc(t.t_eventMap)+'</h2><div class="scroll-x"><table class="tbl"><thead><tr><th>'+adEsc(t.t_event)+'</th><th>'+adEsc(t.t_purpose)+'</th><th>'+adEsc(t.t_browser)+'</th><th>'+adEsc(t.t_server)+'</th></tr></thead><tbody>'+evRows+'</tbody></table></div></div>';
+  html+='<div class="box" style="margin-bottom:16px"><h2 style="margin-bottom:12px;font-size:18px">'+adEsc(t.t_qa)+'</h2><div style="display:flex;flex-direction:column;gap:10px">';
+  const qaItems=[['qa1','capi'],['qa2','capi'],['qa3','capi'],['qa4','manual'],['qa5','test']];
+  Object.keys(qaDone).forEach(ai=>{
+    const q=qaDone[ai];
+    html+='<div style="font-weight:700;color:var(--amber);margin-top:6px">'+adEsc(accs[ai].name)+'</div>';
+    qaItems.forEach(it=>{
+      let cls,txt;
+      if(it[1]==='capi'){cls=q.capiOk?'ok':'bad';txt=q.capiOk?t.t_ok:t.t_review}
+      else if(it[1]==='manual'){cls='';txt=t.t_manual}
+      else{cls='bad';txt=t.t_review}
+      const badge=cls?'<span class="badge '+cls+'">'+adEsc(txt)+'</span>':'<span class="badge" style="background:var(--infobg);color:var(--info)">'+adEsc(txt)+'</span>';
+      html+='<div class="chk" style="font-size:14px;color:var(--text)">'+badge+'<span>'+adEsc(t[it[0]])+'</span>'+(it[1]==='test'?' <button class="btn-s" data-trktest="'+q.pixel+'" type="button" style="min-height:36px;padding:6px 14px">'+adEsc(t.t_runTest)+'</button> <span data-trktestmsg="'+q.pixel+'" style="font-size:13px"></span>':'')+'</div>';
+    });
+  });
+  html+='</div></div>';
+  box.innerHTML=html;
+  box.querySelectorAll('[data-trktest]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const px=btn.dataset.trktest,msg=box.querySelector('[data-trktestmsg="'+px+'"]');
+    btn.disabled=true;if(msg){msg.textContent=t.t_testing;msg.style.color=''}
+    try{const r=await fetch('/api/ads/tracking-test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pixel_id:px})});
+      const d=await r.json();
+      if(msg){msg.textContent=d.ok?t.t_testOk:t.t_testFail;msg.style.color=d.ok?'var(--ok)':'var(--bad)'}
+    }catch(e){if(msg){msg.textContent=t.t_testFail;msg.style.color='var(--bad)'}}
+    btn.disabled=false;
+  }));
+  const cc=document.getElementById('trk2Claude');
+  if(cc)cc.addEventListener('click',()=>{const nb=document.querySelector('#sideNav .side-item[data-id="claude-connect"]');if(nb)nb.click()});
+}
 function openTrackingScreen(){
   const sec=document.getElementById('trackingSection');if(!sec)return;
   if(!trkSavedDisplays){trkSavedDisplays={};const ids=['heroSection','dashSection','toolsSection','utmSection','importsSection','nichesSection'];for(const id of ids){const el=document.getElementById(id);if(el)trkSavedDisplays[id]=el.style.display}}
   for(const id in trkSavedDisplays){const el=document.getElementById(id);if(el)el.style.display='none'}
   sec.style.display='block';currentModule='tracking';
-  applyTrackingTexts();trkLoadDraft();trkLoadConfig();trkLoadSales();refreshTrackingDash();
+  applyTrackingTexts();trkLoadDraft();trkLoadConfig();trkLoadSales();refreshTrackingDash();trk2Load();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function closeTrackingScreen(){

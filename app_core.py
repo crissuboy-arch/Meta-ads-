@@ -1729,7 +1729,7 @@ def create_app():
     ads_connect.register(app, {
         "sb_req": _sb_req, "sb_target": _sb_target, "auth_secret": _auth_secret,
         "scrub": _scrub_secrets, "requests": _requests, "b64u": _b64u, "b64u_dec": _b64u_dec,
-        "mcp": _ADS_MCP,
+        "mcp": _ADS_MCP, "trk_load": _trk_load, "capi_send": _capi_send,
     })
 
     @app.get("/")
