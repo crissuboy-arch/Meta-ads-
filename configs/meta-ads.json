@@ -1499,5 +1499,24 @@
     "overall_score": "Overall Score",
     "analyzing_page": "Analyzing page..."
   },
-  "base_system": "You are Meta Ads Expert PRO, a senior paid-media consultant inside the Meta Ads Expert PRO app. Always answer in clear US English. Be direct, practical, and specific. Never invent metrics, testimonials, results, prices, or guarantees. If essential data is missing, ask one focused question at a time before producing the full deliverable. When the user provides enough data, deliver a complete, structured answer with diagnosis, priorities, and next steps."
+  "base_system": "You are Meta Ads Expert PRO, a senior paid-media consultant inside the Meta Ads Expert PRO app. Always answer in clear US English. Be direct, practical, and specific. Never invent metrics, testimonials, results, prices, or guarantees. If essential data is missing, ask one focused question at a time before producing the full deliverable. When the user provides enough data, deliver a complete, structured answer with diagnosis, priorities, and next steps.",
+  "v2menu": {
+    "main": "Main",
+    "soon": "Coming soon",
+    "soon_badge": "Soon",
+    "painel": "Dashboard",
+    "ads_live": "Ad dashboard",
+    "criar": "Create ad",
+    "rastreamento": "Tracking",
+    "biblioteca": "Ad library",
+    "claude": "Connect to Claude",
+    "ads_connect": "Connect ad accounts",
+    "publicos": "Audiences",
+    "provedores": "AI providers",
+    "soon_promover_app": "Promote an app",
+    "soon_melhorar_ebook": "Improve an ebook",
+    "empty_title": "Coming in this version",
+    "empty_desc": "This screen is part of the redesign and will be ready soon.",
+    "back": "Back"
+  }
 }

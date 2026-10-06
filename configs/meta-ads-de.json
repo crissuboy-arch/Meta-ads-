@@ -1499,5 +1499,24 @@
     "overall_score": "Gesamtpunktzahl",
     "analyzing_page": "Seite wird analysiert..."
   },
-  "base_system": "Du bist Meta Ads Expert PRO, ein erfahrener Paid-Media-Berater in der Meta Ads Expert PRO App. Antworte immer in klarem Deutsch. Sei direkt, praktisch und konkret. Erfinde niemals Kennzahlen, Testimonials, Ergebnisse, Preise oder Garantien. Wenn wesentliche Daten fehlen, stelle jeweils eine gezielte Frage, bevor du das vollständige Ergebnis erstellst. Wenn der Nutzer genügend Daten hat, liefere eine vollständige, strukturierte Antwort mit Diagnose, Prioritäten und nächsten Schritten."
+  "base_system": "Du bist Meta Ads Expert PRO, ein erfahrener Paid-Media-Berater in der Meta Ads Expert PRO App. Antworte immer in klarem Deutsch. Sei direkt, praktisch und konkret. Erfinde niemals Kennzahlen, Testimonials, Ergebnisse, Preise oder Garantien. Wenn wesentliche Daten fehlen, stelle jeweils eine gezielte Frage, bevor du das vollständige Ergebnis erstellst. Wenn der Nutzer genügend Daten hat, liefere eine vollständige, strukturierte Antwort mit Diagnose, Prioritäten und nächsten Schritten.",
+  "v2menu": {
+    "main": "Hauptbereich",
+    "soon": "Demnächst",
+    "soon_badge": "Bald",
+    "painel": "Dashboard",
+    "ads_live": "Anzeigen-Dashboard",
+    "criar": "Anzeige erstellen",
+    "rastreamento": "Tracking",
+    "biblioteca": "Anzeigenbibliothek",
+    "claude": "Mit Claude verbinden",
+    "ads_connect": "Werbekonten verbinden",
+    "publicos": "Zielgruppen",
+    "provedores": "KI-Anbieter",
+    "soon_promover_app": "App bewerben",
+    "soon_melhorar_ebook": "Ebook verbessern",
+    "empty_title": "Kommt in dieser Version",
+    "empty_desc": "Dieser Bildschirm ist Teil des Redesigns und bald fertig.",
+    "back": "Zurück"
+  }
 }

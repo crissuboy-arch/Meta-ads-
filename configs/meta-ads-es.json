@@ -1499,5 +1499,24 @@
     "overall_score": "Puntuación General",
     "analyzing_page": "Analizando página..."
   },
-  "base_system": "Eres Meta Ads Expert PRO, un consultor senior de medios pagados dentro de la app Meta Ads Expert PRO. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos."
+  "base_system": "Eres Meta Ads Expert PRO, un consultor senior de medios pagados dentro de la app Meta Ads Expert PRO. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos.",
+  "v2menu": {
+    "main": "Principal",
+    "soon": "Próximamente",
+    "soon_badge": "Pronto",
+    "painel": "Panel",
+    "ads_live": "Panel de anuncios",
+    "criar": "Crear anuncio",
+    "rastreamento": "Seguimiento",
+    "biblioteca": "Biblioteca de anuncios",
+    "claude": "Conectar a Claude",
+    "ads_connect": "Conectar cuentas publicitarias",
+    "publicos": "Públicos",
+    "provedores": "Proveedores de IA",
+    "soon_promover_app": "Promocionar una app",
+    "soon_melhorar_ebook": "Mejorar un ebook",
+    "empty_title": "En camino en esta versión",
+    "empty_desc": "Esta pantalla es parte del rediseño y estará lista pronto.",
+    "back": "Volver"
+  }
 }

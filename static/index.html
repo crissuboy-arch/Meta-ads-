@@ -52,6 +52,14 @@
   .side-footer{padding:14px 14px 16px;border-top:1px solid var(--glass-border)}
   .side-premium{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--gold-dim),transparent);border:1px solid rgba(246,196,83,0.15);cursor:pointer;transition:all .2s}
   .side-premium:hover{border-color:rgba(246,196,83,0.3);box-shadow:0 0 20px -6px var(--gold-glow)}
+  /* redesign-v2: menu "Em breve" e telas novas */
+  .side-item.soon{opacity:.55;cursor:default}
+  .side-item.soon:hover{background:none;color:var(--text-dim)}
+  .soon-badge{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line2);color:var(--muted);border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .side-item.active{background:var(--tint);color:var(--amber);box-shadow:inset 3px 0 0 var(--accent)}
+  .empty-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-xl);padding:40px 32px;text-align:center;max-width:560px;margin:40px auto}
+  .empty-box h3{font-family:var(--display);font-size:22px;margin:0 0 10px;color:var(--text)}
+  .empty-box p{margin:0;color:var(--muted);font-size:14px}
   .side-premium .ico{font-size:16px}
   .side-premium .txt{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.04em}
   .side-premium .sub{font-size:9.5px;color:var(--text-faint)}
@@ -492,6 +500,18 @@
       </div>
       <div class="trk-block"><span class="utm-hint" id="clLocked" style="display:none"></span></div>
     </section>
+    <section class="sec" id="bibSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="bibTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
+      <div id="bibBody"></div>
+    </section>
+    <section class="sec" id="criarSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="criarTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
+      <div id="criarBody"></div>
+    </section>
+    <section class="sec" id="provSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="provTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
+      <div id="provBody"></div>
+    </section>
 
     <section class="sec" id="importsSection" style="display:none">
       <div class="sec-h"><span class="gd"></span><h3 id="importsTitle">Import Your Product</h3><span class="ln"></span></div>
@@ -694,13 +714,21 @@ async function send(){const t=input.value.trim();if(!t||busy)return;input.value=
 sendBtn.addEventListener('click',send);
 input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
 
+document.querySelector('.app').addEventListener('click',e=>{
+  const b=e.target.closest('.v2-back');if(!b)return;
+  v2Hide();setActiveNav(document.querySelector('#sideNav .side-item[data-id="painel"]'));currentModule='painel';window.scrollTo({top:0,behavior:'smooth'});
+});
 document.querySelector('.app').addEventListener('click',async e=>{
   const btn=e.target.closest('.t-card,.i-card,.n-card,.side-item[data-id]');if(!btn||busy||e.target.closest('.side-premium'))return;
-  if(btn.dataset.id==='ads-live'){if(trkSavedDisplays)closeTrackingScreen();lvOpenScreen();return}
-  if(btn.dataset.id==='ads-connect'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();lvCloseScreen();openAdsScreen();return}
-  if(btn.dataset.id==='claude-connect'){if(trkSavedDisplays)closeTrackingScreen();closeAdsScreen();lvCloseScreen();openClaudeScreen();return}
-  closeClaudeScreen();closeAdsScreen();lvCloseScreen();
-  if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'){openTrackingScreen();return}
+  if(btn.dataset.id==='ads-live'){if(trkSavedDisplays)closeTrackingScreen();v2Hide();setActiveNav(btn);lvOpenScreen();return}
+  if(btn.dataset.id==='ads-connect'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();lvCloseScreen();v2Hide();setActiveNav(btn);openAdsScreen();return}
+  if(btn.dataset.id==='claude-connect'){if(trkSavedDisplays)closeTrackingScreen();closeAdsScreen();lvCloseScreen();v2Hide();setActiveNav(btn);openClaudeScreen();return}
+  if(btn.dataset.id==='painel'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();v2Hide();setActiveNav(btn);currentModule='painel';window.scrollTo({top:0,behavior:'smooth'});return}
+  if(btn.dataset.id==='biblioteca'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='biblioteca';v2ApplyTexts();v2Show('bibSection');bibBodyRender();return}
+  if(btn.dataset.id==='criar'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='criar';v2ApplyTexts();v2Show('criarSection');criarBodyRender();return}
+  if(btn.dataset.id==='provedores'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='provedores';v2ApplyTexts();v2Show('provSection');provBodyRender();return}
+  closeClaudeScreen();closeAdsScreen();lvCloseScreen();v2Hide();
+  if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'||btn.dataset.id==='rastreamento'){setActiveNav(btn);openTrackingScreen();return}
   if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentModule=btn.dataset.id;currentSystemPrompt=p;syncUTMPanel();await sendChat(btn.dataset.label||btn.dataset.id)}return}
   const id=btn.dataset.id;if(!id)return;
   if(id==='import-imagem'){document.getElementById('fileInput').click();return}
@@ -752,32 +780,74 @@ document.getElementById('urlModalCancel').addEventListener('click',closeURLModal
 document.getElementById('urlModalSubmit').addEventListener('click',async()=>{const url=document.getElementById('urlInput').value.trim();if(!url.startsWith('http://')&&!url.startsWith('https://')){const e=document.getElementById('urlError');e.textContent=UI.url_error;e.style.display='block';return}closeURLModal();await handleURLAnalysis(url,currentURLType)});
 document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('urlModalSubmit').click()}});
 
+const FEATURE_FLAGS={biblioteca:true,criar_anuncio:true,rastreamento:true,provedores:true,publicos:true,
+  google_ads:false,tiktok_ads:false,youtube_ads:false,pinterest_ads:false,whatsapp_ads:false,promover_app:false,melhorar_ebook:false};
+let V2M={};
+function v2T(){return V2M||{}}
 function renderSidebar(cfg){
   const nav=document.getElementById('sideNav');nav.innerHTML='';
-  const cats=cfg.sidebar&&cfg.sidebar.categories||[];
-  const items=cfg.sidebar&&cfg.sidebar.items||{};
-  for(const cat of cats){
-    const label=document.createElement('div');label.className='side-label';label.textContent=cat.label;
-    nav.appendChild(label);
-    const catItems=items[cat.key]||[];
-    for(const item of catItems){
-      const btn=document.createElement('button');btn.className='side-item';
-      if(item.id==='dashboard')btn.classList.add('active');
-      if(item.id){btn.dataset.id=item.id;btn.dataset.label=item.label}
-      btn.innerHTML='<span class="ico">'+(item.icon||'')+'</span>'+item.label;
-      nav.appendChild(btn)
-    }
+  V2M=(cfg&&cfg.v2menu)||{};
+  const t=k=>V2M[k]||k;
+  const label=document.createElement('div');label.className='side-label';label.textContent=t('main');nav.appendChild(label);
+  const items=[
+    ['painel','\uD83D\uDCCA','painel'],
+    ['ads-live','\uD83D\uDCC8','ads_live'],
+    ['criar','\u2795','criar'],
+    ['rastreamento','\uD83C\uDFAF','rastreamento'],
+    ['biblioteca','\uD83D\uDCDA','biblioteca'],
+    ['claude-connect','\uD83D\uDD0C','claude'],
+    ['ads-connect','\uD83D\uDD17','ads_connect'],
+    ['criar-publico','\uD83D\uDC65','publicos'],
+    ['provedores','\u2699\uFE0F','provedores']
+  ];
+  for(const [id,ico,key] of items){
+    const btn=document.createElement('button');btn.className='side-item'+(id==='painel'?' active':'');
+    btn.dataset.id=id;btn.dataset.label=t(key);
+    btn.innerHTML='<span class="ico">'+ico+'</span><span>'+t(key)+'</span>';
+    nav.appendChild(btn);
   }
-  const cb=document.createElement('button');cb.className='side-item';cb.dataset.id='claude-connect';cb.dataset.label=clT().label;
-  cb.innerHTML='<span class="ico">\uD83D\uDD0C</span>'+clT().label;
-  const dash=nav.querySelector('.side-item[data-id="dashboard"]');
-  if(dash&&dash.nextSibling)nav.insertBefore(cb,dash.nextSibling);else nav.appendChild(cb);
-  const ab=document.createElement('button');ab.className='side-item';ab.dataset.id='ads-connect';ab.dataset.label=adT().label;
-  ab.innerHTML='<span class="ico">\uD83D\uDCCA</span>'+adT().label;
-  const lb=document.createElement('button');lb.className='side-item';lb.dataset.id='ads-live';lb.dataset.label=lvT().label;
-  lb.innerHTML='<span class="ico">\uD83D\uDCC8</span>'+lvT().label;
-  nav.insertBefore(lb,cb);nav.insertBefore(ab,cb);
+  const soon=document.createElement('div');soon.className='side-label';soon.textContent=t('soon');nav.appendChild(soon);
+  const soonItems=[['google_ads','Google Ads'],['tiktok_ads','TikTok Ads'],['youtube_ads','YouTube Ads'],['pinterest_ads','Pinterest Ads'],['whatsapp_ads','WhatsApp Ads'],['promover_app','soon_promover_app'],['melhorar_ebook','soon_melhorar_ebook']];
+  for(const [flag,key] of soonItems){
+    const nm=(key.indexOf('soon_')===0)?t(key):key;
+    const d=document.createElement('div');d.className='side-item soon';d.dataset.soon=flag;
+    d.innerHTML='<span>'+nm+'</span><span class="soon-badge">'+t('soon_badge')+'</span>';
+    d.title=t('soon');nav.appendChild(d);
+  }
 }
+function setActiveNav(btn){
+  document.querySelectorAll('#sideNav .side-item').forEach(x=>x.classList.remove('active'));
+  if(btn&&btn.classList)btn.classList.add('active');
+}
+let v2Open=null;
+const V2_HOME=['heroSection','dashSection','toolsSection','utmSection','importsSection','nichesSection'];
+function v2Show(secId){
+  v2Hide();
+  const prev={};V2_HOME.forEach(h=>{const el=document.getElementById(h);prev[h]=el?el.style.display:'';if(el)el.style.display='none'});
+  v2Open={sec:secId,prev};
+  const sec=document.getElementById(secId);if(sec)sec.style.display='block';
+  document.body.classList.add('cl-open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function v2Hide(){
+  if(!v2Open)return;
+  const sec=document.getElementById(v2Open.sec);if(sec)sec.style.display='none';
+  V2_HOME.forEach(h=>{const el=document.getElementById(h);if(el)el.style.display=v2Open.prev[h]});
+  document.body.classList.remove('cl-open');
+  v2Open=null;
+}
+function v2ApplyTexts(){
+  const t=v2T();
+  const map={bibTitle:'biblioteca',criarTitle:'criar',provTitle:'provedores'};
+  for(const [id,key] of Object.entries(map)){const el=document.getElementById(id);if(el)el.textContent=t(key)||key}
+  document.querySelectorAll('.v2-empty-t').forEach(el=>{el.textContent=t('empty_title')||''});
+  document.querySelectorAll('.v2-empty-d').forEach(el=>{el.textContent=t('empty_desc')||''});
+  document.querySelectorAll('.v2-back').forEach(el=>{el.textContent='\u2190 '+(t('back')||'')});
+}
+function v2EmptyHTML(){const t=v2T();return '<div class="empty-box"><h3>'+(t.empty_title||'')+'</h3><p>'+(t.empty_desc||'')+'</p></div>'}
+function bibBodyRender(){const el=document.getElementById('bibBody');if(el)el.innerHTML=v2EmptyHTML()}
+function criarBodyRender(){const el=document.getElementById('criarBody');if(el)el.innerHTML=v2EmptyHTML()}
+function provBodyRender(){const el=document.getElementById('provBody');if(el)el.innerHTML=v2EmptyHTML()}
 
 function renderTools(tools){
   const grid=document.getElementById('toolsGrid');grid.innerHTML='';
@@ -1720,6 +1790,7 @@ function applyConfig(cfg){
 
   setColors(cfg.colors||{});
   renderSidebar(cfg);
+  v2ApplyTexts();
   renderHero(cfg.hero||{});
   renderDashboardMetrics(cfg.dashboard_metrics||[]);
   applyTrackingTexts();

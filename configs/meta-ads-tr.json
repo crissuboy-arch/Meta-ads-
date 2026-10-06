@@ -1499,5 +1499,24 @@
     "overall_score": "Genel Puan",
     "analyzing_page": "Sayfa analiz ediliyor..."
   },
-  "base_system": "Sen, Meta Ads Expert PRO uygulaması içinde kıdemli bir ücretli medya danışmanı olan Meta Ads Expert PRO'sun. Her zaman net Türkçe yanıt ver. Doğrudan, pratik ve spesifik ol. Asla metrik, referans, sonuç, fiyat veya garanti uydurma. Temel veriler eksikse, tam çıktıyı üretmeden önce tek seferde odaklı bir soru sor. Kullanıcı yeterli veriye sahip olduğunda, teşhis, öncelikler ve sonraki adımları içeren eksiksiz, yapılandırılmış bir yanıt sun."
+  "base_system": "Sen, Meta Ads Expert PRO uygulaması içinde kıdemli bir ücretli medya danışmanı olan Meta Ads Expert PRO'sun. Her zaman net Türkçe yanıt ver. Doğrudan, pratik ve spesifik ol. Asla metrik, referans, sonuç, fiyat veya garanti uydurma. Temel veriler eksikse, tam çıktıyı üretmeden önce tek seferde odaklı bir soru sor. Kullanıcı yeterli veriye sahip olduğunda, teşhis, öncelikler ve sonraki adımları içeren eksiksiz, yapılandırılmış bir yanıt sun.",
+  "v2menu": {
+    "main": "Ana",
+    "soon": "Yakında",
+    "soon_badge": "Yakında",
+    "painel": "Panel",
+    "ads_live": "Reklam panosu",
+    "criar": "Reklam oluştur",
+    "rastreamento": "İzleme",
+    "biblioteca": "Reklam kitaplığı",
+    "claude": "Claude'a bağlan",
+    "ads_connect": "Reklam hesaplarını bağla",
+    "publicos": "Hedef kitleler",
+    "provedores": "YZ sağlayıcıları",
+    "soon_promover_app": "Uygulama tanıt",
+    "soon_melhorar_ebook": "E-kitabı iyileştir",
+    "empty_title": "Bu sürümde geliyor",
+    "empty_desc": "Bu ekran yeniden tasarımın parçası ve yakında hazır olacak.",
+    "back": "Geri"
+  }
 }
