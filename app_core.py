@@ -979,6 +979,147 @@ def _b64u_dec(text):
     return base64.urlsafe_b64decode(text + "=" * (-len(text) % 4))
 
 
+def _prov_keys():
+    base = hashlib.sha256(b"ai-provider|" + _auth_secret()).digest()
+    return (hmac.new(base, b"enc", hashlib.sha256).digest(),
+            hmac.new(base, b"mac", hashlib.sha256).digest())
+
+
+def _prov_enc(text):
+    ek, mk = _prov_keys()
+    nonce = secrets.token_bytes(16)
+    raw = text.encode()
+    stream = b""
+    i = 0
+    while len(stream) < len(raw):
+        stream += hmac.new(ek, nonce + i.to_bytes(4, "big"), hashlib.sha256).digest()
+        i += 1
+    ct = bytes(a ^ b for a, b in zip(raw, stream))
+    tag = hmac.new(mk, nonce + ct, hashlib.sha256).digest()
+    return _b64u(nonce + ct + tag)
+
+
+def _prov_dec(blob):
+    try:
+        data = _b64u_dec(blob)
+        nonce, ct, tag = data[:16], data[16:-32], data[-32:]
+        ek, mk = _prov_keys()
+        if not hmac.compare_digest(tag, hmac.new(mk, nonce + ct, hashlib.sha256).digest()):
+            return None
+        stream = b""
+        i = 0
+        while len(stream) < len(ct):
+            stream += hmac.new(ek, nonce + i.to_bytes(4, "big"), hashlib.sha256).digest()
+            i += 1
+        return bytes(a ^ b for a, b in zip(ct, stream)).decode()
+    except Exception:
+        return None
+
+
+_PROV_DEFAULT_MODELS = {
+    ("gemini", "text"): "gemini-2.0-flash",
+    ("openai", "text"): "gpt-4o-mini",
+    ("openrouter", "text"): "google/gemini-2.0-flash-001",
+    ("gemini", "image"): "gemini-2.0-flash-preview-image-generation",
+    ("openai", "image"): "dall-e-3",
+    ("openrouter", "image"): "",
+}
+
+
+def _prov_post(url, headers, payload, timeout):
+    if _requests is None:
+        raise RuntimeError("no_http_client")
+    r = _requests.post(url, headers=headers, json=payload, timeout=timeout)
+    if r.status_code >= 400:
+        raise RuntimeError(f"provider_http_{r.status_code}")
+    return r.json()
+
+
+def _prov_text(provider, key, model, prompt):
+    prompt = (prompt or "")[:8000]
+    if provider in ("openai", "openrouter"):
+        base = "https://api.openai.com/v1" if provider == "openai" else "https://openrouter.ai/api/v1"
+        d = _prov_post(base + "/chat/completions",
+                       {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                       {"model": model, "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": 1500, "temperature": 0.7}, 60)
+        ch = (d.get("choices") or [{}])[0]
+        txt = ((ch.get("message") or {}).get("content") or "").strip()
+        if not txt:
+            raise RuntimeError("empty_response")
+        return txt
+    if provider == "gemini":
+        d = _prov_post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
+            {"Content-Type": "application/json"},
+            {"contents": [{"parts": [{"text": prompt}]}],
+             "generationConfig": {"maxOutputTokens": 1500, "temperature": 0.7}}, 60)
+        cands = d.get("candidates") or []
+        parts = ((cands[0].get("content") or {}).get("parts") or []) if cands else []
+        txt = "".join(p.get("text", "") for p in parts).strip()
+        if not txt:
+            raise RuntimeError("empty_response")
+        return txt
+    raise RuntimeError("unknown_provider")
+
+
+def _prov_image(provider, key, model, prompt):
+    prompt = (prompt or "")[:2000]
+    if provider == "openai":
+        d = _prov_post("https://api.openai.com/v1/images/generations",
+                       {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                       {"model": model or "dall-e-3", "prompt": prompt,
+                        "size": "1024x1024", "response_format": "b64_json"}, 120)
+        item = (d.get("data") or [{}])[0]
+        b64 = item.get("b64_json")
+        if b64:
+            return {"b64": b64}
+        if item.get("url"):
+            return {"url": item["url"]}
+        raise RuntimeError("empty_response")
+    if provider == "openrouter":
+        d = _prov_post("https://openrouter.ai/api/v1/chat/completions",
+                       {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                       {"model": model,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "modalities": ["image", "text"]}, 120)
+        msg = ((d.get("choices") or [{}])[0].get("message") or {})
+        imgs = msg.get("images") or []
+        if imgs:
+            first = imgs[0]
+            url = first.get("image_url", {}).get("url") if isinstance(first, dict) else None
+            if url:
+                return {"url": url}
+        raise RuntimeError("empty_response")
+    if provider == "gemini":
+        d = _prov_post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
+            {"Content-Type": "application/json"},
+            {"contents": [{"parts": [{"text": prompt}]}],
+             "generationConfig": {"responseModalities": ["IMAGE"]}}, 120)
+        cands = d.get("candidates") or []
+        parts = ((cands[0].get("content") or {}).get("parts") or []) if cands else []
+        for pt in parts:
+            inline = pt.get("inlineData") or pt.get("inline_data") or {}
+            if inline.get("data"):
+                return {"b64": inline["data"], "mime": inline.get("mimeType", "image/png")}
+        raise RuntimeError("empty_response")
+    raise RuntimeError("unknown_provider")
+
+
+def _prov_models_ok(provider, key):
+    """Cheap key validation without spending: list models."""
+    if provider in ("openai", "openrouter"):
+        base = "https://api.openai.com/v1" if provider == "openai" else "https://openrouter.ai/api/v1"
+        d = _prov_post(base + "/models",
+                       {"Authorization": f"Bearer {key}"}, None, 30)
+        return bool(d.get("data") is not None)
+    d = _prov_post(
+        f"https://generativelanguage.googleapis.com/v1beta/models?key={key}",
+        {}, None, 30)
+    return bool(d.get("models") is not None)
+
+
 def _make_session(email):
     payload = {"sub": email, "exp": int(time.time()) + 30 * 24 * 3600}
     part = _b64u(json.dumps(payload, separators=(",", ":")).encode())
@@ -1566,7 +1707,8 @@ def create_app():
     _PUBLIC_PREFIXES = ("/api/auth/", "/api/branding", "/api/health",
                         "/api/webhooks/", "/api/ads/meta/callback", "/api/ads/cron")
     _PROTECTED_PREFIXES = ("/api/chat", "/api/models", "/api/tracking/",
-                           "/api/sales", "/api/package", "/api/mcp", "/api/ads")
+                           "/api/sales", "/api/package", "/api/mcp", "/api/ads",
+                           "/api/library", "/api/providers")
 
     @app.middleware("http")
     async def _auth_gate(request, call_next):
@@ -1729,7 +1871,7 @@ def create_app():
     ads_connect.register(app, {
         "sb_req": _sb_req, "sb_target": _sb_target, "auth_secret": _auth_secret,
         "scrub": _scrub_secrets, "requests": _requests, "b64u": _b64u, "b64u_dec": _b64u_dec,
-        "mcp": _ADS_MCP,
+        "mcp": _ADS_MCP, "trk_load": _trk_load, "capi_send": _capi_send,
     })
 
     @app.get("/")
@@ -2116,5 +2258,464 @@ def create_app():
             sales = [s for s in sales if s.get("method") == method]
         sales.sort(key=lambda s: s.get("ts", 0), reverse=True)
         return {"sales": sales[:200], "total": len(sales)}
+
+    # ============ Biblioteca viva de estruturas (redesign-v2) ============
+    _LIB_LANGS = ("en", "pt", "es", "fr", "tr", "de")
+
+    def _lib_localize(row, lang):
+        lang = (lang or "pt")[:2]
+        if lang not in _LIB_LANGS:
+            lang = "pt"
+        t = (row.get("i18n") or {}).get(lang) or {}
+        return {
+            "id": row.get("id"), "slug": row.get("slug"),
+            "name": t.get("name") or row.get("name"),
+            "description": t.get("description") or row.get("description"),
+            "category": t.get("category") or row.get("category"),
+            "trigger": t.get("trigger") or row.get("trigger"),
+            "funnel_stage": row.get("funnel_stage"),
+            "placement": row.get("placement"),
+            "cta_options": row.get("cta_options") or [],
+            "image_prompt_structure": row.get("image_prompt_structure"),
+            "active": bool(row.get("active")),
+        }
+
+    @app.get("/api/library/structures")
+    def library_list(stage: str = "", lang: str = "pt", include_inactive: str = ""):
+        need_supabase_lib()
+        params = {"select": "*", "order": "funnel_stage.asc,name.asc", "limit": "500"}
+        if stage in ("topo", "meio", "fundo"):
+            params["funnel_stage"] = f"eq.{stage}"
+        if include_inactive != "1":
+            params["active"] = "eq.true"
+        try:
+            rows = _sb_req("GET", "ad_structures", params=params) or []
+        except Exception as exc:
+            raise HTTPException(502, f"supabase_error:{str(exc)[:120]}")
+        counts = {"topo": 0, "meio": 0, "fundo": 0, "total": 0}
+        out = []
+        for r in rows:
+            if r.get("active"):
+                st = r.get("funnel_stage")
+                if st in counts:
+                    counts[st] += 1
+                counts["total"] += 1
+            out.append(_lib_localize(r, lang))
+        return {"structures": out, "counts": counts}
+
+    @app.post("/api/library/structures")
+    async def library_create(request: Request):
+        need_supabase_lib()
+        body = await request.json()
+        name = str(body.get("name") or "").strip()[:160]
+        stage = str(body.get("funnel_stage") or "").strip()
+        if not name or stage not in ("topo", "meio", "fundo"):
+            raise HTTPException(400, "invalid_fields")
+        slug = re.sub(r"[^a-z0-9]+", "-", str(body.get("slug") or name).lower()).strip("-")[:80]
+        row = {
+            "id": slug, "slug": slug, "name": name,
+            "description": str(body.get("description") or "")[:2000],
+            "funnel_stage": stage,
+            "category": str(body.get("category") or "")[:120],
+            "trigger": str(body.get("trigger") or "")[:120],
+            "placement": (str(body.get("placement") or "")[:120] or None),
+            "cta_options": body.get("cta_options") if isinstance(body.get("cta_options"), list) else [],
+            "image_prompt_structure": (str(body.get("image_prompt_structure") or "")[:2000] or None),
+            "i18n": body.get("i18n") if isinstance(body.get("i18n"), dict) else {},
+            "active": True,
+        }
+        try:
+            _sb_req("POST", "ad_structures", payload=row)
+        except Exception as exc:
+            raise HTTPException(502, f"supabase_error:{str(exc)[:120]}")
+        return {"ok": True, "id": slug}
+
+    @app.patch("/api/library/structures/{sid}")
+    async def library_update(sid: str, request: Request):
+        need_supabase_lib()
+        body = await request.json()
+        allowed = ("name", "description", "funnel_stage", "category", "trigger",
+                   "placement", "cta_options", "image_prompt_structure", "i18n", "active")
+        patch = {}
+        for k in allowed:
+            if k in body:
+                patch[k] = body[k]
+        if "funnel_stage" in patch and patch["funnel_stage"] not in ("topo", "meio", "fundo"):
+            raise HTTPException(400, "invalid_stage")
+        if not patch:
+            raise HTTPException(400, "empty_patch")
+        try:
+            _sb_req("PATCH", "ad_structures",
+                    params={"id": f"eq.{sid}"}, payload=patch)
+        except Exception as exc:
+            raise HTTPException(502, f"supabase_error:{str(exc)[:120]}")
+        return {"ok": True}
+
+    def need_supabase_lib():
+        url, _ = _sb_target()
+        if not url:
+            raise HTTPException(503, "supabase_required")
+
+    # ============ Criar anúncio: autofill, geração, rascunhos (redesign-v2) ============
+    _CRIAR_LANGS = {"en": "inglês", "pt": "português", "es": "espanhol",
+                    "fr": "francês", "tr": "turco", "de": "alemão"}
+
+    _CRIAR_SYS = (
+        "Você é o Diretor de Criação AI: copywriter de resposta direta "
+        "(Halbert/Schwartz/Hormozi) + diretor de arte de performance "
+        "(Meta/TikTok Ads) + psicólogo da persuasão (6 gatilhos de Cialdini).\n"
+        "Missão: transformar o briefing em um anúncio que para o scroll e gera clique.\n"
+        "REGRAS DE OURO (nunca quebrar):\n"
+        "1. Especificidade mata a genericidade.\n"
+        "2. Uma Big Idea por criativo.\n"
+        "3. Ordem lógica: Dor > Desejo > Prova > Oferta > CTA.\n"
+        "4. NUNCA invente números, prazos, provas, depoimentos ou garantias. "
+        "Use apenas o que está no briefing.\n"
+        "5. Adapte o hook ao nível de consciência do avatar.\n"
+        "6. Headline legível em 1.5 segundo no feed.\n"
+        "7. CTA de baixo atrito para topo de funil.\n"
+        "8. Paleta de cores: use a paleta indicada como parâmetro (se houver). "
+        "Não imponha proibições fixas de cores."
+    )
+
+    def _criar_director_prompt(briefing, structure, lang):
+        b = briefing or {}
+        lines = []
+        for k in ("name", "niche", "description", "price", "avatar", "pain",
+                  "desire", "offer", "bonus", "guarantee", "urgency",
+                  "objective", "cta"):
+            v = str(b.get(k) or "").strip()
+            if v:
+                lines.append("- " + k + ": " + v)
+        st = ""
+        if structure:
+            st = ("\nEstrutura de anúncio escolhida: "
+                  + str(structure.get("name", "")) + " ("
+                  + str(structure.get("funnel_stage", "")) + ") — "
+                  + str(structure.get("description", "")))
+        lang_name = _CRIAR_LANGS.get((lang or "pt")[:2], "português")
+        body = "\n".join(lines) if lines else "(vazio)"
+        tail = (
+            "Idioma do anúncio: " + lang_name + ".\n"
+            'Responda SOMENTE com JSON válido, sem markdown: '
+            '{"title": "...", "text": "...", "cta": "...", '
+            '"image_prompt": "...", "policy_risk": "..."}\n'
+            "- title: headline do anúncio em " + lang_name + " (máx. 60 caracteres)\n"
+            "- text: texto principal em " + lang_name + " (2 a 4 frases curtas)\n"
+            "- cta: texto do botão em " + lang_name + "\n"
+            "- image_prompt: prompt EM INGLÊS para gerar a imagem do criativo "
+            "(cena, composição, iluminação, estética publicitária)\n"
+            "- policy_risk: nota curta em " + lang_name + " sobre risco de "
+            "reprovação na política de anúncios da Meta (ou 'baixo risco')"
+        )
+        return _CRIAR_SYS + "\nBRIEFING:\n" + body + st + "\n" + tail
+
+    def _criar_clean_json(txt):
+        t = (txt or "").strip()
+        if t.startswith("```"):
+            t = re.sub(r"^```[a-zA-Z]*\n?", "", t)
+            t = re.sub(r"\n?```$", "", t)
+        return t
+
+    def _criar_parse_result(txt):
+        t = _criar_clean_json(txt)
+        try:
+            d = json.loads(t)
+        except Exception:
+            m = re.search(r"\{.*\}", t, re.S)
+            d = json.loads(m.group(0)) if m else {}
+        out = {}
+        for k in ("title", "text", "cta", "image_prompt", "policy_risk"):
+            out[k] = str(d.get(k) or "")[:2000]
+        if not out["title"] and not out["text"]:
+            raise RuntimeError("empty_result")
+        return out
+
+    _AUTOFILL_FIELDS = ("name", "niche", "description", "price", "avatar",
+                        "pain", "desire", "offer", "bonus", "guarantee",
+                        "urgency", "cta")
+
+    @app.post("/api/library/autofill")
+    async def criar_autofill(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        url = str(body.get("url") or "").strip()[:500]
+        lang = str(body.get("lang") or "pt")[:2]
+        if not url:
+            raise HTTPException(400, "empty_url")
+        try:
+            page = _fetch_and_clean_url(url, lang)
+        except Exception as exc:
+            raise HTTPException(400, "fetch_failed:" + str(exc)[:120])
+        raw = {"title": page.get("title") or "",
+               "description": page.get("description") or "",
+               "text": str(page.get("text") or "")[:4000]}
+        empty_briefing = {k: "" for k in _AUTOFILL_FIELDS}
+        empty_briefing["name"] = raw["title"]
+        empty_briefing["description"] = raw["description"]
+        chain = _prov_chain(email, "text")
+        if not chain:
+            return {"ok": True, "source": "page", "briefing": empty_briefing}
+        prompt = (
+            "Extraia deste conteúdo de página de produto um briefing de anúncio. "
+            "Responda SOMENTE com JSON válido, sem markdown: "
+            '{"name":"...","niche":"...","description":"...","price":"...",'
+            '"avatar":"...","pain":"...","desire":"...","offer":"...",'
+            '"bonus":"...","guarantee":"...","urgency":"...","cta":"..."} '
+            "Campos vazios quando não houver informação. Não invente nada.\n\n"
+            "TÍTULO: " + raw["title"] + "\nDESCRIÇÃO: " + raw["description"]
+            + "\nTEXTO: " + raw["text"])
+        last_err = "no_provider"
+        for _provider, cred in chain:
+            try:
+                txt = _prov_text(_provider, cred["key"], cred["model"], prompt)
+                d = json.loads(_criar_clean_json(txt))
+                briefing = {k: str(d.get(k) or "")[:1000]
+                            for k in _AUTOFILL_FIELDS}
+                return {"ok": True, "source": "ai", "briefing": briefing}
+            except Exception as exc:
+                last_err = str(exc)[:160]
+        return {"ok": True, "source": "page", "briefing": empty_briefing,
+                "warning": last_err}
+
+    @app.post("/api/library/generate")
+    async def criar_generate(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        briefing = body.get("briefing") or {}
+        structure = body.get("structure") or {}
+        lang = str(body.get("lang") or "pt")[:2]
+        if not str(briefing.get("name") or "").strip():
+            raise HTTPException(400, "empty_briefing")
+        chain = _prov_chain(email, "text")
+        if not chain:
+            raise HTTPException(400, "no_provider")
+        prompt = _criar_director_prompt(briefing, structure, lang)
+        last_err = "no_provider"
+        for _provider, cred in chain:
+            try:
+                txt = _prov_text(_provider, cred["key"], cred["model"], prompt)
+                result = _criar_parse_result(txt)
+                return {"ok": True, "provider": _provider, "result": result}
+            except Exception as exc:
+                last_err = str(exc)[:160]
+        return {"ok": False, "error": last_err}
+
+    @app.get("/api/library/drafts")
+    def criar_drafts_list(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        try:
+            rows = _sb_req("GET", "ad_drafts",
+                           params={"owner_email": "eq." + email,
+                                   "select": "*",
+                                   "order": "updated_at.desc",
+                                   "limit": "100"}) or []
+        except Exception as exc:
+            raise HTTPException(502, "supabase_error:" + str(exc)[:120])
+        return {"drafts": rows}
+
+    @app.post("/api/library/drafts")
+    async def criar_drafts_save(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        did = str(body.get("id") or "").strip()[:80] or secrets.token_hex(8)
+        row = {"id": did, "owner_email": email,
+               "structure_slug": str(body.get("structure_slug") or "")[:80] or None,
+               "structure_name": str(body.get("structure_name") or "")[:160] or None,
+               "briefing": body.get("briefing") if isinstance(body.get("briefing"), dict) else {},
+               "result": body.get("result") if isinstance(body.get("result"), dict) else None,
+               "updated_at": "now()"}
+        try:
+            _sb_req("POST", "ad_drafts", payload=row)
+        except Exception as exc:
+            raise HTTPException(502, "supabase_error:" + str(exc)[:120])
+        return {"ok": True, "id": did}
+
+    @app.delete("/api/library/drafts/{did}")
+    def criar_drafts_delete(did: str, request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        try:
+            _sb_req("DELETE", "ad_drafts",
+                    params={"id": "eq." + did, "owner_email": "eq." + email})
+        except Exception as exc:
+            raise HTTPException(502, "supabase_error:" + str(exc)[:120])
+        return {"ok": True}
+
+    # ============ Provedores de IA (redesign-v2) ============
+    _PROV_VALID = {"gemini", "openai", "openrouter"}
+
+    def _prov_mask(row):
+        return {"id": row.get("id"), "provider": row.get("provider"),
+                "kind": row.get("kind"), "role": row.get("role"),
+                "model": row.get("model") or "",
+                "key_hint": row.get("key_hint") or "",
+                "has_key": bool(row.get("key_enc")),
+                "active": bool(row.get("active")),
+                "last_test_ok": row.get("last_test_ok"),
+                "last_test_at": row.get("last_test_at")}
+
+    def _prov_rows(email):
+        try:
+            rows = _sb_req("GET", "ai_providers",
+                           params={"owner_email": f"eq.{email}",
+                                   "select": "*",
+                                   "order": "kind.asc,role.asc"}) or []
+        except Exception as exc:
+            raise HTTPException(502, f"supabase_error:{str(exc)[:120]}")
+        return rows
+
+    @app.get("/api/providers")
+    def providers_list(request: Request):
+        need_supabase_lib()
+        return {"providers": [_prov_mask(r) for r in _prov_rows(request.state.user_email)]}
+
+    @app.post("/api/providers")
+    async def providers_save(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        provider = str(body.get("provider") or "")
+        kind = str(body.get("kind") or "")
+        role = str(body.get("role") or "")
+        if provider not in _PROV_VALID or kind not in ("text", "image") \
+                or role not in ("primary", "backup"):
+            raise HTTPException(400, "invalid_fields")
+        model = str(body.get("model") or "").strip()[:160] \
+            or _PROV_DEFAULT_MODELS.get((provider, kind), "")
+        key_in = str(body.get("api_key") or "").strip()
+        pid = f"{email}|{kind}|{role}"
+        # never overwrite a stored key with an empty one
+        patch = {"id": pid, "owner_email": email, "provider": provider,
+                 "kind": kind, "role": role, "model": model, "active": True}
+        if key_in:
+            patch["key_enc"] = _prov_enc(key_in)
+            patch["key_hint"] = "\u2026" + key_in[-4:]
+        try:
+            _sb_req("POST", "ai_providers", payload=patch)
+        except Exception as exc:
+            raise HTTPException(502, f"supabase_error:{str(exc)[:120]}")
+        return {"ok": True, "id": pid}
+
+    @app.delete("/api/providers/{pid}")
+    def providers_delete(pid: str, request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        if not pid.startswith(email + "|"):
+            raise HTTPException(403, "forbidden")
+        try:
+            _sb_req("DELETE", "ai_providers", params={"id": f"eq.{pid}"})
+        except Exception as exc:
+            raise HTTPException(502, f"supabase_error:{str(exc)[:120]}")
+        return {"ok": True}
+
+    def _prov_decrypt_row(row):
+        key = _prov_dec(row.get("key_enc") or "")
+        if not key:
+            return None
+        return {"provider": row.get("provider"), "key": key,
+                "model": row.get("model") or _PROV_DEFAULT_MODELS.get(
+                    (row.get("provider"), row.get("kind")), "")}
+
+    @app.post("/api/providers/test")
+    async def providers_test(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        pid = str(body.get("id") or "")
+        cred = None
+        row = None
+        if pid:
+            if not pid.startswith(email + "|"):
+                raise HTTPException(403, "forbidden")
+            rows = [r for r in _prov_rows(email) if r.get("id") == pid]
+            if not rows:
+                raise HTTPException(404, "not_found")
+            row = rows[0]
+            cred = _prov_decrypt_row(row)
+        else:
+            # one-off test of a pasted key (never stored here)
+            provider = str(body.get("provider") or "")
+            key_in = str(body.get("api_key") or "").strip()
+            kind = str(body.get("kind") or "text")
+            if provider not in _PROV_VALID or not key_in:
+                raise HTTPException(400, "invalid_fields")
+            cred = {"provider": provider, "key": key_in,
+                    "model": str(body.get("model") or "").strip()
+                    or _PROV_DEFAULT_MODELS.get((provider, kind), "")}
+        if not cred:
+            return {"ok": False, "error": "decrypt_failed"}
+        kind = (row.get("kind") if row else str(body.get("kind") or "text"))
+        try:
+            if kind == "image":
+                ok = _prov_models_ok(cred["provider"], cred["key"])
+            else:
+                _prov_text(cred["provider"], cred["key"], cred["model"],
+                           "Reply with exactly: OK")
+                ok = True
+        except Exception as exc:
+            err = str(exc)[:120]
+            if row:
+                try:
+                    _sb_req("PATCH", "ai_providers",
+                            params={"id": f"eq.{row['id']}"},
+                            payload={"last_test_ok": False,
+                                     "last_test_at": "now()"})
+                except Exception:
+                    pass
+            return {"ok": False, "error": err}
+        if row:
+            try:
+                _sb_req("PATCH", "ai_providers",
+                        params={"id": f"eq.{row['id']}"},
+                        payload={"last_test_ok": True,
+                                 "last_test_at": "now()"})
+            except Exception:
+                pass
+        return {"ok": True}
+
+    def _prov_chain(email, kind):
+        rows = [r for r in _prov_rows(email)
+                if r.get("kind") == kind and r.get("active")]
+        order = {"primary": 0, "backup": 1}
+        rows.sort(key=lambda r: order.get(r.get("role"), 9))
+        chain = []
+        for r in rows:
+            cred = _prov_decrypt_row(r)
+            if cred:
+                chain.append((r.get("provider"), cred))
+        return chain
+
+    @app.post("/api/providers/generate")
+    async def providers_generate(request: Request):
+        """Single server-side entrypoint: tries primary, falls back to backup."""
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        kind = str(body.get("kind") or "text")
+        if kind not in ("text", "image"):
+            raise HTTPException(400, "invalid_kind")
+        prompt = str(body.get("prompt") or "")
+        if not prompt.strip():
+            raise HTTPException(400, "empty_prompt")
+        chain = _prov_chain(email, kind)
+        if not chain:
+            raise HTTPException(400, "no_provider")
+        last_err = "no_provider"
+        for provider, cred in chain:
+            try:
+                if kind == "text":
+                    txt = _prov_text(provider, cred["key"], cred["model"], prompt)
+                    return {"ok": True, "provider": provider, "text": txt}
+                img = _prov_image(provider, cred["key"], cred["model"], prompt)
+                return {"ok": True, "provider": provider, **img}
+            except Exception as exc:
+                last_err = str(exc)[:160]
+                continue
+        return {"ok": False, "error": last_err}
 
     return _strip_vercel_prefix(app)
