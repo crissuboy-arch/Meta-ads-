@@ -338,11 +338,12 @@
   @media(max-width:1200px){.app{grid-template-columns:var(--sidebar-w) 1fr}.chat-panel{display:none}}
   @media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.hero{grid-template-columns:1fr}.hero-right{display:none}.dash-grid{grid-template-columns:repeat(3,1fr)}.tool-grid{grid-template-columns:repeat(2,1fr)}.import-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:600px){.main{padding:0 14px 14px}.dash-grid{grid-template-columns:repeat(2,1fr)}.tool-grid{grid-template-columns:1fr}.import-grid{grid-template-columns:1fr}.hero-left h2{font-size:22px}.topbar-left .sub{display:none}}
-  .auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0B1220 0%,#101B33 55%,#0B1220 100%);padding:20px}
+  .auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 140% at 20% 0%,#3A220A 0,#1B130B 55%,#0E0C0A 100%);padding:20px}
   .auth-overlay.hidden{display:none}
-  .auth-card{width:100%;max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:30px 28px;box-shadow:0 24px 60px rgba(0,0,0,0.45)}
-  .auth-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;color:#fff}
-  .auth-logo .dot{width:10px;height:10px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,0.18)}
+  .auth-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:30px 28px;box-shadow:0 24px 60px rgba(0,0,0,0.45)}
+  .auth-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16px;color:var(--text)}
+  .auth-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,138,31,0.18)}
+  .v2pill{font-size:10px;font-weight:800;letter-spacing:.1em;background:linear-gradient(135deg,var(--accent),var(--gold));color:#1A1208;border-radius:999px;padding:3px 10px;margin-left:4px}
   .auth-sub{color:var(--text-dim);font-size:13px;margin:10px 0 20px;line-height:1.5}
   .auth-card label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text-dim);text-transform:uppercase;margin:14px 0 6px}
   .auth-err{display:none;margin-top:14px;font-size:12.5px;color:#FCA5A5;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);padding:9px 11px;border-radius:9px}
@@ -355,7 +356,7 @@
 <body>
 <div class="auth-overlay hidden" id="authOverlay">
   <div class="auth-card">
-    <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span></div>
+    <div class="auth-logo"><span class="dot"></span><span>Meta Ads Expert PRO</span><span class="v2pill">V2</span></div>
     <div class="auth-sub" id="authSubtitle"></div>
     <form id="authForm" autocomplete="on">
       <label for="authEmail" id="authEmailLabel"></label>
