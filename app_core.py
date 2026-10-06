@@ -2356,6 +2356,196 @@ def create_app():
         if not url:
             raise HTTPException(503, "supabase_required")
 
+    # ============ Criar anúncio: autofill, geração, rascunhos (redesign-v2) ============
+    _CRIAR_LANGS = {"en": "inglês", "pt": "português", "es": "espanhol",
+                    "fr": "francês", "tr": "turco", "de": "alemão"}
+
+    _CRIAR_SYS = (
+        "Você é o Diretor de Criação AI: copywriter de resposta direta "
+        "(Halbert/Schwartz/Hormozi) + diretor de arte de performance "
+        "(Meta/TikTok Ads) + psicólogo da persuasão (6 gatilhos de Cialdini).\n"
+        "Missão: transformar o briefing em um anúncio que para o scroll e gera clique.\n"
+        "REGRAS DE OURO (nunca quebrar):\n"
+        "1. Especificidade mata a genericidade.\n"
+        "2. Uma Big Idea por criativo.\n"
+        "3. Ordem lógica: Dor > Desejo > Prova > Oferta > CTA.\n"
+        "4. NUNCA invente números, prazos, provas, depoimentos ou garantias. "
+        "Use apenas o que está no briefing.\n"
+        "5. Adapte o hook ao nível de consciência do avatar.\n"
+        "6. Headline legível em 1.5 segundo no feed.\n"
+        "7. CTA de baixo atrito para topo de funil.\n"
+        "8. Paleta de cores: use a paleta indicada como parâmetro (se houver). "
+        "Não imponha proibições fixas de cores."
+    )
+
+    def _criar_director_prompt(briefing, structure, lang):
+        b = briefing or {}
+        lines = []
+        for k in ("name", "niche", "description", "price", "avatar", "pain",
+                  "desire", "offer", "bonus", "guarantee", "urgency",
+                  "objective", "cta"):
+            v = str(b.get(k) or "").strip()
+            if v:
+                lines.append("- " + k + ": " + v)
+        st = ""
+        if structure:
+            st = ("\nEstrutura de anúncio escolhida: "
+                  + str(structure.get("name", "")) + " ("
+                  + str(structure.get("funnel_stage", "")) + ") — "
+                  + str(structure.get("description", "")))
+        lang_name = _CRIAR_LANGS.get((lang or "pt")[:2], "português")
+        body = "\n".join(lines) if lines else "(vazio)"
+        tail = (
+            "Idioma do anúncio: " + lang_name + ".\n"
+            'Responda SOMENTE com JSON válido, sem markdown: '
+            '{"title": "...", "text": "...", "cta": "...", '
+            '"image_prompt": "...", "policy_risk": "..."}\n'
+            "- title: headline do anúncio em " + lang_name + " (máx. 60 caracteres)\n"
+            "- text: texto principal em " + lang_name + " (2 a 4 frases curtas)\n"
+            "- cta: texto do botão em " + lang_name + "\n"
+            "- image_prompt: prompt EM INGLÊS para gerar a imagem do criativo "
+            "(cena, composição, iluminação, estética publicitária)\n"
+            "- policy_risk: nota curta em " + lang_name + " sobre risco de "
+            "reprovação na política de anúncios da Meta (ou 'baixo risco')"
+        )
+        return _CRIAR_SYS + "\nBRIEFING:\n" + body + st + "\n" + tail
+
+    def _criar_clean_json(txt):
+        t = (txt or "").strip()
+        if t.startswith("```"):
+            t = re.sub(r"^```[a-zA-Z]*\n?", "", t)
+            t = re.sub(r"\n?```$", "", t)
+        return t
+
+    def _criar_parse_result(txt):
+        t = _criar_clean_json(txt)
+        try:
+            d = json.loads(t)
+        except Exception:
+            m = re.search(r"\{.*\}", t, re.S)
+            d = json.loads(m.group(0)) if m else {}
+        out = {}
+        for k in ("title", "text", "cta", "image_prompt", "policy_risk"):
+            out[k] = str(d.get(k) or "")[:2000]
+        if not out["title"] and not out["text"]:
+            raise RuntimeError("empty_result")
+        return out
+
+    _AUTOFILL_FIELDS = ("name", "niche", "description", "price", "avatar",
+                        "pain", "desire", "offer", "bonus", "guarantee",
+                        "urgency", "cta")
+
+    @app.post("/api/library/autofill")
+    async def criar_autofill(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        url = str(body.get("url") or "").strip()[:500]
+        lang = str(body.get("lang") or "pt")[:2]
+        if not url:
+            raise HTTPException(400, "empty_url")
+        try:
+            page = _fetch_and_clean_url(url, lang)
+        except Exception as exc:
+            raise HTTPException(400, "fetch_failed:" + str(exc)[:120])
+        raw = {"title": page.get("title") or "",
+               "description": page.get("description") or "",
+               "text": str(page.get("text") or "")[:4000]}
+        empty_briefing = {k: "" for k in _AUTOFILL_FIELDS}
+        empty_briefing["name"] = raw["title"]
+        empty_briefing["description"] = raw["description"]
+        chain = _prov_chain(email, "text")
+        if not chain:
+            return {"ok": True, "source": "page", "briefing": empty_briefing}
+        prompt = (
+            "Extraia deste conteúdo de página de produto um briefing de anúncio. "
+            "Responda SOMENTE com JSON válido, sem markdown: "
+            '{"name":"...","niche":"...","description":"...","price":"...",'
+            '"avatar":"...","pain":"...","desire":"...","offer":"...",'
+            '"bonus":"...","guarantee":"...","urgency":"...","cta":"..."} '
+            "Campos vazios quando não houver informação. Não invente nada.\n\n"
+            "TÍTULO: " + raw["title"] + "\nDESCRIÇÃO: " + raw["description"]
+            + "\nTEXTO: " + raw["text"])
+        last_err = "no_provider"
+        for _provider, cred in chain:
+            try:
+                txt = _prov_text(_provider, cred["key"], cred["model"], prompt)
+                d = json.loads(_criar_clean_json(txt))
+                briefing = {k: str(d.get(k) or "")[:1000]
+                            for k in _AUTOFILL_FIELDS}
+                return {"ok": True, "source": "ai", "briefing": briefing}
+            except Exception as exc:
+                last_err = str(exc)[:160]
+        return {"ok": True, "source": "page", "briefing": empty_briefing,
+                "warning": last_err}
+
+    @app.post("/api/library/generate")
+    async def criar_generate(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        briefing = body.get("briefing") or {}
+        structure = body.get("structure") or {}
+        lang = str(body.get("lang") or "pt")[:2]
+        if not str(briefing.get("name") or "").strip():
+            raise HTTPException(400, "empty_briefing")
+        chain = _prov_chain(email, "text")
+        if not chain:
+            raise HTTPException(400, "no_provider")
+        prompt = _criar_director_prompt(briefing, structure, lang)
+        last_err = "no_provider"
+        for _provider, cred in chain:
+            try:
+                txt = _prov_text(_provider, cred["key"], cred["model"], prompt)
+                result = _criar_parse_result(txt)
+                return {"ok": True, "provider": _provider, "result": result}
+            except Exception as exc:
+                last_err = str(exc)[:160]
+        return {"ok": False, "error": last_err}
+
+    @app.get("/api/library/drafts")
+    def criar_drafts_list(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        try:
+            rows = _sb_req("GET", "ad_drafts",
+                           params={"owner_email": "eq." + email,
+                                   "select": "*",
+                                   "order": "updated_at.desc",
+                                   "limit": "100"}) or []
+        except Exception as exc:
+            raise HTTPException(502, "supabase_error:" + str(exc)[:120])
+        return {"drafts": rows}
+
+    @app.post("/api/library/drafts")
+    async def criar_drafts_save(request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        body = await request.json()
+        did = str(body.get("id") or "").strip()[:80] or secrets.token_hex(8)
+        row = {"id": did, "owner_email": email,
+               "structure_slug": str(body.get("structure_slug") or "")[:80] or None,
+               "structure_name": str(body.get("structure_name") or "")[:160] or None,
+               "briefing": body.get("briefing") if isinstance(body.get("briefing"), dict) else {},
+               "result": body.get("result") if isinstance(body.get("result"), dict) else None,
+               "updated_at": "now()"}
+        try:
+            _sb_req("POST", "ad_drafts", payload=row)
+        except Exception as exc:
+            raise HTTPException(502, "supabase_error:" + str(exc)[:120])
+        return {"ok": True, "id": did}
+
+    @app.delete("/api/library/drafts/{did}")
+    def criar_drafts_delete(did: str, request: Request):
+        need_supabase_lib()
+        email = request.state.user_email
+        try:
+            _sb_req("DELETE", "ad_drafts",
+                    params={"id": "eq." + did, "owner_email": "eq." + email})
+        except Exception as exc:
+            raise HTTPException(502, "supabase_error:" + str(exc)[:120])
+        return {"ok": True}
+
     # ============ Provedores de IA (redesign-v2) ============
     _PROV_VALID = {"gemini", "openai", "openrouter"}
 

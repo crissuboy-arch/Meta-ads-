@@ -978,7 +978,131 @@ function libRenderList(){
     const nb=document.querySelector('#sideNav .side-item[data-id="criar"]');if(nb)nb.click();
   }));
 }
-function criarBodyRender(){const el=document.getElementById('criarBody');if(el)el.innerHTML=v2EmptyHTML()}
+const CRIAR={"en": {"b1": "1 · Product", "b2": "2 · Customer", "b3": "3 · Offer", "b4": "4 · Ad", "f_name": "Product name", "f_url": "Product URL", "f_autofill": "Autofill with AI", "f_desc": "Description", "f_price": "Price", "f_niche": "Niche", "f_avatar": "Who is the customer", "f_pain": "Main pain", "f_desire": "Main desire", "f_offer": "Offer", "f_bonus": "Bonus", "f_guarantee": "Guarantee", "f_urgency": "Urgency / deadline", "f_structure": "Structure", "f_objective": "Objective", "f_cta": "CTA", "obj_conv": "Conversions", "obj_lead": "Leads", "obj_msg": "Messages", "obj_traffic": "Traffic", "review_btn": "Review briefing", "back_btn": "Back to editing", "generate_btn": "Generate ad", "save_btn": "Save draft", "saved_ok": "Draft saved", "history": "Draft history", "empty_hist": "No drafts yet.", "load_btn": "Load", "del_btn": "Delete", "out_title": "Headline", "out_text": "Main text", "out_cta": "CTA", "out_image": "Image prompt", "out_risk": "Policy risk", "num_t": "Double-check numbers and deadlines", "num_d": "You mentioned numbers or deadlines in the briefing. Confirm they are true and provable before advertising.", "generating": "Generating…", "err_gen": "Could not generate. Check your AI providers.", "autofill_ok": "Briefing filled — review before generating.", "autofill_fail": "Could not extract from the URL. Fill in manually.", "review_t": "Review your briefing", "struct_none": "Choose later", "filling": "Filling…"}, "pt": {"b1": "1 · Produto", "b2": "2 · Cliente", "b3": "3 · Oferta", "b4": "4 · Anúncio", "f_name": "Nome do produto", "f_url": "URL do produto", "f_autofill": "Preencher com IA", "f_desc": "Descrição", "f_price": "Preço", "f_niche": "Nicho", "f_avatar": "Quem é o cliente", "f_pain": "Dor principal", "f_desire": "Desejo principal", "f_offer": "Oferta", "f_bonus": "Bônus", "f_guarantee": "Garantia", "f_urgency": "Urgência / prazo", "f_structure": "Estrutura", "f_objective": "Objetivo", "f_cta": "CTA", "obj_conv": "Conversões", "obj_lead": "Leads", "obj_msg": "Mensagens", "obj_traffic": "Tráfego", "review_btn": "Revisar briefing", "back_btn": "Voltar e editar", "generate_btn": "Gerar anúncio", "save_btn": "Salvar rascunho", "saved_ok": "Rascunho salvo", "history": "Histórico de rascunhos", "empty_hist": "Nenhum rascunho ainda.", "load_btn": "Carregar", "del_btn": "Excluir", "out_title": "Título", "out_text": "Texto principal", "out_cta": "CTA", "out_image": "Prompt da imagem", "out_risk": "Risco de política", "num_t": "Confira os números e prazos", "num_d": "Você mencionou números ou prazos no briefing. Confirme que são verdadeiros e comprováveis antes de anunciar.", "generating": "Gerando…", "err_gen": "Não foi possível gerar. Verifique os provedores de IA.", "autofill_ok": "Briefing preenchido — revise antes de gerar.", "autofill_fail": "Não foi possível extrair da URL. Preencha manualmente.", "review_t": "Revise seu briefing", "struct_none": "Escolher depois", "filling": "Preenchendo…"}, "es": {"b1": "1 · Producto", "b2": "2 · Cliente", "b3": "3 · Oferta", "b4": "4 · Anuncio", "f_name": "Nombre del producto", "f_url": "URL del producto", "f_autofill": "Autocompletar con IA", "f_desc": "Descripción", "f_price": "Precio", "f_niche": "Nicho", "f_avatar": "Quién es el cliente", "f_pain": "Dolor principal", "f_desire": "Deseo principal", "f_offer": "Oferta", "f_bonus": "Bono", "f_guarantee": "Garantía", "f_urgency": "Urgencia / plazo", "f_structure": "Estructura", "f_objective": "Objetivo", "f_cta": "CTA", "obj_conv": "Conversiones", "obj_lead": "Leads", "obj_msg": "Mensajes", "obj_traffic": "Tráfico", "review_btn": "Revisar briefing", "back_btn": "Volver a editar", "generate_btn": "Generar anuncio", "save_btn": "Guardar borrador", "saved_ok": "Borrador guardado", "history": "Historial de borradores", "empty_hist": "Aún sin borradores.", "load_btn": "Cargar", "del_btn": "Eliminar", "out_title": "Título", "out_text": "Texto principal", "out_cta": "CTA", "out_image": "Prompt de imagen", "out_risk": "Riesgo de política", "num_t": "Revisa los números y plazos", "num_d": "Mencionaste números o plazos en el briefing. Confirma que sean reales y comprobables antes de anunciarte.", "generating": "Generando…", "err_gen": "No se pudo generar. Revisa tus proveedores de IA.", "autofill_ok": "Briefing completado — revísalo antes de generar.", "autofill_fail": "No se pudo extraer de la URL. Completa manualmente.", "review_t": "Revisa tu briefing", "struct_none": "Elegir después", "filling": "Completando…"}, "fr": {"b1": "1 · Produit", "b2": "2 · Client", "b3": "3 · Offre", "b4": "4 · Publicité", "f_name": "Nom du produit", "f_url": "URL du produit", "f_autofill": "Remplir avec l'IA", "f_desc": "Description", "f_price": "Prix", "f_niche": "Niche", "f_avatar": "Qui est le client", "f_pain": "Douleur principale", "f_desire": "Désir principal", "f_offer": "Offre", "f_bonus": "Bonus", "f_guarantee": "Garantie", "f_urgency": "Urgence / délai", "f_structure": "Structure", "f_objective": "Objectif", "f_cta": "CTA", "obj_conv": "Conversions", "obj_lead": "Leads", "obj_msg": "Messages", "obj_traffic": "Trafic", "review_btn": "Relire le briefing", "back_btn": "Retour modifier", "generate_btn": "Générer la publicité", "save_btn": "Enregistrer le brouillon", "saved_ok": "Brouillon enregistré", "history": "Historique des brouillons", "empty_hist": "Aucun brouillon.", "load_btn": "Charger", "del_btn": "Supprimer", "out_title": "Titre", "out_text": "Texte principal", "out_cta": "CTA", "out_image": "Prompt d'image", "out_risk": "Risque de non-conformité", "num_t": "Vérifiez chiffres et délais", "num_d": "Vous avez mentionné des chiffres ou délais. Confirmez qu'ils sont vrais et prouvables avant de diffuser.", "generating": "Génération…", "err_gen": "Génération impossible. Vérifiez vos fournisseurs d'IA.", "autofill_ok": "Briefing rempli — relisez avant de générer.", "autofill_fail": "Extraction impossible. Remplissez manuellement.", "review_t": "Relisez votre briefing", "struct_none": "Choisir plus tard", "filling": "Remplissage…"}, "tr": {"b1": "1 · Ürün", "b2": "2 · Müşteri", "b3": "3 · Teklif", "b4": "4 · Reklam", "f_name": "Ürün adı", "f_url": "Ürün URL'si", "f_autofill": "YZ ile doldur", "f_desc": "Açıklama", "f_price": "Fiyat", "f_niche": "Niş", "f_avatar": "Müşteri kim", "f_pain": "Ana sorun", "f_desire": "Ana arzu", "f_offer": "Teklif", "f_bonus": "Bonus", "f_guarantee": "Garanti", "f_urgency": "Aciliyet / süre", "f_structure": "Yapı", "f_objective": "Hedef", "f_cta": "CTA", "obj_conv": "Dönüşümler", "obj_lead": "Potansiyel müşteriler", "obj_msg": "Mesajlar", "obj_traffic": "Trafik", "review_btn": "Brifingi gözden geçir", "back_btn": "Düzenlemeye dön", "generate_btn": "Reklam oluştur", "save_btn": "Taslağı kaydet", "saved_ok": "Taslak kaydedildi", "history": "Taslak geçmişi", "empty_hist": "Henüz taslak yok.", "load_btn": "Yükle", "del_btn": "Sil", "out_title": "Başlık", "out_text": "Ana metin", "out_cta": "CTA", "out_image": "Görsel istemi", "out_risk": "Politika riski", "num_t": "Sayıları ve süreleri kontrol edin", "num_d": "Brifingde sayı veya süre belirttiniz. Reklam vermeden önce doğru ve kanıtlanabilir olduğunu onaylayın.", "generating": "Oluşturuluyor…", "err_gen": "Oluşturulamadı. YZ sağlayıcılarınızı kontrol edin.", "autofill_ok": "Brifing dolduruldu — oluşturmadan önce gözden geçirin.", "autofill_fail": "URL'den çıkarılamadı. Manuel doldurun.", "review_t": "Brifinginizi gözden geçirin", "struct_none": "Sonra seç", "filling": "Dolduruluyor…"}, "de": {"b1": "1 · Produkt", "b2": "2 · Kunde", "b3": "3 · Angebot", "b4": "4 · Anzeige", "f_name": "Produktname", "f_url": "Produkt-URL", "f_autofill": "Mit KI ausfüllen", "f_desc": "Beschreibung", "f_price": "Preis", "f_niche": "Nische", "f_avatar": "Wer ist der Kunde", "f_pain": "Hauptschmerz", "f_desire": "Hauptwunsch", "f_offer": "Angebot", "f_bonus": "Bonus", "f_guarantee": "Garantie", "f_urgency": "Dringlichkeit / Frist", "f_structure": "Struktur", "f_objective": "Ziel", "f_cta": "CTA", "obj_conv": "Conversions", "obj_lead": "Leads", "obj_msg": "Nachrichten", "obj_traffic": "Traffic", "review_btn": "Briefing prüfen", "back_btn": "Zurück zum Bearbeiten", "generate_btn": "Anzeige generieren", "save_btn": "Entwurf speichern", "saved_ok": "Entwurf gespeichert", "history": "Entwurfsverlauf", "empty_hist": "Noch keine Entwürfe.", "load_btn": "Laden", "del_btn": "Löschen", "out_title": "Titel", "out_text": "Haupttext", "out_cta": "CTA", "out_image": "Bild-Prompt", "out_risk": "Richtlinienrisiko", "num_t": "Zahlen und Fristen prüfen", "num_d": "Sie haben Zahlen oder Fristen genannt. Bestätigen Sie vor der Schaltung, dass sie wahr und belegbar sind.", "generating": "Wird generiert…", "err_gen": "Generierung nicht möglich. Prüfen Sie Ihre KI-Anbieter.", "autofill_ok": "Briefing ausgefüllt — vor dem Generieren prüfen.", "autofill_fail": "Aus der URL nichts extrahierbar. Manuell ausfüllen.", "review_t": "Prüfen Sie Ihr Briefing", "struct_none": "Später wählen", "filling": "Wird ausgefüllt…"}};
+function criarT(){return CRIAR[LANG]||CRIAR.en}
+let criarStructs=[],criarDrafts=[],criarResult=null,criarBriefing=null,criarPre=null;
+function cfV(id){const el=document.getElementById('cf_'+id);return el?el.value.trim():''}
+function cfS(id,v){const el=document.getElementById('cf_'+id);if(el)el.value=v||''}
+function criarBriefingGet(){
+  return {name:cfV('name'),url:cfV('url'),description:cfV('desc'),price:cfV('price'),niche:cfV('niche'),
+    avatar:cfV('avatar'),pain:cfV('pain'),desire:cfV('desire'),
+    offer:cfV('offer'),bonus:cfV('bonus'),guarantee:cfV('guarantee'),urgency:cfV('urgency'),
+    structure:cfV('structure'),objective:cfV('objective'),cta:cfV('cta')};
+}
+function criarBriefingSet(b){
+  ['name','url','desc','price','niche','avatar','pain','desire','offer','bonus','guarantee','urgency','objective','cta'].forEach(k=>cfS(k,b[k==='desc'?'description':k]||''));
+  if(b.structure)cfS('structure',b.structure);
+}
+function criarHasNumbers(s){
+  return /(\d+\s?%|\d+\s?x\b|R\$\s?[\d.,]+|\$\s?[\d.,]+|€\s?[\d.,]+|\d+\s?(dias|days|días|horas|hours|weeks?|semanas?|months?|meses?|minutes?|minutos?|jours|heures|tage|stunden))/i.test(s||'');
+}
+async function criarBodyRender(){
+  const t=criarT(),el=document.getElementById('criarBody');if(!el)return;
+  try{criarPre=JSON.parse(sessionStorage.getItem('v2struct')||'null')}catch(e){criarPre=null}
+  try{const r=await fetch('/api/library/structures?lang='+LANG);if(r.ok)criarStructs=(await r.json()).structures||[]}catch(e){}
+  const fld=(id,label,ph)=>'<div class="utm-field"><label>'+adEsc(label)+'</label><input id="cf_'+id+'" class="url-input" placeholder="'+adEsc(ph||'')+'"></div>';
+  const area=(id,label)=>'<div class="utm-field"><label>'+adEsc(label)+'</label><textarea id="cf_'+id+'" class="url-input" rows="2"></textarea></div>';
+  const blk=(title,inner)=>'<div class="box" style="margin-bottom:14px"><h2 style="font-size:17px;margin-bottom:12px">'+adEsc(title)+'</h2><div class="utm-grid">'+inner+'</div></div>';
+  el.innerHTML=
+    blk(t.b1, fld('name',t.f_name)+'<div class="utm-field"><label>'+adEsc(t.f_url)+'</label><div style="display:flex;gap:8px"><input id="cf_url" class="url-input" style="flex:1" placeholder="https://…"><button class="btn-s" id="cfAutofill" type="button" style="white-space:nowrap">'+adEsc(t.f_autofill)+'</button></div><div class="utm-hint" id="cfAutofillMsg"></div></div>'+area('desc',t.f_desc)+fld('price',t.f_price)+fld('niche',t.f_niche))
+    +blk(t.b2, fld('avatar',t.f_avatar)+area('pain',t.f_pain)+area('desire',t.f_desire))
+    +blk(t.b3, area('offer',t.f_offer)+fld('bonus',t.f_bonus)+fld('guarantee',t.f_guarantee)+fld('urgency',t.f_urgency))
+    +blk(t.b4, '<div class="utm-field"><label>'+adEsc(t.f_structure)+'</label><select id="cf_structure" class="url-input"><option value="">'+adEsc(t.struct_none)+'</option>'+criarStructs.map(s2=>'<option value="'+adEsc(s2.slug)+'">'+adEsc(s2.name)+'</option>').join('')+'</select></div>'
+      +'<div class="utm-field"><label>'+adEsc(t.f_objective)+'</label><select id="cf_objective" class="url-input"><option value="conv">'+adEsc(t.obj_conv)+'</option><option value="lead">'+adEsc(t.obj_lead)+'</option><option value="msg">'+adEsc(t.obj_msg)+'</option><option value="traffic">'+adEsc(t.obj_traffic)+'</option></select></div>'
+      +fld('cta',t.f_cta))
+    +'<div style="display:flex;gap:10px;margin:6px 0 18px"><button class="btn-p" id="cfReview" type="button">'+adEsc(t.review_btn)+'</button></div>'
+    +'<div id="cfReviewBox"></div><div id="cfResultBox"></div>'
+    +'<div class="box" style="margin-top:16px"><h2 style="font-size:17px;margin-bottom:12px">'+adEsc(t.history)+'</h2><div id="cfHist"><div class="utm-hint">…</div></div></div>';
+  if(criarPre){cfS('structure',criarPre.slug);try{sessionStorage.removeItem('v2struct')}catch(e){}}
+  document.getElementById('cfAutofill').addEventListener('click',criarAutofill);
+  document.getElementById('cfReview').addEventListener('click',criarReview);
+  criarLoadHistory();
+}
+async function criarAutofill(){
+  const t=criarT(),msg=document.getElementById('cfAutofillMsg'),btn=document.getElementById('cfAutofill');
+  const url=cfV('url');if(!url)return;
+  btn.disabled=true;msg.textContent=t.filling;msg.style.color='';
+  try{
+    const r=await fetch('/api/library/autofill',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url,lang:LANG})});
+    const d=await r.json();
+    if(d.ok&&d.briefing){criarBriefingSet(d.briefing);msg.textContent=t.autofill_ok;msg.style.color='var(--ok)'}
+    else{msg.textContent=t.autofill_fail;msg.style.color='var(--bad)'}
+  }catch(e){msg.textContent=t.autofill_fail;msg.style.color='var(--bad)'}
+  btn.disabled=false;
+}
+function criarReview(){
+  const t=criarT(),b=criarBriefingGet();criarBriefing=b;
+  const box=document.getElementById('cfReviewBox');if(!box)return;
+  const st=criarStructs.find(s2=>s2.slug===b.structure);
+  const rows=[['f_name',b.name],['f_desc',b.description],['f_price',b.price],['f_niche',b.niche],['f_avatar',b.avatar],['f_pain',b.pain],['f_desire',b.desire],['f_offer',b.offer],['f_bonus',b.bonus],['f_guarantee',b.guarantee],['f_urgency',b.urgency],['f_cta',b.cta]]
+    .filter(r=>r[1]).map(r=>'<div class="chk" style="align-items:flex-start"><b style="min-width:140px">'+adEsc(t[r[0]]||r[0])+':</b><span>'+adEsc(r[1])+'</span></div>').join('');
+  const allTxt=Object.values(b).join(' ');
+  const warn=criarHasNumbers(allTxt)?'<div class="reco" style="padding:16px 20px;margin:12px 0"><div><div class="reco-k"><i></i>'+adEsc(t.num_t)+'</div><p>'+adEsc(t.num_d)+'</p></div></div>':'';
+  box.innerHTML='<div class="box" style="margin-bottom:14px;border-color:var(--tintline)"><h2 style="font-size:17px;margin-bottom:12px">'+adEsc(t.review_t)+(st?' · '+adEsc(st.name):'')+'</h2>'
+    +'<div style="display:flex;flex-direction:column;gap:8px;font-size:14px">'+rows+'</div>'+warn
+    +'<div style="display:flex;gap:10px;margin-top:14px"><button class="btn-p" id="cfGenerate" type="button">'+adEsc(t.generate_btn)+'</button><button class="btn-s" id="cfBackEdit" type="button">'+adEsc(t.back_btn)+'</button></div>'
+    +'<div class="utm-hint" id="cfGenMsg"></div></div>';
+  document.getElementById('cfBackEdit').addEventListener('click',()=>{box.innerHTML='';window.scrollTo({top:0,behavior:'smooth'})});
+  document.getElementById('cfGenerate').addEventListener('click',criarGenerate);
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function criarGenerate(){
+  const t=criarT(),msg=document.getElementById('cfGenMsg');
+  msg.textContent=t.generating;msg.style.color='';
+  const b=criarBriefing||criarBriefingGet();
+  const st=criarStructs.find(s2=>s2.slug===b.structure)||criarPre||{};
+  try{
+    const r=await fetch('/api/library/generate',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({briefing:b,structure:{name:st.name||'',funnel_stage:st.funnel_stage||'',description:st.description||''},lang:LANG})});
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error||('HTTP '+r.status));
+    criarResult=d.result;criarRenderResult();
+    msg.textContent='';
+  }catch(e){msg.textContent=t.err_gen+' — '+e.message;msg.style.color='var(--bad)'}
+}
+function criarRenderResult(){
+  const t=criarT(),box=document.getElementById('cfResultBox');if(!box||!criarResult)return;
+  const r=criarResult;
+  const card=(label,val,mono)=>'<div class="box" style="margin-bottom:10px"><div class="lib-meta" style="margin-bottom:6px">'+adEsc(label)+'</div><div style="font-size:15px;line-height:1.6;white-space:pre-wrap;'+(mono?'font-family:monospace;font-size:12.5px':'')+'">'+adEsc(val)+'</div></div>';
+  box.innerHTML='<div class="sec-h" style="margin-top:8px"><span class="gd"></span><h3>'+adEsc(criarResult.title||t.generate_btn)+'</h3><span class="ln"></span></div>'
+    +card(t.out_title,r.title)+card(t.out_text,r.text)+card(t.out_cta,r.cta)+card(t.out_image,r.image_prompt,true)+card(t.out_risk,r.policy_risk)
+    +'<div style="display:flex;gap:10px;margin:4px 0 18px"><button class="btn-p" id="cfSave" type="button">'+adEsc(t.save_btn)+'</button></div><div class="utm-hint" id="cfSaveMsg"></div>';
+  document.getElementById('cfSave').addEventListener('click',criarSaveDraft);
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function criarSaveDraft(){
+  const t=criarT(),msg=document.getElementById('cfSaveMsg');
+  const b=criarBriefing||criarBriefingGet();
+  const st=criarStructs.find(s2=>s2.slug===b.structure)||{};
+  try{
+    const r=await fetch('/api/library/drafts',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({structure_slug:st.slug||'',structure_name:st.name||'',briefing:b,result:criarResult})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    msg.textContent=t.saved_ok;msg.style.color='var(--ok)';criarLoadHistory();
+  }catch(e){msg.textContent=e.message;msg.style.color='var(--bad)'}
+}
+async function criarLoadHistory(){
+  const t=criarT(),box=document.getElementById('cfHist');if(!box)return;
+  try{const r=await fetch('/api/library/drafts');if(r.ok)criarDrafts=(await r.json()).drafts||[]}catch(e){}
+  if(!criarDrafts.length){box.innerHTML='<div class="utm-hint">'+adEsc(t.empty_hist)+'</div>';return}
+  box.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+criarDrafts.map(d=>{
+    const b=d.briefing||{};
+    const dt=d.updated_at?new Date(d.updated_at).toLocaleString(lvLoc()):'';
+    return '<div class="chk" style="justify-content:space-between"><span><b>'+adEsc(b.name||d.structure_name||d.id)+'</b> <small style="color:var(--dim)">'+adEsc(dt)+'</small></span>'
+      +'<span style="display:flex;gap:6px"><button class="btn-s" data-dload="'+d.id+'" type="button" style="min-height:32px;padding:4px 12px">'+adEsc(t.load_btn)+'</button>'
+      +'<button class="btn-s" data-ddel="'+d.id+'" type="button" style="min-height:32px;padding:4px 12px">'+adEsc(t.del_btn)+'</button></span></div>'}).join('')+'</div>';
+  box.querySelectorAll('[data-dload]').forEach(btn=>btn.addEventListener('click',()=>{
+    const d=criarDrafts.find(x=>x.id===btn.dataset.dload);if(!d)return;
+    criarBriefingSet(d.briefing||{});criarResult=d.result||null;criarBriefing=d.briefing||null;
+    if(criarResult)criarRenderResult();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }));
+  box.querySelectorAll('[data-ddel]').forEach(btn=>btn.addEventListener('click',async()=>{
+    try{await fetch('/api/library/drafts/'+encodeURIComponent(btn.dataset.ddel),{method:'DELETE'})}catch(e){}
+    criarLoadHistory();
+  }));
+}
+
 const PROV={"en": {"p_title": "AI providers", "k_text": "Text", "k_image": "Image", "primary": "Primary", "backup": "Backup", "provider_l": "Provider", "model_l": "Model", "key_l": "API key", "key_ph": "Paste the API key", "save": "Save", "test": "Test", "testing": "Testing…", "remove": "Remove", "saved": "Saved", "test_ok": "Test passed", "test_fail": "Test failed", "no_key": "No key saved yet", "hint": "Configure one primary and one backup per type. Keys are encrypted server-side and never shown again."}, "pt": {"p_title": "Provedores de IA", "k_text": "Texto", "k_image": "Imagem", "primary": "Principal", "backup": "Reserva", "provider_l": "Provedor", "model_l": "Modelo", "key_l": "Chave de API", "key_ph": "Cole a chave de API", "save": "Salvar", "test": "Testar", "testing": "Testando…", "remove": "Remover", "saved": "Salvo", "test_ok": "Teste passou", "test_fail": "Teste falhou", "no_key": "Nenhuma chave salva ainda", "hint": "Configure um principal e uma reserva por tipo. As chaves são criptografadas no servidor e nunca exibidas de novo."}, "es": {"p_title": "Proveedores de IA", "k_text": "Texto", "k_image": "Imagen", "primary": "Principal", "backup": "Reserva", "provider_l": "Proveedor", "model_l": "Modelo", "key_l": "Clave de API", "key_ph": "Pega la clave de API", "save": "Guardar", "test": "Probar", "testing": "Probando…", "remove": "Eliminar", "saved": "Guardado", "test_ok": "Prueba exitosa", "test_fail": "Prueba fallida", "no_key": "Aún sin clave", "hint": "Configure un principal y una reserva por tipo. Las claves se cifran en el servidor y nunca se muestran de nuevo."}, "fr": {"p_title": "Fournisseurs d'IA", "k_text": "Texte", "k_image": "Image", "primary": "Principal", "backup": "Secours", "provider_l": "Fournisseur", "model_l": "Modèle", "key_l": "Clé API", "key_ph": "Collez la clé API", "save": "Enregistrer", "test": "Tester", "testing": "Test en cours…", "remove": "Supprimer", "saved": "Enregistré", "test_ok": "Test réussi", "test_fail": "Échec du test", "no_key": "Aucune clé enregistrée", "hint": "Configurez un principal et un secours par type. Les clés sont chiffrées côté serveur et ne sont plus jamais affichées."}, "tr": {"p_title": "YZ sağlayıcıları", "k_text": "Metin", "k_image": "Görsel", "primary": "Birincil", "backup": "Yedek", "provider_l": "Sağlayıcı", "model_l": "Model", "key_l": "API anahtarı", "key_ph": "API anahtarını yapıştırın", "save": "Kaydet", "test": "Test et", "testing": "Test ediliyor…", "remove": "Kaldır", "saved": "Kaydedildi", "test_ok": "Test geçti", "test_fail": "Test başarısız", "no_key": "Henüz anahtar yok", "hint": "Tür başına bir birincil ve bir yedek yapılandırın. Anahtarlar sunucuda şifrelenir ve bir daha gösterilmez."}, "de": {"p_title": "KI-Anbieter", "k_text": "Text", "k_image": "Bild", "primary": "Primär", "backup": "Backup", "provider_l": "Anbieter", "model_l": "Modell", "key_l": "API-Schlüssel", "key_ph": "API-Schlüssel einfügen", "save": "Speichern", "test": "Testen", "testing": "Teste läuft…", "remove": "Entfernen", "saved": "Gespeichert", "test_ok": "Test bestanden", "test_fail": "Test fehlgeschlagen", "no_key": "Noch kein Schlüssel", "hint": "Konfigurieren Sie je Typ einen primären und einen Backup-Anbieter. Schlüssel werden serverseitig verschlüsselt und nie wieder angezeigt."}};
 function provT(){return PROV[LANG]||PROV.en}
 let provData=[];
