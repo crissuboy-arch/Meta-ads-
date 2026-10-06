@@ -66,6 +66,16 @@
   .reco-k i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
   .reco h3{margin:0 0 8px;font-family:var(--display);font-size:24px;line-height:1.2}
   .reco p{margin:0;color:var(--muted);font-size:14px;max-width:640px}
+  .promo{border-radius:var(--radius-xl);padding:22px 26px;background:linear-gradient(135deg,#1E1508,#14100B);border:1px solid var(--tintline);display:flex;align-items:center;gap:18px;cursor:pointer;transition:transform .18s;margin-top:16px}
+  .promo:hover{transform:translateY(-2px)}
+  .promo-ico{width:46px;height:46px;flex:none;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:22px}
+  .promo-tx{flex:1;min-width:0}
+  .promo-tx b{display:block;font-family:var(--display);font-size:18px;margin-bottom:4px}
+  .promo-tx span{color:var(--muted);font-size:13.5px}
+  .promo-cta{flex:none;color:var(--amber);font-weight:700;font-size:13.5px;white-space:nowrap}
+  .promo-dots{display:flex;gap:6px;margin-top:10px;justify-content:center}
+  .promo-dots i{width:22px;height:4px;border-radius:2px;background:var(--line2);cursor:pointer;transition:background .2s}
+  .promo-dots i.on{background:var(--accent)}
   .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
   .box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px}
   .kpi span{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
@@ -463,6 +473,7 @@
 
     <section class="sec" id="recoSection" style="display:none">
       <div class="reco" id="recoBody"></div>
+      <div id="promoWrap" style="display:none"><div class="promo" id="promoCard" role="button" tabindex="0"><div class="promo-ico">✨</div><div class="promo-tx"><b id="promoT"></b><span id="promoD"></span></div><div class="promo-cta" id="promoCta"></div></div><div class="promo-dots" id="promoDots"></div></div>
     </section>
 
     <section class="sec" id="kpiSection" style="display:none">
@@ -1292,6 +1303,33 @@ async function homeLoad(){
   }
   homeRender();
 }
+let promoIdx=0,promoTimer=null;
+const PROMO_ICONS=['\uD83D\uDCCA','\u2753','\uD83D\uDCB0'];
+function promoInit(t){
+  const wrap=document.getElementById('promoWrap');if(!wrap)return;
+  const items=[
+    {t:t.promo_1_t,d:t.promo_1_d,q:t.promo_1_q},
+    {t:t.promo_2_t,d:t.promo_2_d,q:t.promo_2_q},
+    {t:t.promo_3_t,d:t.promo_3_d,q:t.promo_3_q},
+  ].filter(p=>p.t);
+  if(!items.length){wrap.style.display='none';return}
+  wrap.style.display='block';
+  const card=document.getElementById('promoCard'),pt=document.getElementById('promoT'),
+        pd=document.getElementById('promoD'),pc=document.getElementById('promoCta'),
+        dots=document.getElementById('promoDots'),ico=card.querySelector('.promo-ico');
+  function show(i){
+    promoIdx=(i+items.length)%items.length;
+    const p=items[promoIdx];
+    pt.textContent=p.t;pd.textContent=p.d||'';pc.textContent=t.promo_cta||'';
+    ico.textContent=PROMO_ICONS[promoIdx%PROMO_ICONS.length];
+    dots.innerHTML=items.map((_,j)=>'<i class="'+(j===promoIdx?'on':'')+'" data-pd="'+j+'"></i>').join('');
+    dots.querySelectorAll('[data-pd]').forEach(d=>d.addEventListener('click',ev=>{ev.stopPropagation();show(parseInt(d.dataset.pd,10));restart()}));
+  }
+  function restart(){if(promoTimer)clearInterval(promoTimer);promoTimer=setInterval(()=>show(promoIdx+1),6000)}
+  card.onclick=()=>{const q=items[promoIdx].q;if(q&&!busy){v2Hide();setActiveNav(document.querySelector('#sideNav .side-item[data-id="chat"]'));currentModule='chat';sendChat(q)}};
+  card.onkeydown=e=>{if(e.key==='Enter')card.onclick()};
+  show(0);restart();
+}
 function homeRender(){
   const t=hT(),acc=homeCache;
   ['recoSection','kpiSection','bmSection'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='block'});
@@ -1328,6 +1366,7 @@ function homeRender(){
   hSet('kpiAccV',actN+' '+(t.kpi_of||'')+' '+ok.length);
   hSet('kpiCampV',String(ok.reduce((s,a)=>s+(a.active_campaigns||0),0)));
   const alerts=ok.filter(a=>['UNSETTLED','PENDING_SETTLEMENT','IN_GRACE_PERIOD','DISABLED'].indexOf(a.account_status)>=0).length+bad.length;
+  promoInit(t);
   hSet('kpiAlertV',String(alerts));
   const groups={};
   ok.forEach(a=>{const b=a.business||t.no_bm||'—';const g=groups[b]=groups[b]||{n:0,curs:{},res:0,rev:0,sp:0};g.n++;const c=a.currency||'USD';g.curs[c]=(g.curs[c]||0)+(a.spend||0);g.res+=a.results||0;g.rev+=a.revenue||0;g.sp+=a.spend||0});

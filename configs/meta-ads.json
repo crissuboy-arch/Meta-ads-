@@ -1553,6 +1553,16 @@
     "g_proteger": "Protect",
     "g_proteger_d": "Avoid disapprovals and tracking errors.",
     "g_operar": "Operate",
-    "g_operar_d": "Read the numbers and know what to do."
+    "g_operar_d": "Read the numbers and know what to do.",
+    "promo_1_t": "Analyze your campaign with AI",
+    "promo_1_d": "AI reads your numbers and tells you what to do next",
+    "promo_1_q": "Analyze my active campaigns and tell me what to improve",
+    "promo_2_t": "Not sure how to use it?",
+    "promo_2_d": "Ask the chat — it knows every screen of the platform",
+    "promo_2_q": "How do I use this platform? Give me a quick tour of each section",
+    "promo_3_t": "Discover your ROI",
+    "promo_3_d": "Connect your ad account and let AI calculate it for you",
+    "promo_3_q": "Help me calculate my ROI from my connected ad accounts",
+    "promo_cta": "Ask in chat →"
   }
 }

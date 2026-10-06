@@ -1553,6 +1553,16 @@
     "g_proteger": "Koru",
     "g_proteger_d": "Reddedilme ve izleme hatalarından kaçının.",
     "g_operar": "Yönet",
-    "g_operar_d": "Rakamları okuyun ve ne yapacağınızı bilin."
+    "g_operar_d": "Rakamları okuyun ve ne yapacağınızı bilin.",
+    "promo_1_t": "Kampanyanı YZ ile analiz et",
+    "promo_1_d": "YZ sayılarını okur ve ne yapacağını söyler",
+    "promo_1_q": "Aktif kampanyalarımı analiz et ve neyi iyileştireceğimi söyle",
+    "promo_2_t": "Nasıl kullanacağından emin değil misin?",
+    "promo_2_d": "Sohbete sor — platformun her ekranını bilir",
+    "promo_2_q": "Platformu nasıl kullanırım? Her bölümün hızlı bir turunu yap",
+    "promo_3_t": "ROI'ni öğren",
+    "promo_3_d": "Reklam hesabını bağla, YZ senin için hesaplasın",
+    "promo_3_q": "Bağlı reklam hesaplarımdan ROI'mi hesaplamama yardım et",
+    "promo_cta": "Sohbette sor →"
   }
 }

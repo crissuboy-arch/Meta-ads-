@@ -1553,6 +1553,16 @@
     "g_proteger": "Protéger",
     "g_proteger_d": "Évitez les refus et les erreurs de suivi.",
     "g_operar": "Opérer",
-    "g_operar_d": "Lisez les chiffres et sachez quoi faire."
+    "g_operar_d": "Lisez les chiffres et sachez quoi faire.",
+    "promo_1_t": "Analysez votre campagne avec l'IA",
+    "promo_1_d": "L'IA lit vos chiffres et vous dit quoi faire",
+    "promo_1_q": "Analysez mes campagnes actives et dites-moi quoi améliorer",
+    "promo_2_t": "Un doute sur l'utilisation ?",
+    "promo_2_d": "Demandez au chat — il connaît chaque écran de la plateforme",
+    "promo_2_q": "Comment utiliser la plateforme ? Faites-moi un tour rapide de chaque section",
+    "promo_3_t": "Découvrez votre ROI",
+    "promo_3_d": "Connectez votre compte publicitaire et l'IA le calcule pour vous",
+    "promo_3_q": "Aidez-moi à calculer mon ROI à partir de mes comptes publicitaires connectés",
+    "promo_cta": "Demander dans le chat →"
   }
 }

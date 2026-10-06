@@ -1553,6 +1553,16 @@
     "g_proteger": "Schützen",
     "g_proteger_d": "Vermeiden Sie Ablehnungen und Tracking-Fehler.",
     "g_operar": "Steuern",
-    "g_operar_d": "Lesen Sie die Zahlen und wissen Sie, was zu tun ist."
+    "g_operar_d": "Lesen Sie die Zahlen und wissen Sie, was zu tun ist.",
+    "promo_1_t": "Analysiere deine Kampagne mit KI",
+    "promo_1_d": "Die KI liest deine Zahlen und sagt dir, was zu tun ist",
+    "promo_1_q": "Analysiere meine aktiven Kampagnen und sag mir, was ich verbessern soll",
+    "promo_2_t": "Unsicher in der Bedienung?",
+    "promo_2_d": "Frag den Chat — er kennt jeden Bildschirm der Plattform",
+    "promo_2_q": "Wie nutze ich die Plattform? Gib mir einen kurzen Überblick über jeden Bereich",
+    "promo_3_t": "Entdecke deinen ROI",
+    "promo_3_d": "Verbinde dein Werbekonto und die KI berechnet ihn für dich",
+    "promo_3_q": "Hilf mir, meinen ROI aus meinen verbundenen Werbekonten zu berechnen",
+    "promo_cta": "Im Chat fragen →"
   }
 }

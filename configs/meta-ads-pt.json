@@ -1553,6 +1553,16 @@
     "g_proteger": "Proteger",
     "g_proteger_d": "Evite reprovação e erro de rastreamento.",
     "g_operar": "Operar",
-    "g_operar_d": "Leia os números e saiba o que fazer."
+    "g_operar_d": "Leia os números e saiba o que fazer.",
+    "promo_1_t": "Analise sua campanha com IA",
+    "promo_1_d": "A IA lê seus números e diz o que fazer",
+    "promo_1_q": "Analise minhas campanhas ativas e me diga o que melhorar",
+    "promo_2_t": "Tem dúvida como usar?",
+    "promo_2_d": "Pergunte no chat — ele conhece cada tela da plataforma",
+    "promo_2_q": "Como uso a plataforma? Me dá um tour rápido de cada seção",
+    "promo_3_t": "Descubra quanto é seu ROI",
+    "promo_3_d": "Conecte sua conta de anúncios e a IA calcula para você",
+    "promo_3_q": "Me ajuda a calcular meu ROI das contas de anúncio conectadas",
+    "promo_cta": "Perguntar no chat →"
   }
 }
