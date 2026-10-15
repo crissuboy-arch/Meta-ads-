@@ -31,6 +31,8 @@ from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from openai import OpenAI
 
+import athena_integration
+
 try:
     import requests as _requests
 except ImportError:
@@ -1705,6 +1707,7 @@ def create_app():
     static_dir = ROOT / "static"
 
     _PUBLIC_PREFIXES = ("/api/auth/", "/api/branding", "/api/health",
+                        "/api/integrations/health",
                         "/api/webhooks/", "/api/ads/meta/callback", "/api/ads/cron")
     _PROTECTED_PREFIXES = ("/api/chat", "/api/models", "/api/tracking/",
                            "/api/sales", "/api/package", "/api/mcp", "/api/ads",
@@ -1939,6 +1942,38 @@ def create_app():
             "providers": [a for a in API_PROVIDERS if _provider_key(a)],
             "models": list(model_registry.keys()),
         })
+
+    # ============ Athena Control — integração somente-leitura ============
+    # GET /api/integrations/health (público) e /api/integrations/stats
+    # (Bearer EXPERTPRO_ATHENA_API_KEY, chave exclusiva). Só agregados reais,
+    # zero PII. Lógica em athena_integration.py (testável); aqui só o adapter.
+    @app.get("/api/integrations/health")
+    def integrations_health():
+        return JSONResponse({
+            "platform": athena_integration.ATHENA_PLATFORM,
+            "status": "operational",
+            "contract": athena_integration.ATHENA_CONTRACT,
+            "endpoints": ["/api/integrations/health", "/api/integrations/stats"],
+        })
+
+    @app.get("/api/integrations/stats")
+    def integrations_stats(request: Request):
+        expected = os.getenv(athena_integration.ATHENA_API_KEY_ENV, "")
+        if not expected:
+            return JSONResponse(
+                {"ok": False, "error": f"{athena_integration.ATHENA_API_KEY_ENV} não configurado"},
+                status_code=503,
+            )
+        if not athena_integration.bearer_ok(request.headers.get("authorization"), expected):
+            return JSONResponse({"ok": False, "error": "unauthorized"}, status_code=401)
+        try:
+            def _fetch(table, select):
+                return _sb_req("GET", table, params={"select": select}) or []
+            stats = athena_integration.collect_stats(_fetch)
+            return JSONResponse({"ok": True, **stats})
+        except Exception as exc:
+            return JSONResponse({"ok": False, "error": f"falha_interna:{type(exc).__name__}"},
+                                status_code=500)
 
     @app.get("/api/branding")
     def branding(app_id: str = None, lang: str = "en"):
