@@ -520,6 +520,7 @@
     <section class="sec" id="trackingSection" style="display:none">
       <div class="sec-h"><span class="gd"></span><h3 id="trkTitle"></h3><span class="trk-status none" id="trkStatus"></span><span class="ln"></span><button class="btn-s" id="trkClose" type="button"></button></div>
       <p class="utm-desc" id="trkDesc"></p>
+      <div class="trk-block" id="trkProdBar"><div class="trk-block-title" id="trkProdTitle"></div><div class="utm-row"><select id="trkProdSel" class="app-select" style="width:auto;min-width:200px"></select><button class="btn-s" id="trkProdNew" type="button"></button><button class="btn-s" id="trkProdRename" type="button"></button></div><div class="utm-hint" id="trkProdHint"></div></div>
       <div id="trk2Block"></div>
       <div class="utm-grid">
         <div class="utm-field"><label id="trkPixelLabel"></label><input id="trkPixel" class="url-input" inputmode="numeric" autocomplete="off"><div class="utm-hint" id="trkPixelHint"></div></div>
@@ -551,6 +552,10 @@
         <p class="utm-desc" id="trkWebhookDesc"></p>
         <div class="utm-result" id="trkWebhookUrl"></div>
         <div class="utm-row"><button class="btn-p" id="trkCopyWebhook" type="button"></button><span class="utm-msg" id="trkWebhookMsg"></span><button class="btn-s" id="trkOpenUtm" type="button"></button></div>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkDailyTitle"></div>
+        <div id="trkDaily"></div>
       </div>
       <div class="trk-block">
         <div class="trk-block-title" id="trkSalesTitle"></div>
@@ -886,6 +891,9 @@ document.getElementById('clCopy').addEventListener('click',clCopyUrl);
 document.getElementById('trkSave').addEventListener('click',trkSave);
 document.getElementById('trkTest').addEventListener('click',trkTestConn);
 document.getElementById('trkSendTest').addEventListener('click',trkSendTest);
+document.getElementById('trkProdSel').addEventListener('change',function(e){trkSwitchProduct(e.target.value)});
+document.getElementById('trkProdNew').addEventListener('click',trkNewProduct);
+document.getElementById('trkProdRename').addEventListener('click',trkRenameProduct);
 document.getElementById('trkTokenToggle').addEventListener('click',()=>{const t=document.getElementById('trkToken');if(!t)return;t.type=t.type==='password'?'text':'password';const b=document.getElementById('trkTokenToggle');if(b)b.textContent=t.type==='password'?UI.trk_show:UI.trk_hide});
 document.getElementById('authPwToggle').addEventListener('click',()=>{const t=document.getElementById('authPassword');if(!t)return;const show=t.type==='password';t.type=show?'text':'password';const b=document.getElementById('authPwToggle');if(b){b.textContent=show?'🙈':'👁️';b.setAttribute('aria-label',show?'hide password':'show password');}});
 document.getElementById('trkCopyScript').addEventListener('click',()=>{trkCopyTo(document.getElementById('trkScript').textContent,document.getElementById('trkScriptMsg'))});
@@ -1836,7 +1844,25 @@ function trkRenderTokenHint(){const hint=document.getElementById('trkTokenHint')
 
 function trkStoreGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function trkStoreSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-function trkKey(){let k=trkStoreGet('metaAdsTrackingKey');if(!k||!/^[a-f0-9]{32,64}$/.test(k)){const a=new Uint8Array(16);crypto.getRandomValues(a);k=Array.from(a).map(function(b){return b.toString(16).padStart(2,'0')}).join('');trkStoreSet('metaAdsTrackingKey',k)}return k}
+function trkRand(){const a=new Uint8Array(16);crypto.getRandomValues(a);return Array.from(a).map(function(b){return b.toString(16).padStart(2,'0')}).join('')}
+function trkT(pt,en){return LANG==='pt'?pt:en}
+function trkProducts(){
+  let l=[];try{l=JSON.parse(trkStoreGet('metaAdsTrackingProducts')||'[]')}catch(e){}
+  l=(Array.isArray(l)?l:[]).filter(function(p){return p&&/^[a-f0-9]{32,64}$/.test(p.key)});
+  if(!l.length){
+    let k=trkStoreGet('metaAdsTrackingKey');if(!k||!/^[a-f0-9]{32,64}$/.test(k))k=trkRand();
+    l=[{name:trkT('Produto 1','Product 1'),key:k}];
+    trkStoreSet('metaAdsTrackingProducts',JSON.stringify(l));
+  }
+  return l;
+}
+function trkKey(){
+  const l=trkProducts();let act=trkStoreGet('metaAdsTrackingActive');
+  let p=l.find(function(x){return x.key===act});if(!p)p=l[0];
+  if(trkStoreGet('metaAdsTrackingKey')!==p.key)trkStoreSet('metaAdsTrackingKey',p.key);
+  trkStoreSet('metaAdsTrackingActive',p.key);
+  return p.key;
+}
 function trkEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function trkSetStatus(kind){const el=document.getElementById('trkStatus');if(!el)return;el.className='trk-status '+kind;el.textContent=kind==='ok'?UI.trk_status_connected:kind==='saved'?UI.trk_status_saved:kind==='err'?UI.trk_status_error:UI.trk_status_none}
 function trkRefreshStatus(){if(!trkConfigured){trkSetStatus('none');return}if(trkLastTestOk===true)trkSetStatus('ok');else if(trkLastTestOk===false)trkSetStatus('err');else trkSetStatus('saved')}
@@ -1911,7 +1937,7 @@ function openTrackingScreen(){
   if(!trkSavedDisplays){trkSavedDisplays={};const ids=['heroSection','dashSection','toolsSection','utmSection','importsSection','nichesSection'];for(const id of ids){const el=document.getElementById(id);if(el)trkSavedDisplays[id]=el.style.display}}
   for(const id in trkSavedDisplays){const el=document.getElementById(id);if(el)el.style.display='none'}
   sec.style.display='block';currentModule='tracking';
-  applyTrackingTexts();trkLoadDraft();trkLoadConfig();trkLoadSales();refreshTrackingDash();trk2Load();
+  applyTrackingTexts();trkRenderProdBar();trkLoadDraft();trkLoadConfig();trkLoadSales();trkLoadDaily();refreshTrackingDash();trk2Load();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function closeTrackingScreen(){
@@ -1977,7 +2003,7 @@ function applyTrackingTexts(){
 }
 
 function trkLoadDraft(){
-  try{const d=JSON.parse(trkStoreGet('metaAdsTrackingDraft')||'null');if(!d)return;
+  try{const d=JSON.parse(trkStoreGet('metaAdsTrackingDraft'+trkKey().slice(0,8))||'null');if(!d)return;
     const px=document.getElementById('trkPixel');if(px&&!px.value&&d.pixel_id)px.value=d.pixel_id;
     const dm=document.getElementById('trkDomain');if(dm&&!dm.value&&d.domain)dm.value=d.domain;
     const tc=document.getElementById('trkTestCode');if(tc&&!tc.value&&d.test_code)tc.value=d.test_code;
@@ -2014,7 +2040,7 @@ async function trkSave(){
     trkConfigured=true;
     document.getElementById('trkToken').value='';
     trkHasToken=!!d.has_token;trkRenderTokenHint();
-    trkStoreSet('metaAdsTrackingDraft',JSON.stringify({pixel_id:px,domain:payload.domain,test_code:payload.test_code,events:payload.events}));
+    trkStoreSet('metaAdsTrackingDraft'+trkKey().slice(0,8),JSON.stringify({pixel_id:px,domain:payload.domain,test_code:payload.test_code,events:payload.events}));
     trkMsg(UI.trk_saved_ok,true);trkRefreshStatus();trkRenderScript();trkLoadSales();refreshTrackingDash();
   }catch(e){trkMsg(UI.trk_send_fail,false)}
 }
@@ -2048,6 +2074,60 @@ function trkFmtMoney(amount,currency){
   try{return new Intl.NumberFormat(HTML_LANG_MAP[LANG]||'en-US',{style:'currency',currency:currency||'USD'}).format(amount||0)}
   catch(e){return (currency||'')+' '+(amount||0)}
 }
+function trkRenderProdBar(){
+  const sel=document.getElementById('trkProdSel');if(!sel)return;
+  const set=function(id,v){const el=document.getElementById(id);if(el)el.textContent=v};
+  set('trkProdTitle',trkT('Produtos (cada um com seu pixel e seu webhook)','Products (each with its own pixel and webhook)'));
+  set('trkProdNew',trkT('+ Novo produto','+ New product'));
+  set('trkProdRename',trkT('Renomear','Rename'));
+  set('trkProdHint',trkT('Crie um produto para cada infoproduto. Cada um tem o seu link de webhook.','Create one product per offer. Each has its own webhook link.'));
+  const act=trkKey();
+  sel.innerHTML=trkProducts().map(function(p){return '<option value="'+p.key+'"'+(p.key===act?' selected':'')+'>'+trkEsc(p.name)+'</option>'}).join('');
+}
+function trkClearFields(){
+  for(const id of ['trkPixel','trkToken','trkTestCode','trkDomain']){const el=document.getElementById(id);if(el)el.value=''}
+  trkConfigured=false;trkHasToken=false;trkLastTestOk=null;
+}
+function trkSwitchProduct(key){
+  trkStoreSet('metaAdsTrackingActive',key);
+  trkClearFields();trkRenderProdBar();trkRenderWebhook();trkRenderTokenHint();
+  trkLoadDraft();trkLoadConfig();trkLoadSales();
+}
+function trkNewProduct(){
+  const name=(prompt(trkT('Nome do produto:','Product name:'))||'').trim().slice(0,60);
+  if(!name)return;
+  const l=trkProducts();const key=trkRand();l.push({name:name,key:key});
+  trkStoreSet('metaAdsTrackingProducts',JSON.stringify(l));
+  trkSwitchProduct(key);
+}
+function trkRenameProduct(){
+  const l=trkProducts();const k=trkKey();const p=l.find(function(x){return x.key===k});if(!p)return;
+  const name=(prompt(trkT('Novo nome:','New name:'),p.name)||'').trim().slice(0,60);
+  if(!name)return;p.name=name;
+  trkStoreSet('metaAdsTrackingProducts',JSON.stringify(l));trkRenderProdBar();trkLoadDaily();
+}
+function trkDayKey(ts){const d=new Date((ts||0)*1000);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+async function trkAllSales(){
+  const out=[];
+  await Promise.all(trkProducts().map(async function(p){
+    try{const r=await fetch('/api/sales?key='+encodeURIComponent(p.key));if(!r.ok)return;const d=await r.json();
+      for(const s of (d.sales||[]))out.push(Object.assign({},s,{_prod:p.name}))}catch(e){}
+  }));
+  return out;
+}
+async function trkLoadDaily(){
+  const box=document.getElementById('trkDaily');const tt=document.getElementById('trkDailyTitle');if(!box)return;
+  if(tt)tt.textContent=trkT('Vendas por dia (só vendas pagas)','Sales per day (paid only)');
+  const paid=(await trkAllSales()).filter(function(s){return s.status==='paid'});
+  if(!paid.length){box.innerHTML='<p class="utm-desc">'+trkEsc(trkT('Ainda sem vendas pagas.','No paid sales yet.'))+'</p>';return}
+  const g={};
+  for(const s of paid){const k=trkDayKey(s.ts)+'|'+s._prod+'|'+(s.currency||'BRL');const o=g[k]||(g[k]={day:trkDayKey(s.ts),prod:s._prod,cur:s.currency||'BRL',n:0,sum:0});o.n++;o.sum+=(s.amount||0)}
+  const rows=Object.values(g).sort(function(a,b){return a.day<b.day?1:a.day>b.day?-1:a.prod.localeCompare(b.prod)});
+  const tot={};for(const r of rows){tot[r.cur]=(tot[r.cur]||0)+r.sum}
+  const body=rows.slice(0,60).map(function(r){return '<tr><td>'+trkEsc(r.day)+'</td><td>'+trkEsc(r.prod)+'</td><td>'+r.n+'</td><td>'+trkEsc(trkFmtMoney(r.sum,r.cur))+'</td></tr>'}).join('');
+  const totTxt=Object.keys(tot).map(function(c){return trkFmtMoney(tot[c],c)}).join(' + ');
+  box.innerHTML='<table class="trk-table"><thead><tr><th>'+trkEsc(trkT('Dia','Day'))+'</th><th>'+trkEsc(trkT('Produto','Product'))+'</th><th>'+trkEsc(trkT('Vendas','Sales'))+'</th><th>'+trkEsc(trkT('Total','Total'))+'</th></tr></thead><tbody>'+body+'</tbody></table><p class="utm-desc"><b>'+trkEsc(trkT('Total geral: ','Grand total: ')+totTxt)+'</b></p>';
+}
 function trkRenderSales(){
   const box=document.getElementById('trkSalesList');if(!box)return;
   if(!trkSalesCache.length){box.innerHTML='<p class="utm-desc">'+trkEsc(UI.trk_no_sales)+'</p>';return}
@@ -2073,8 +2153,7 @@ async function refreshTrackingDash(){
   const badge=document.getElementById('dashSampleBadge');
   let sales=[];
   try{
-    const k=trkStoreGet('metaAdsTrackingKey');
-    if(k){const r=await fetch('/api/sales?key='+encodeURIComponent(k));if(r.ok){const d=await r.json();sales=d.sales||[]}}
+    sales=await trkAllSales();
   }catch(e){}
   const paid=sales.filter(function(s){return s.status==='paid'});
   if(!paid.length){if(badge)badge.style.display='inline-block';return}
