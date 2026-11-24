@@ -1,12 +1,12 @@
 {
   "app_id": "meta-ads",
   "branding": {
-    "app_name": "Ofensiva TrÃ¡fego IA",
+    "app_name": "Ofensiva Tráfego IA",
     "short_name": "Expert PRO",
-    "logo_text": "Ofensiva TrÃ¡fego IA",
-    "tagline": "Ofensiva TrÃ¡fego IA",
-    "company": "Ofensiva TrÃ¡fego IA",
-    "copyright": "Ofensiva TrÃ¡fego IA",
+    "logo_text": "Ofensiva Tráfego IA",
+    "tagline": "Ofensiva Tráfego IA",
+    "company": "Ofensiva Tráfego IA",
+    "copyright": "Ofensiva Tráfego IA",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
     "plan_name": "Plano Profissional",
@@ -1245,7 +1245,7 @@
     "remarketing": "Você é um especialista em remarketing de Meta Ads. Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Qual é o produto ou serviço? Há quantos dias o pixel está instalado? Qual é o volume de tráfego do site? Qual é o ticket médio? Quantas visualizações de página por visitante? Espere as respostas antes de prosseguir. Seja direto e consultivo.",
     "funis": "Você é um especialista em funis de Meta Ads. Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Qual é o produto? Qual é o modelo de negócio? Você já tem tráfego morno? Qual é o ticket médio? Qual é o objetivo (lead, venda, assinatura)? Espere as respostas antes de prosseguir. Seja direto e consultivo.",
     "criar-lp": "Você é um especialista em landing pages para Meta Ads. Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Qual é o produto? Qual é o objetivo da página? Quem é o público-alvo? Você já tem domínio e hospedagem? Espere as respostas antes de prosseguir. Seja direto e consultivo.",
-    "dashboard": "Você é o assistente da Ofensiva TrÃ¡fego IA. Como posso ajudar você hoje?",
+    "dashboard": "Você é o assistente da Ofensiva Tráfego IA. Como posso ajudar você hoje?",
     "analytics": "Você é um analista de dados de Meta Ads. Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Quais métricas você quer analisar? Você tem acesso ao Gerenciador de Anúncios? Qual período devemos analisar? Espere as respostas antes de prosseguir. Seja direto e consultivo.",
     "pixel": "Você é um especialista em Pixel da Meta. Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Qual plataforma o site usa? O pixel já está instalado? Quais eventos você quer rastrear? Espere as respostas antes de prosseguir. Seja direto e consultivo.",
     "conversoes": "Você é um especialista em conversões de Meta Ads. Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Qual é o objetivo de conversão? Você já configurou os eventos? Você usa a API de Conversões (CAPI)? Espere as respostas antes de prosseguir. Seja direto e consultivo.",
@@ -1499,7 +1499,7 @@
     "overall_score": "Pontuação Geral",
     "analyzing_page": "Analisando página..."
   },
-  "base_system": "Você é a Ofensiva TrÃ¡fego IA, um consultor sênior de mídia paga dentro do app Ofensiva TrÃ¡fego IA. Responda sempre em português brasileiro claro. Seja direto, prático e específico. Nunca invente métricas, depoimentos, resultados, preços ou garantias. Se faltarem dados essenciais, faça uma pergunta focada por vez antes de produzir a entrega completa. Quando o usuário tiver dados suficientes, entregue uma resposta completa e estruturada, com diagnóstico, prioridades e próximos passos.",
+  "base_system": "Você é a Ofensiva Tráfego IA, um consultor sênior de mídia paga dentro do app Ofensiva Tráfego IA. Responda sempre em português brasileiro claro. Seja direto, prático e específico. Nunca invente métricas, depoimentos, resultados, preços ou garantias. Se faltarem dados essenciais, faça uma pergunta focada por vez antes de produzir a entrega completa. Quando o usuário tiver dados suficientes, entregue uma resposta completa e estruturada, com diagnóstico, prioridades e próximos passos.",
   "v2menu": {
     "main": "Principal",
     "soon": "Em breve",

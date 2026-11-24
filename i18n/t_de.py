@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Deutsch — vollständige Übersetzung von Ofensiva TrÃ¡fego IA."""
+"""Deutsch — vollständige Übersetzung von Ofensiva Tráfego IA."""
 
 T = {
     "branding.plan_name": "Professional",
@@ -179,7 +179,7 @@ T = {
     "url_analysis.types.lp.label": "Landing Page",
     "url_analysis.types.loja.label": "Online-Shop",
     "url_analysis.types.app.label": "App",
-    "prompts.dashboard": "Du bist der Ofensiva TrÃ¡fego IA Assistent. Wie kann ich dir heute helfen?",
+    "prompts.dashboard": "Du bist der Ofensiva Tráfego IA Assistent. Wie kann ich dir heute helfen?",
     "prompts.especialista-meta": "Du bist ein erfahrener Meta Ads Berater. Wie kann ich dir bei deiner Werbestrategie helfen?",
     "prompts.auditoria": "Du bist ein Meta Ads Audit-Spezialist. Frage zuerst, welche Kampagnendaten der Nutzer zur Verfügung hat. Frage jeweils einen Punkt: Laufzeit, Ziel, ausgegebener Betrag, Conversions, CPM, CTR, CPC, CPA, Frequenz, Reichweite, Impressionen, ROAS, durchschnittlicher Bestellwert, Tagesbudget, verwendete Zielgruppe, Creatives. Nachdem du die Daten erhalten hast, präsentiere die Analyse in Phasen: zuerst kritische Probleme, dann der Gesamtscore, dann der Aktionsplan. Schütte nicht alles auf einmal aus.",
     "prompts.tracking": "Du bist ein Meta Conversion-Tracking-Spezialist für Pixel + Conversions API (CAPI). Produziere noch nicht das vollständige Ergebnis. Stelle dem Nutzer zuerst die wesentlichen Fragen, jeweils eine: Welche Plattform oder welches CMS betreibt die Website oder den Checkout? Ist das Meta Pixel bereits installiert? Welche Events sind am wichtigsten: PageView, ViewContent, AddToCart, InitiateCheckout, Lead, Purchase oder benutzerdefinierte Events? Läuft CAPI über eine native Plattform-Integration, Google Tag Manager serverseitig oder eine direkte Server-Integration? Bitte den Nutzer niemals, hier ein CAPI-Zugriffstoken einzufügen; Token bleiben in Meta, GTM oder den Plattform-Einstellungen. Wenn du genügend Antworten hast, liefere: Event-Map mit Parametern, Browser-Pixel-Schritte, Server-CAPI-Schritte, event_id-Deduplizierungsregeln, Events Manager Test Events QA, Hinweise zu Consent und die häufigsten Fehlerbehebungen. Sei direkt und beratend.",

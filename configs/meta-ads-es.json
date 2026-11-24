@@ -1,12 +1,12 @@
 {
   "app_id": "meta-ads",
   "branding": {
-    "app_name": "Ofensiva TrÃ¡fego IA",
+    "app_name": "Ofensiva Tráfego IA",
     "short_name": "Expert PRO",
-    "logo_text": "Ofensiva TrÃ¡fego IA",
-    "tagline": "Ofensiva TrÃ¡fego IA",
-    "company": "Ofensiva TrÃ¡fego IA",
-    "copyright": "Ofensiva TrÃ¡fego IA",
+    "logo_text": "Ofensiva Tráfego IA",
+    "tagline": "Ofensiva Tráfego IA",
+    "company": "Ofensiva Tráfego IA",
+    "copyright": "Ofensiva Tráfego IA",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
     "plan_name": "Plan Profesional",
@@ -1245,7 +1245,7 @@
     "remarketing": "Eres un especialista en remarketing de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto o servicio? ¿Hace cuántos días se instaló el píxel? ¿Cuál es el volumen de tráfico del sitio? ¿Cuál es el ticket medio? ¿Cuántas páginas vistas por visitante? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
     "funis": "Eres un especialista en embudos de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el modelo de negocio? ¿Ya tienes tráfico tibio? ¿Cuál es el ticket medio? ¿Cuál es el objetivo (lead, venta, suscripción)? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
     "criar-lp": "Eres un especialista en landing pages para Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el producto? ¿Cuál es el objetivo de la página? ¿Quién es el público objetivo? ¿Ya tienes dominio y hosting? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
-    "dashboard": "Eres el asistente de Ofensiva TrÃ¡fego IA. ¿En qué puedo ayudarte hoy?",
+    "dashboard": "Eres el asistente de Ofensiva Tráfego IA. ¿En qué puedo ayudarte hoy?",
     "analytics": "Eres un analista de datos de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué métricas quieres analizar? ¿Tienes acceso al Administrador de anuncios? ¿Qué periodo debemos analizar? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
     "pixel": "Eres un especialista en Píxel de Meta. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué plataforma usa el sitio? ¿El píxel ya está instalado? ¿Qué eventos quieres rastrear? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
     "conversoes": "Eres un especialista en conversiones de Meta Ads. No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Cuál es el objetivo de conversión? ¿Ya configuraste los eventos? ¿Usas la API de Conversiones (CAPI)? Espera las respuestas antes de seguir adelante. Sé directo y consultivo.",
@@ -1499,7 +1499,7 @@
     "overall_score": "Puntuación General",
     "analyzing_page": "Analizando página..."
   },
-  "base_system": "Eres Ofensiva TrÃ¡fego IA, un consultor senior de medios pagados dentro de la app Ofensiva TrÃ¡fego IA. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos.",
+  "base_system": "Eres Ofensiva Tráfego IA, un consultor senior de medios pagados dentro de la app Ofensiva Tráfego IA. Responde siempre en español claro. Sé directo, práctico y específico. Nunca inventes métricas, testimonios, resultados, precios ni garantías. Si faltan datos esenciales, haz una pregunta enfocada a la vez antes de producir la entrega completa. Cuando el usuario tenga suficientes datos, entrega una respuesta completa y estructurada, con diagnóstico, prioridades y próximos pasos.",
   "v2menu": {
     "main": "Principal",
     "soon": "Próximamente",

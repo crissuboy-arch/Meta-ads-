@@ -1,12 +1,12 @@
 {
   "app_id": "meta-ads",
   "branding": {
-    "app_name": "Ofensiva TrÃ¡fego IA",
+    "app_name": "Ofensiva Tráfego IA",
     "short_name": "Expert PRO",
-    "logo_text": "Ofensiva TrÃ¡fego IA",
-    "tagline": "Ofensiva TrÃ¡fego IA",
-    "company": "Ofensiva TrÃ¡fego IA",
-    "copyright": "Ofensiva TrÃ¡fego IA",
+    "logo_text": "Ofensiva Tráfego IA",
+    "tagline": "Ofensiva Tráfego IA",
+    "company": "Ofensiva Tráfego IA",
+    "copyright": "Ofensiva Tráfego IA",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
     "plan_name": "Profesyonel Plan",
@@ -1245,7 +1245,7 @@
     "remarketing": "Sen bir Meta Ads yeniden pazarlama uzmanısın. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Ürün veya hizmet nedir? Piksel kaç gün önce kuruldu? Site trafik hacmi nedir? Ortalama sipariş değeri nedir? Ziyaretçi başına kaç sayfa görüntüleme var? İlerlemeden önce yanıtları bekle. Doğrudan ve danışman gibi ol.",
     "funis": "Sen bir Meta Ads huni uzmanısın. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Ürün nedir? İş modeli nedir? Zaten sıcak trafiğin var mı? Ortalama sipariş değeri nedir? Hedef nedir (lead, satış, abonelik)? İlerlemeden önce yanıtları bekle. Doğrudan ve danışman gibi ol.",
     "criar-lp": "Sen bir Meta Ads açılış sayfası uzmanısın. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Ürün nedir? Sayfanın hedefi nedir? Hedef kitle kim? Zaten bir alan adın ve hostingin var mı? İlerlemeden önce yanıtları bekle. Doğrudan ve danışman gibi ol.",
-    "dashboard": "Sen Ofensiva TrÃ¡fego IA asistanısın. Bugün sana nasıl yardımcı olabilirim?",
+    "dashboard": "Sen Ofensiva Tráfego IA asistanısın. Bugün sana nasıl yardımcı olabilirim?",
     "analytics": "Sen bir Meta Ads veri analistisin. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Hangi metrikleri analiz etmek istiyorsun? Reklam Yöneticisi'ne erişimin var mı? Hangi dönemi analiz edelim? İlerlemeden önce yanıtları bekle. Doğrudan ve danışman gibi ol.",
     "pixel": "Sen bir Meta Pikseli uzmanısın. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Site hangi platformu kullanıyor? Piksel zaten kurulu mu? Hangi etkinlikleri takip etmek istiyorsun? İlerlemeden önce yanıtları bekle. Doğrudan ve danışman gibi ol.",
     "conversoes": "Sen bir Meta Ads dönüşüm uzmanısın. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Dönüşüm hedefi nedir? Etkinlikleri zaten yapılandırdın mı? Dönüşüm API'sini (CAPI) kullanıyor musun? İlerlemeden önce yanıtları bekle. Doğrudan ve danışman gibi ol.",
@@ -1499,7 +1499,7 @@
     "overall_score": "Genel Puan",
     "analyzing_page": "Sayfa analiz ediliyor..."
   },
-  "base_system": "Sen, Ofensiva TrÃ¡fego IA uygulaması içinde kıdemli bir ücretli medya danışmanı olan Ofensiva TrÃ¡fego IA'sun. Her zaman net Türkçe yanıt ver. Doğrudan, pratik ve spesifik ol. Asla metrik, referans, sonuç, fiyat veya garanti uydurma. Temel veriler eksikse, tam çıktıyı üretmeden önce tek seferde odaklı bir soru sor. Kullanıcı yeterli veriye sahip olduğunda, teşhis, öncelikler ve sonraki adımları içeren eksiksiz, yapılandırılmış bir yanıt sun.",
+  "base_system": "Sen, Ofensiva Tráfego IA uygulaması içinde kıdemli bir ücretli medya danışmanı olan Ofensiva Tráfego IA'sun. Her zaman net Türkçe yanıt ver. Doğrudan, pratik ve spesifik ol. Asla metrik, referans, sonuç, fiyat veya garanti uydurma. Temel veriler eksikse, tam çıktıyı üretmeden önce tek seferde odaklı bir soru sor. Kullanıcı yeterli veriye sahip olduğunda, teşhis, öncelikler ve sonraki adımları içeren eksiksiz, yapılandırılmış bir yanıt sun.",
   "v2menu": {
     "main": "Ana",
     "soon": "Yakında",

@@ -27,7 +27,7 @@
 
 ### Apps Inclusos
 
-- Ofensiva TrÃ¡fego IA (app padrao)
+- Ofensiva Tráfego IA (app padrao)
 - Google Ads Expert PRO
 - TikTok Ads Expert PRO
 - Landing Pages Expert PRO

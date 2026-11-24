@@ -1,4 +1,4 @@
--- Biblioteca viva de estruturas de anúncio (Ofensiva TrÃ¡fego IA, redesign-v2).
+-- Biblioteca viva de estruturas de anúncio (Ofensiva Tráfego IA, redesign-v2).
 -- Run once in Supabase: SQL Editor -> paste -> Run.
 -- RLS on, no public policies: only the service_role key (server-side) can
 -- read/write. The app exposes a filtered read API and admin write API.

@@ -1,4 +1,4 @@
--- MCP approval-gate audit log (Ofensiva TrÃ¡fego IA, Fase 2).
+-- MCP approval-gate audit log (Ofensiva Tráfego IA, Fase 2).
 -- Run once in Supabase: SQL Editor -> paste -> Run.
 -- RLS on, no public policies: only the service_role key (server-side) can
 -- read/write. Never store ad-account tokens here — only action metadata.
