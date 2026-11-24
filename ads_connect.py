@@ -749,7 +749,14 @@ def register(app, d):
             raise ToolError("Valor de orçamento inválido.")
         if v <= 0:
             raise ToolError("O orçamento precisa ser maior que zero.")
-        return int(round(v * (1 if (currency or "").upper() in ZERO_DEC else 100)))
+        minor = int(round(v * (1 if (currency or "").upper() in ZERO_DEC else 100)))
+        cap = os.getenv("MAX_DAILY_BUDGET_CENTS")
+        if cap and minor > int(cap):
+            raise ToolError(
+                f"Orçamento diário ({amount}) acima do teto de segurança configurado "
+                f"(MAX_DAILY_BUDGET_CENTS={cap}). Aumente o teto no ambiente se isso for "
+                "intencional.")
+        return minor
 
     def need(args, *names):
         miss = [n for n in names if args.get(n) in (None, "", [], {})]
