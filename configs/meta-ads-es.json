@@ -1518,7 +1518,8 @@
     "empty_title": "En camino en esta versión",
     "empty_desc": "Esta pantalla es parte del rediseño y estará lista pronto.",
     "back": "Volver",
-    "chat": "Chat"
+    "chat": "Chat",
+    "finance": "Finanzas"
   },
   "v2home": {
     "reco_title": "Próximo paso recomendado",

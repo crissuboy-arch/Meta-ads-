@@ -646,6 +646,10 @@
       <div class="sec-h"><span class="gd"></span><h3 id="provTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
       <div id="provBody"></div>
     </section>
+    <section class="sec" id="financeSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="financeTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
+      <div id="financeBody"></div>
+    </section>
 
     <section class="sec" id="importsSection" style="display:none">
       <div class="sec-h"><span class="gd"></span><h3 id="importsTitle">Import Your Product</h3><span class="ln"></span></div>
@@ -862,6 +866,7 @@ document.querySelector('.app').addEventListener('click',async e=>{
   if(btn.dataset.id==='biblioteca'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='biblioteca';v2ApplyTexts();v2Show('bibSection');bibBodyRender();return}
   if(btn.dataset.id==='criar'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='criar';v2ApplyTexts();v2Show('criarSection');criarBodyRender();return}
   if(btn.dataset.id==='provedores'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='provedores';v2ApplyTexts();v2Show('provSection');provBodyRender();return}
+  if(btn.dataset.id==='finance'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='finance';v2ApplyTexts();v2Show('financeSection');financeBodyRender();return}
   closeClaudeScreen();closeAdsScreen();lvCloseScreen();v2Hide();
   if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'||btn.dataset.id==='rastreamento'){setActiveNav(btn);openTrackingScreen();return}
   if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentModule=btn.dataset.id;currentSystemPrompt=p;syncUTMPanel();await sendChat(btn.dataset.label||btn.dataset.id)}return}
@@ -934,6 +939,7 @@ function renderSidebar(cfg){
     ['claude-connect','\uD83D\uDD0C','claude'],
     ['ads-connect','\uD83D\uDD17','ads_connect'],
     ['criar-publico','\uD83D\uDC65','publicos'],
+    ['finance','\uD83D\uDCB0','finance'],
     ['provedores','\u2699\uFE0F','provedores']
   ];
   for(const [id,ico,key] of items){
@@ -974,7 +980,7 @@ function v2Hide(){
 }
 function v2ApplyTexts(){
   const t=v2T();
-  const map={bibTitle:'biblioteca',criarTitle:'criar',provTitle:'provedores'};
+  const map={bibTitle:'biblioteca',criarTitle:'criar',provTitle:'provedores',financeTitle:'finance'};
   for(const [id,key] of Object.entries(map)){const el=document.getElementById(id);if(el)el.textContent=t(key)||key}
   document.querySelectorAll('.v2-empty-t').forEach(el=>{el.textContent=t('empty_title')||''});
   document.querySelectorAll('.v2-empty-d').forEach(el=>{el.textContent=t('empty_desc')||''});
@@ -1273,6 +1279,51 @@ function provRender(){
       provBodyRender();
     }
   }));
+}
+
+const FIN_I18N={
+  en:{hint:"Figure out what you can actually afford to pay per sale on ads, and whether you're really making money.",price:"Sale price",fee_pct:"Payment platform fee (%)",fee_fixed:"Fixed fee per sale",other:"Other costs per sale",margin:"Target profit margin (%)",spend:"Ad spend in the period (optional)",purchases:"Sales in the period (optional)",calc:"Calculate",net:"Net per sale (after fees/costs)",cpa:"Max CPA to hit your margin",roas:"Break-even ROAS",profit:"Estimated net profit",err:"Enter a sale price greater than zero."},
+  pt:{hint:"Descubra quanto você pode realmente pagar por venda em anúncio, e se está ganhando dinheiro de verdade.",price:"Preço de venda",fee_pct:"Taxa da plataforma de pagamento (%)",fee_fixed:"Taxa fixa por venda",other:"Outros custos por venda",margin:"Margem de lucro desejada (%)",spend:"Gasto com anúncios no período (opcional)",purchases:"Vendas no período (opcional)",calc:"Calcular",net:"Sobra por venda (após taxas/custos)",cpa:"CPA máximo para bater a margem",roas:"ROAS de equilíbrio",profit:"Lucro líquido estimado",err:"Informe um preço de venda maior que zero."},
+  es:{hint:"Descubre cuánto puedes pagar realmente por venta en anuncios, y si estás ganando dinero de verdad.",price:"Precio de venta",fee_pct:"Tarifa de la plataforma de pago (%)",fee_fixed:"Tarifa fija por venta",other:"Otros costos por venta",margin:"Margen de ganancia deseado (%)",spend:"Gasto en anuncios del período (opcional)",purchases:"Ventas del período (opcional)",calc:"Calcular",net:"Neto por venta (tras tarifas/costos)",cpa:"CPA máximo para cumplir el margen",roas:"ROAS de equilibrio",profit:"Ganancia neta estimada",err:"Ingresa un precio de venta mayor que cero."},
+  fr:{hint:"Découvrez combien vous pouvez vraiment dépenser en publicité par vente, et si vous gagnez vraiment de l'argent.",price:"Prix de vente",fee_pct:"Frais de la plateforme de paiement (%)",fee_fixed:"Frais fixe par vente",other:"Autres coûts par vente",margin:"Marge bénéficiaire visée (%)",spend:"Dépenses publicitaires de la période (optionnel)",purchases:"Ventes de la période (optionnel)",calc:"Calculer",net:"Net par vente (après frais/coûts)",cpa:"CPA max pour atteindre la marge",roas:"ROAS d'équilibre",profit:"Bénéfice net estimé",err:"Entrez un prix de vente supérieur à zéro."},
+  tr:{hint:"Reklamda satış başına gerçekte ne kadar ödeyebileceğinizi ve gerçekten kazanıp kazanmadığınızı öğrenin.",price:"Satış fiyatı",fee_pct:"Ödeme platformu ücreti (%)",fee_fixed:"Satış başına sabit ücret",other:"Satış başına diğer maliyetler",margin:"Hedef kâr marjı (%)",spend:"Dönemdeki reklam harcaması (opsiyonel)",purchases:"Dönemdeki satışlar (opsiyonel)",calc:"Hesapla",net:"Satış başına net (ücret/maliyet sonrası)",cpa:"Marjı tutturmak için maksimum CPA",roas:"Başabaş ROAS",profit:"Tahmini net kâr",err:"Sıfırdan büyük bir satış fiyatı girin."},
+  de:{hint:"Finden Sie heraus, wie viel Sie pro Verkauf wirklich für Werbung ausgeben können und ob Sie wirklich Geld verdienen.",price:"Verkaufspreis",fee_pct:"Gebühr der Zahlungsplattform (%)",fee_fixed:"Feste Gebühr pro Verkauf",other:"Weitere Kosten pro Verkauf",margin:"Angestrebte Gewinnmarge (%)",spend:"Werbeausgaben im Zeitraum (optional)",purchases:"Verkäufe im Zeitraum (optional)",calc:"Berechnen",net:"Netto pro Verkauf (nach Gebühren/Kosten)",cpa:"Max. CPA für die Marge",roas:"Break-even-ROAS",profit:"Geschätzter Nettogewinn",err:"Geben Sie einen Verkaufspreis größer als null ein."},
+};
+function finT(){return FIN_I18N[LANG]||FIN_I18N.en}
+function financeBodyRender(){
+  const t=finT(),el=document.getElementById('financeBody');if(!el)return;
+  el.innerHTML='<p class="utm-desc" style="margin-bottom:16px">'+adEsc(t.hint)+'</p>'
+    +'<div class="utm-grid">'
+    +'<div class="utm-field"><label>'+adEsc(t.price)+'</label><input id="finPrice" class="url-input" inputmode="decimal"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.fee_pct)+'</label><input id="finFeePct" class="url-input" inputmode="decimal" value="0"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.fee_fixed)+'</label><input id="finFeeFixed" class="url-input" inputmode="decimal" value="0"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.other)+'</label><input id="finOther" class="url-input" inputmode="decimal" value="0"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.margin)+'</label><input id="finMargin" class="url-input" inputmode="decimal" value="30"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.spend)+'</label><input id="finSpend" class="url-input" inputmode="decimal"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.purchases)+'</label><input id="finPurchases" class="url-input" inputmode="decimal"></div>'
+    +'</div>'
+    +'<div class="utm-row" style="margin-top:10px"><button class="btn-p" id="finCalc" type="button">'+adEsc(t.calc)+'</button><span class="utm-msg" id="finMsg"></span></div>'
+    +'<div id="finResult" style="margin-top:14px"></div>';
+  document.getElementById('finCalc').addEventListener('click', financeCalc);
+}
+async function financeCalc(){
+  const t=finT(),num=id=>{const v=parseFloat((document.getElementById(id).value||'').replace(',','.'));return isNaN(v)?null:v};
+  const msg=document.getElementById('finMsg'),res=document.getElementById('finResult');
+  msg.textContent='';res.innerHTML='';
+  const price=num('finPrice');
+  if(!price||price<=0){msg.textContent=t.err;msg.style.color='var(--bad)';return}
+  const body={price,gateway_fee_pct:num('finFeePct')||0,gateway_fee_fixed:num('finFeeFixed')||0,
+    other_costs:num('finOther')||0,target_margin_pct:num('finMargin')||0,
+    ad_spend:num('finSpend'),purchases:num('finPurchases')};
+  try{
+    const r=await fetch('/api/finance/calc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!r.ok){msg.textContent=d.detail||t.err;msg.style.color='var(--bad)';return}
+    const rows=[[t.net,adMoney(d.net_price_per_sale)],[t.cpa,adMoney(d.max_cpa)],
+      [t.roas,d.breakeven_roas==null?'—':d.breakeven_roas.toFixed(2)+'x']];
+    if(d.net_profit!=null)rows.push([t.profit,adMoney(d.net_profit)]);
+    res.innerHTML=rows.map(x=>'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span style="color:var(--muted)">'+adEsc(x[0])+'</span><b>'+adEsc(x[1])+'</b></div>').join('');
+  }catch(e){msg.textContent=t.err;msg.style.color='var(--bad)'}
 }
 
 let V2H={};
