@@ -2029,7 +2029,7 @@ async function trkTestConn(){
   try{
     const res=await trkPost('/api/tracking/test');
     if(res.ok&&res.d.ok){trkLastTestOk=true;trkMsg(UI.trk_test_ok,true)}
-    else{trkLastTestOk=false;trkMsg(UI.trk_test_fail,false)}
+    else{trkLastTestOk=false;const dt=(res.d&&res.d.detail&&typeof res.d.detail==='string')?res.d.detail:'';trkMsg(UI.trk_test_fail+(dt?' ['+dt+']':''),false)}
   }catch(e){trkLastTestOk=false;trkMsg(UI.trk_test_fail,false)}
   trkRefreshStatus();
 }

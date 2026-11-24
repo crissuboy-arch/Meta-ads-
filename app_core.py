@@ -993,7 +993,16 @@ def _capi_test(cfg):
     try:
         r = _requests.get(f"{_GRAPH_BASE}/{pixel}",
                           params={"fields": "id,name", "access_token": token}, timeout=15)
-        return (r.status_code == 200), ("ok" if r.status_code == 200 else f"meta_{r.status_code}")
+        if r.status_code == 200:
+            return True, "ok"
+        detail = f"meta_{r.status_code}"
+        try:
+            err = (r.json() or {}).get("error") or {}
+            msg = _scrub_secrets(str(err.get("message") or ""))[:160]
+            detail = f"meta_{r.status_code} (código {err.get('code')}): {msg}"
+        except Exception:
+            pass
+        return False, detail
     except Exception as exc:
         print(f"[tracking] capi test error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
         return False, "network_error"
