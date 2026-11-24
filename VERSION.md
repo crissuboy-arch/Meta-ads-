@@ -1,6 +1,6 @@
 # Versao
 
-**Meta Ads Expert PRO v1.0** — 2026-07-14
+**Ofensiva TrÃ¡fego IA v1.0** — 2026-07-14
 
 Detalhes tecnicos:
 
@@ -8,7 +8,7 @@ Detalhes tecnicos:
 |----------|-------|
 | Versao | 1.0.0 |
 | Release | stable |
-| App padrao | Meta Ads Expert PRO |
+| App padrao | Ofensiva TrÃ¡fego IA |
 | Total de apps | 8 |
 | Engine | NVIDIA NIM (API) |
 | Modelo padrao | meta/llama-3.1-70b-instruct |

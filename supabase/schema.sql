@@ -1,4 +1,4 @@
--- Meta Ads Expert PRO — Tracking storage (Supabase)
+-- Ofensiva TrÃ¡fego IA — Tracking storage (Supabase)
 -- Run once in Supabase: SQL Editor -> paste -> Run.
 -- RLS is enabled with no public policies: only the service_role key
 -- (used server-side by the app) can read/write. The anon key is blocked.

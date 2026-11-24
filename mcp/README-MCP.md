@@ -79,7 +79,7 @@ mcp/.venv/bin/python -m pytest mcp/tests/ -q   # 10 testes, tudo mockado
    anúncios no Gerenciador de Negócios (Contas de anúncios → Adicionar ativos
    → Páginas). Sem isso, erro 200:1815199. Propagação pode levar minutos.
 5. **ID da página ≠ URL do perfil.** O ID usável da API vem de
-   `GET /me/accounts` (aqui: Meta Ads Expert PRO = 352558807930156).
+   `GET /me/accounts` (aqui: Ofensiva TrÃ¡fego IA = 352558807930156).
 6. **Token via arquivo** (`tokemads.txt`): a usuária envia, o script lê UMA
    vez, usa e **apaga imediatamente**. Evita erros de transcrição em tokens
    longos. Nunca commitar.

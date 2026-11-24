@@ -27,7 +27,7 @@
 
 ### Apps Inclusos
 
-- Meta Ads Expert PRO (app padrao)
+- Ofensiva TrÃ¡fego IA (app padrao)
 - Google Ads Expert PRO
 - TikTok Ads Expert PRO
 - Landing Pages Expert PRO

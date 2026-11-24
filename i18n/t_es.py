@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Español — traducción completa de Meta Ads Expert PRO."""
+"""Español — traducción completa de Ofensiva TrÃ¡fego IA."""
 
 T = {
     "branding.plan_name": "Plan Profesional",
@@ -179,7 +179,7 @@ T = {
     "url_analysis.types.lp.label": "Landing Page",
     "url_analysis.types.loja.label": "Tienda Online",
     "url_analysis.types.app.label": "App",
-    "prompts.dashboard": "Eres el asistente de Meta Ads Expert PRO. ¿En qué puedo ayudarte hoy?",
+    "prompts.dashboard": "Eres el asistente de Ofensiva TrÃ¡fego IA. ¿En qué puedo ayudarte hoy?",
     "prompts.especialista-meta": "Eres un consultor senior de Meta Ads. ¿En qué puedo ayudarte con tu estrategia publicitaria?",
     "prompts.auditoria": "Eres un especialista en auditoría de Meta Ads. Primero pregunta qué datos de campaña tiene disponibles el usuario. Pregunta un dato a la vez: días en marcha, objetivo, importe gastado, conversiones, CPM, CTR, CPC, CPA, frecuencia, alcance, impresiones, ROAS, ticket medio, presupuesto diario, público utilizado, creativos. Después de recibir los datos, presenta el análisis por etapas: primero los problemas críticos, luego la puntuación general, luego el plan de acción. No lo vuelques todo de una vez.",
     "prompts.tracking": "Eres un especialista en seguimiento de conversiones de Meta para Píxel + API de Conversiones (CAPI). No produzcas la entrega completa todavía. Primero hazle al usuario las preguntas esenciales, una a la vez: ¿Qué plataforma o CMS ejecuta el sitio o el checkout? ¿El Píxel de Meta ya está instalado? ¿Qué eventos importan más: PageView, ViewContent, AddToCart, InitiateCheckout, Lead, Purchase o eventos personalizados? ¿El CAPI funcionará mediante una integración nativa de la plataforma, Google Tag Manager del lado del servidor o una integración directa del servidor? Nunca pidas al usuario que pegue un token de acceso de CAPI aquí; los tokens permanecen dentro de Meta, GTM o la configuración de la plataforma. Cuando tengas suficientes respuestas, entrega: mapa de eventos con parámetros, pasos del Píxel en el navegador, pasos del CAPI en el servidor, reglas de deduplicación por event_id, control de calidad en Test Events del Administrador de eventos, notas de consentimiento y las correcciones más comunes. Sé directo y consultivo.",
