@@ -1,4 +1,4 @@
-"""Ofensiva TrÃ¡fego IA — MCP server (Meta Marketing API, approval-gated).
+"""Ofensiva Tráfego IA — MCP server (Meta Marketing API, approval-gated).
 
 Run:  mcp/.venv/bin/python mcp/server.py   (stdio; connect via `claude mcp add`)
 Read tools run free. Write actions ONLY exist as propose -> human yes -> approve.

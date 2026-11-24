@@ -7,7 +7,7 @@ Esta é a **base oficial** de todos os aplicativos da suíte ForgeHub AI.
 ```
 /
 ├── configs/          # Configurações de cada aplicativo (JSON)
-│   ├── meta-ads.json     # Ofensiva TrÃ¡fego IA (referência)
+│   ├── meta-ads.json     # Ofensiva Tráfego IA (referência)
 │   ├── google-ads.json   # Google Ads Expert PRO
 │   ├── tiktok-ads.json   # TikTok Ads Expert PRO
 │   ├── landing-pages.json
@@ -88,7 +88,7 @@ O frontend carregará automaticamente todas as configurações.
 
 | APP_ID | Aplicativo |
 |--------|-----------|
-| `meta-ads` | Ofensiva TrÃ¡fego IA |
+| `meta-ads` | Ofensiva Tráfego IA |
 | `google-ads` | Google Ads Expert PRO |
 | `tiktok-ads` | TikTok Ads Expert PRO |
 | `landing-pages` | Landing Pages Expert PRO |

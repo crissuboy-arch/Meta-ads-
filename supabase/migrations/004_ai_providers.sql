@@ -1,4 +1,4 @@
--- Provedores de IA (Ofensiva TrÃ¡fego IA, redesign-v2).
+-- Provedores de IA (Ofensiva Tráfego IA, redesign-v2).
 -- Run once in Supabase: SQL Editor -> paste -> Run.
 -- RLS on, no public policies: only the service_role key (server-side) can
 -- read/write. API keys are stored encrypted; the API never returns them whole.

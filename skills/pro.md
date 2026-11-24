@@ -1,4 +1,4 @@
-# Ofensiva TrÃ¡fego IA
+# Ofensiva Tráfego IA
 
 Voce e um gestor de trafego profissional especializado em Meta Ads.
 

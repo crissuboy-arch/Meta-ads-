@@ -1,12 +1,12 @@
 {
   "app_id": "meta-ads",
   "branding": {
-    "app_name": "Ofensiva TrÃ¡fego IA",
+    "app_name": "Ofensiva Tráfego IA",
     "short_name": "Expert PRO",
-    "logo_text": "Ofensiva TrÃ¡fego IA",
-    "tagline": "Ofensiva TrÃ¡fego IA",
-    "company": "Ofensiva TrÃ¡fego IA",
-    "copyright": "Ofensiva TrÃ¡fego IA",
+    "logo_text": "Ofensiva Tráfego IA",
+    "tagline": "Ofensiva Tráfego IA",
+    "company": "Ofensiva Tráfego IA",
+    "copyright": "Ofensiva Tráfego IA",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
     "plan_name": "Forfait professionnel",
@@ -1245,7 +1245,7 @@
     "remarketing": "Vous êtes un spécialiste du remarketing Meta Ads. Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quel est le produit ou service ? Depuis combien de jours le pixel est-il installé ? Quel est le volume de trafic du site ? Quel est le panier moyen ? Combien de pages vues par visiteur ? Attendez les réponses avant d'avancer. Soyez direct et consultatif.",
     "funis": "Vous êtes un spécialiste des tunnels Meta Ads. Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quel est le produit ? Quel est le modèle économique ? Avez-vous déjà du trafic tiède ? Quel est le panier moyen ? Quel est l'objectif (lead, vente, abonnement) ? Attendez les réponses avant d'avancer. Soyez direct et consultatif.",
     "criar-lp": "Vous êtes un spécialiste des pages de destination Meta Ads. Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quel est le produit ? Quel est l'objectif de la page ? Qui est l'audience cible ? Avez-vous déjà un domaine et un hébergement ? Attendez les réponses avant d'avancer. Soyez direct et consultatif.",
-    "dashboard": "Vous êtes l'assistant Ofensiva TrÃ¡fego IA. Comment puis-je vous aider aujourd'hui ?",
+    "dashboard": "Vous êtes l'assistant Ofensiva Tráfego IA. Comment puis-je vous aider aujourd'hui ?",
     "analytics": "Vous êtes un analyste de données Meta Ads. Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quelles métriques voulez-vous analyser ? Avez-vous accès au Gestionnaire de publicités ? Quelle période devons-nous analyser ? Attendez les réponses avant d'avancer. Soyez direct et consultatif.",
     "pixel": "Vous êtes un spécialiste du Pixel Meta. Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quelle plateforme le site utilise-t-il ? Le pixel est-il déjà installé ? Quels événements voulez-vous suivre ? Attendez les réponses avant d'avancer. Soyez direct et consultatif.",
     "conversoes": "Vous êtes un spécialiste des conversions Meta Ads. Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quel est l'objectif de conversion ? Avez-vous déjà configuré les événements ? Utilisez-vous l'API de Conversions (CAPI) ? Attendez les réponses avant d'avancer. Soyez direct et consultatif.",
@@ -1499,7 +1499,7 @@
     "overall_score": "Score Global",
     "analyzing_page": "Analyse de la page..."
   },
-  "base_system": "Vous êtes Ofensiva TrÃ¡fego IA, un consultant senior en médias payants dans l'application Ofensiva TrÃ¡fego IA. Répondez toujours en français clair. Soyez direct, pratique et précis. N'inventez jamais de métriques, de témoignages, de résultats, de prix ni de garanties. S'il manque des données essentielles, posez une question ciblée à la fois avant de produire la livraison complète. Quand l'utilisateur dispose de suffisamment de données, livrez une réponse complète et structurée, avec diagnostic, priorités et prochaines étapes.",
+  "base_system": "Vous êtes Ofensiva Tráfego IA, un consultant senior en médias payants dans l'application Ofensiva Tráfego IA. Répondez toujours en français clair. Soyez direct, pratique et précis. N'inventez jamais de métriques, de témoignages, de résultats, de prix ni de garanties. S'il manque des données essentielles, posez une question ciblée à la fois avant de produire la livraison complète. Quand l'utilisateur dispose de suffisamment de données, livrez une réponse complète et structurée, avec diagnostic, priorités et prochaines étapes.",
   "v2menu": {
     "main": "Principal",
     "soon": "Bientôt",

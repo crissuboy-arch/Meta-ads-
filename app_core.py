@@ -73,7 +73,7 @@ API_PROVIDERS = {
         "label": "OpenRouter",
         "base_url": "https://openrouter.ai/api/v1",
         "key_env": "OPENROUTER_API_KEY",
-        "headers": {"X-Title": "Ofensiva TrÃ¡fego IA"},
+        "headers": {"X-Title": "Ofensiva Tráfego IA"},
     },
     "agnes": {
         "label": "Agnes AI (free)",
@@ -285,8 +285,8 @@ SKILL_ROUTES = CONFIG.get("skill_routes", {}) if isinstance(CONFIG, dict) else {
 PROMPTS = CONFIG.get("prompts", {}) if isinstance(CONFIG, dict) else {}
 
 _BASE_SYSTEM_EN = (
-    "You are Ofensiva TrÃ¡fego IA, a senior paid-media consultant inside the "
-    "Ofensiva TrÃ¡fego IA app. Always answer in clear US English. Be direct, practical, "
+    "You are Ofensiva Tráfego IA, a senior paid-media consultant inside the "
+    "Ofensiva Tráfego IA app. Always answer in clear US English. Be direct, practical, "
     "and specific. Never invent metrics, testimonials, results, prices, or "
     "guarantees. If essential data is missing, ask one focused question at a "
     "time before producing the full deliverable. When the user provides enough "
@@ -1307,7 +1307,7 @@ _MCP_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
 _MCP_KEY_RE = re.compile(r"^mk_[A-Za-z0-9_-]{20,80}$")
 _MCP_CACHE = None
 _MCP_INSTRUCTIONS = (
-    "Ofensiva TrÃ¡fego IA: an AI media buyer for Facebook and Instagram ads. "
+    "Ofensiva Tráfego IA: an AI media buyer for Facebook and Instagram ads. "
     "Start with the prompt 'start' (or call list_commands). Start from the user's real data: "
     "call list_ad_accounts and account_overview BEFORE asking questions, and never open with a generic questionnaire. "
     "Each command tells you which "
@@ -1427,7 +1427,7 @@ _MCP_NAME_SCHEMA = {"type": "object", "properties": {"name": {"type": "string",
                     "required": ["name"], "additionalProperties": False}
 _MCP_TOOLS = [
     {"name": "list_commands", "title": "List commands",
-     "description": "List the Ofensiva TrÃ¡fego IA commands (start, setup, research, creative, campaign, publish, analyze, ...) with a one-line description each.",
+     "description": "List the Ofensiva Tráfego IA commands (start, setup, research, creative, campaign, publish, analyze, ...) with a one-line description each.",
      "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
     {"name": "get_command", "title": "Get a command",
      "description": "Return the full instructions of one command (for example 'start' or 'publish'). Follow them step by step.",
@@ -1474,7 +1474,7 @@ def _mcp_prompt(name, args):
         return None
     extra = str((args or {}).get("arguments") or "").strip()
     body = it["body"].replace("$ARGUMENTS", extra or "(none)")
-    text = (f"You are running the Ofensiva TrÃ¡fego IA command /{name}.\n"
+    text = (f"You are running the Ofensiva Tráfego IA command /{name}.\n"
             "Specialist skills named below are available through the get_specialist tool: "
             "call it with the skill name and follow the instructions it returns. "
             "Ads are created with this server's own Meta tools (list_ad_accounts, list_pages, list_pixels, create_campaign, create_adset, create_ad, list_objects, get_insights, set_status) and are always paused.\n\n"
@@ -1499,7 +1499,7 @@ def _mcp_rpc_one(msg, email=None):
         return _rpc_ok(mid, {
             "protocolVersion": asked if asked in _MCP_PROTOCOLS else _MCP_PROTOCOLS[0],
             "capabilities": {"tools": {"listChanged": False}, "prompts": {"listChanged": False}},
-            "serverInfo": {"name": "meta-ads-expert-pro", "title": "Ofensiva TrÃ¡fego IA", "version": "1.0.0"},
+            "serverInfo": {"name": "meta-ads-expert-pro", "title": "Ofensiva Tráfego IA", "version": "1.0.0"},
             "instructions": _MCP_INSTRUCTIONS})
     if method == "ping":
         return _rpc_ok(mid, {})

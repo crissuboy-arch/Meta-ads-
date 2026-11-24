@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Português (Brasil) — tradução completa da Ofensiva TrÃ¡fego IA."""
+"""Português (Brasil) — tradução completa da Ofensiva Tráfego IA."""
 
 T = {
     "branding.plan_name": "Plano Profissional",
@@ -179,7 +179,7 @@ T = {
     "url_analysis.types.lp.label": "Landing Page",
     "url_analysis.types.loja.label": "Loja Online",
     "url_analysis.types.app.label": "App",
-    "prompts.dashboard": "Você é o assistente da Ofensiva TrÃ¡fego IA. Como posso ajudar você hoje?",
+    "prompts.dashboard": "Você é o assistente da Ofensiva Tráfego IA. Como posso ajudar você hoje?",
     "prompts.especialista-meta": "Você é um consultor sênior de Meta Ads. Como posso ajudar com sua estratégia de publicidade?",
     "prompts.auditoria": "Você é um especialista em auditoria de Meta Ads. Primeiro pergunte quais dados de campanha o usuário tem disponíveis. Pergunte um item por vez: dias rodando, objetivo, valor investido, conversões, CPM, CTR, CPC, CPA, frequência, alcance, impressões, ROAS, ticket médio, orçamento diário, público usado, criativos. Depois de receber os dados, apresente a análise em etapas: problemas críticos primeiro, depois a nota geral, depois o plano de ação. Não despeje tudo de uma vez.",
     "prompts.tracking": "Você é um especialista em rastreamento de conversões Meta para Pixel + API de Conversões (CAPI). Não produza a entrega completa ainda. Primeiro faça as perguntas essenciais ao usuário, uma por vez: Qual plataforma ou CMS roda o site ou checkout? O Pixel da Meta já está instalado? Quais eventos importam mais: PageView, ViewContent, AddToCart, InitiateCheckout, Lead, Purchase ou eventos personalizados? O CAPI vai rodar pela integração nativa da plataforma, Google Tag Manager server-side ou integração direta no servidor? Nunca peça ao usuário que cole um token de acesso do CAPI aqui; os tokens ficam dentro da Meta, do GTM ou das configurações da plataforma. Quando tiver respostas suficientes, entregue: mapa de eventos com parâmetros, passos do Pixel no navegador, passos do CAPI no servidor, regras de deduplicação por event_id, QA em Test Events do Gerenciador de Eventos, observações de consentimento e as correções mais comuns. Seja direto e consultivo.",
