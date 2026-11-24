@@ -646,6 +646,10 @@
       <div class="sec-h"><span class="gd"></span><h3 id="provTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
       <div id="provBody"></div>
     </section>
+    <section class="sec" id="campwizSection" style="display:none">
+      <div class="sec-h"><span class="gd"></span><h3 id="campwizTitle"></h3><span class="ln"></span><button class="btn-s v2-back" type="button" data-v2back="1"></button></div>
+      <div id="campwizBody"></div>
+    </section>
 
     <section class="sec" id="importsSection" style="display:none">
       <div class="sec-h"><span class="gd"></span><h3 id="importsTitle">Import Your Product</h3><span class="ln"></span></div>
@@ -862,6 +866,7 @@ document.querySelector('.app').addEventListener('click',async e=>{
   if(btn.dataset.id==='biblioteca'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='biblioteca';v2ApplyTexts();v2Show('bibSection');bibBodyRender();return}
   if(btn.dataset.id==='criar'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='criar';v2ApplyTexts();v2Show('criarSection');criarBodyRender();return}
   if(btn.dataset.id==='provedores'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='provedores';v2ApplyTexts();v2Show('provSection');provBodyRender();return}
+  if(btn.dataset.id==='campwiz'){if(trkSavedDisplays)closeTrackingScreen();closeClaudeScreen();closeAdsScreen();lvCloseScreen();setActiveNav(btn);currentModule='campwiz';v2ApplyTexts();v2Show('campwizSection');campwizBodyRender();return}
   closeClaudeScreen();closeAdsScreen();lvCloseScreen();v2Hide();
   if(btn.dataset.id==='pixel'||btn.dataset.id==='tracking'||btn.dataset.id==='rastreamento'){setActiveNav(btn);openTrackingScreen();return}
   if(btn.classList.contains('side-item')&&btn.dataset.id){const p=P[btn.dataset.id];if(p){currentModule=btn.dataset.id;currentSystemPrompt=p;syncUTMPanel();await sendChat(btn.dataset.label||btn.dataset.id)}return}
@@ -934,6 +939,7 @@ function renderSidebar(cfg){
     ['claude-connect','\uD83D\uDD0C','claude'],
     ['ads-connect','\uD83D\uDD17','ads_connect'],
     ['criar-publico','\uD83D\uDC65','publicos'],
+    ['campwiz','\uD83D\uDE80','campwiz'],
     ['provedores','\u2699\uFE0F','provedores']
   ];
   for(const [id,ico,key] of items){
@@ -974,7 +980,7 @@ function v2Hide(){
 }
 function v2ApplyTexts(){
   const t=v2T();
-  const map={bibTitle:'biblioteca',criarTitle:'criar',provTitle:'provedores'};
+  const map={bibTitle:'biblioteca',criarTitle:'criar',provTitle:'provedores',campwizTitle:'campwiz'};
   for(const [id,key] of Object.entries(map)){const el=document.getElementById(id);if(el)el.textContent=t(key)||key}
   document.querySelectorAll('.v2-empty-t').forEach(el=>{el.textContent=t('empty_title')||''});
   document.querySelectorAll('.v2-empty-d').forEach(el=>{el.textContent=t('empty_desc')||''});
@@ -1273,6 +1279,145 @@ function provRender(){
       provBodyRender();
     }
   }));
+}
+
+const CW_I18N={
+  en:{hint:"Step-by-step campaign creation. Nothing is created without your click, and everything is always created PAUSED.",
+    readonly:"Read-only mode: campaign/ad set creation is turned off on the server (WRITE_ACTIONS_ENABLED). You can still fill the form, but nothing will be sent to Meta.",
+    step1:"1. Campaign",account:"Ad account",name:"Campaign name",objective:"Objective",budget:"Daily budget (optional)",
+    createCamp:"Create campaign (paused)",campOk:"Campaign created (paused). ID: ",
+    adsetTitle:"2. Ad set",adsetName:"Ad set name",optGoal:"Optimization",pixel:"Pixel (for Purchase)",
+    countries:"Countries (comma-separated codes, e.g. BR,US)",ageMin:"Min age",ageMax:"Max age",genders:"Genders",
+    g_all:"All",g_m:"Men",g_f:"Women",createAdset:"Create ad set (paused)",adsetOk:"Ad set created (paused). ID: ",
+    next:"Next step: open “Connect to Claude” or the Chat and ask it to create the ad (creative + copy) inside this ad set.",
+    err:"Something went wrong.",needAccount:"Connect an ad account first (see “Connect ad accounts”)."},
+  pt:{hint:"Criação de campanha passo a passo. Nada é criado sem seu clique, e tudo nasce sempre PAUSADO.",
+    readonly:"Modo somente leitura: a criação de campanha/conjunto está desligada no servidor (WRITE_ACTIONS_ENABLED). Você pode preencher o formulário, mas nada será enviado à Meta.",
+    step1:"1. Campanha",account:"Conta de anúncio",name:"Nome da campanha",objective:"Objetivo",budget:"Orçamento diário (opcional)",
+    createCamp:"Criar campanha (pausada)",campOk:"Campanha criada (pausada). ID: ",
+    adsetTitle:"2. Conjunto de anúncios",adsetName:"Nome do conjunto",optGoal:"Otimização",pixel:"Pixel (para Compra)",
+    countries:"Países (códigos separados por vírgula, ex.: BR,US)",ageMin:"Idade mínima",ageMax:"Idade máxima",genders:"Gêneros",
+    g_all:"Todos",g_m:"Homens",g_f:"Mulheres",createAdset:"Criar conjunto (pausado)",adsetOk:"Conjunto criado (pausado). ID: ",
+    next:"Próximo passo: abra “Conectar ao Claude” ou o Chat e peça para criar o anúncio (criativo + copy) dentro deste conjunto.",
+    err:"Algo deu errado.",needAccount:"Conecte uma conta de anúncio primeiro (veja “Conectar contas de anúncio”)."},
+  es:{hint:"Creación de campaña paso a paso. Nada se crea sin tu clic, y todo nace siempre PAUSADO.",
+    readonly:"Modo solo lectura: la creación de campaña/conjunto está desactivada en el servidor (WRITE_ACTIONS_ENABLED). Puedes completar el formulario, pero no se enviará nada a Meta.",
+    step1:"1. Campaña",account:"Cuenta publicitaria",name:"Nombre de la campaña",objective:"Objetivo",budget:"Presupuesto diario (opcional)",
+    createCamp:"Crear campaña (pausada)",campOk:"Campaña creada (pausada). ID: ",
+    adsetTitle:"2. Conjunto de anuncios",adsetName:"Nombre del conjunto",optGoal:"Optimización",pixel:"Píxel (para Compra)",
+    countries:"Países (códigos separados por coma, ej.: BR,US)",ageMin:"Edad mínima",ageMax:"Edad máxima",genders:"Géneros",
+    g_all:"Todos",g_m:"Hombres",g_f:"Mujeres",createAdset:"Crear conjunto (pausado)",adsetOk:"Conjunto creado (pausado). ID: ",
+    next:"Siguiente paso: abre “Conectar con Claude” o el Chat y pídele que cree el anuncio (creativo + copy) dentro de este conjunto.",
+    err:"Algo salió mal.",needAccount:"Conecta una cuenta publicitaria primero (ver “Conectar cuentas publicitarias”)."},
+  fr:{hint:"Création de campagne étape par étape. Rien n'est créé sans votre clic, et tout naît toujours EN PAUSE.",
+    readonly:"Mode lecture seule : la création de campagne/ensemble est désactivée sur le serveur (WRITE_ACTIONS_ENABLED). Vous pouvez remplir le formulaire, mais rien ne sera envoyé à Meta.",
+    step1:"1. Campagne",account:"Compte publicitaire",name:"Nom de la campagne",objective:"Objectif",budget:"Budget quotidien (optionnel)",
+    createCamp:"Créer la campagne (en pause)",campOk:"Campagne créée (en pause). ID : ",
+    adsetTitle:"2. Ensemble de publicités",adsetName:"Nom de l'ensemble",optGoal:"Optimisation",pixel:"Pixel (pour Achat)",
+    countries:"Pays (codes séparés par des virgules, ex. : BR,US)",ageMin:"Âge min",ageMax:"Âge max",genders:"Genres",
+    g_all:"Tous",g_m:"Hommes",g_f:"Femmes",createAdset:"Créer l'ensemble (en pause)",adsetOk:"Ensemble créé (en pause). ID : ",
+    next:"Étape suivante : ouvrez « Se connecter à Claude » ou le Chat et demandez-lui de créer la publicité (créatif + texte) dans cet ensemble.",
+    err:"Une erreur est survenue.",needAccount:"Connectez d'abord un compte publicitaire (voir « Connecter les comptes publicitaires »)."},
+  tr:{hint:"Adım adım kampanya oluşturma. Siz tıklamadan hiçbir şey oluşturulmaz ve her şey her zaman DURAKLATILMIŞ olarak doğar.",
+    readonly:"Salt okunur mod: kampanya/reklam seti oluşturma sunucuda kapalı (WRITE_ACTIONS_ENABLED). Formu doldurabilirsiniz ama Meta'ya hiçbir şey gönderilmeyecek.",
+    step1:"1. Kampanya",account:"Reklam hesabı",name:"Kampanya adı",objective:"Hedef",budget:"Günlük bütçe (opsiyonel)",
+    createCamp:"Kampanya oluştur (duraklatılmış)",campOk:"Kampanya oluşturuldu (duraklatılmış). ID: ",
+    adsetTitle:"2. Reklam seti",adsetName:"Reklam seti adı",optGoal:"Optimizasyon",pixel:"Piksel (Satın Alma için)",
+    countries:"Ülkeler (virgülle ayrılmış kodlar, örn. BR,US)",ageMin:"Min yaş",ageMax:"Maks yaş",genders:"Cinsiyetler",
+    g_all:"Hepsi",g_m:"Erkek",g_f:"Kadın",createAdset:"Reklam seti oluştur (duraklatılmış)",adsetOk:"Reklam seti oluşturuldu (duraklatılmış). ID: ",
+    next:"Sonraki adım: “Claude'a bağlan” veya Sohbet'i açın ve bu reklam seti içinde reklamı (kreatif + metin) oluşturmasını isteyin.",
+    err:"Bir şeyler ters gitti.",needAccount:"Önce bir reklam hesabı bağlayın (“Reklam hesaplarını bağla”)."},
+  de:{hint:"Schrittweise Kampagnenerstellung. Ohne Ihren Klick wird nichts erstellt, und alles startet immer PAUSIERT.",
+    readonly:"Nur-Lese-Modus: Die Erstellung von Kampagnen/Anzeigengruppen ist auf dem Server deaktiviert (WRITE_ACTIONS_ENABLED). Sie können das Formular ausfüllen, aber es wird nichts an Meta gesendet.",
+    step1:"1. Kampagne",account:"Werbekonto",name:"Kampagnenname",objective:"Ziel",budget:"Tagesbudget (optional)",
+    createCamp:"Kampagne erstellen (pausiert)",campOk:"Kampagne erstellt (pausiert). ID: ",
+    adsetTitle:"2. Anzeigengruppe",adsetName:"Name der Anzeigengruppe",optGoal:"Optimierung",pixel:"Pixel (für Kauf)",
+    countries:"Länder (kommagetrennte Codes, z. B. BR,US)",ageMin:"Mindestalter",ageMax:"Höchstalter",genders:"Geschlechter",
+    g_all:"Alle",g_m:"Männer",g_f:"Frauen",createAdset:"Anzeigengruppe erstellen (pausiert)",adsetOk:"Anzeigengruppe erstellt (pausiert). ID: ",
+    next:"Nächster Schritt: Öffnen Sie „Mit Claude verbinden“ oder den Chat und bitten Sie darum, die Anzeige (Creative + Text) in dieser Anzeigengruppe zu erstellen.",
+    err:"Etwas ist schiefgelaufen.",needAccount:"Verbinden Sie zuerst ein Werbekonto (siehe „Werbekonten verbinden“)."},
+};
+function cwT(){return CW_I18N[LANG]||CW_I18N.en}
+let cwMeta=null,cwCampaignId=null;
+async function campwizBodyRender(){
+  const t=cwT(),el=document.getElementById('campwizBody');if(!el)return;
+  el.innerHTML='<p class="utm-desc">'+adEsc(t.hint)+'</p>';
+  try{const r=await fetch('/api/ads/wizard/meta');cwMeta=r.ok?await r.json():{objectives:[],write_actions_enabled:false}}
+  catch(e){cwMeta=null}
+  const accounts=(adState&&adState.accounts||[]).filter(a=>a.selected);
+  if(!accounts.length){el.innerHTML+='<p class="utm-msg" style="color:var(--bad)">'+adEsc(t.needAccount)+'</p>';return}
+  if(cwMeta&&!cwMeta.write_actions_enabled)el.innerHTML+='<p class="utm-msg" style="color:var(--amber);margin-top:8px">'+adEsc(t.readonly)+'</p>';
+  const accOpts=accounts.map(a=>'<option value="'+adEsc(a.account_id)+'">'+adEsc(a.name||a.account_id)+'</option>').join('');
+  const objOpts=((cwMeta&&cwMeta.objectives)||[]).map(o=>'<option value="'+adEsc(o)+'">'+adEsc(o)+'</option>').join('');
+  el.innerHTML+='<div class="box" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:12px">'+adEsc(t.step1)+'</h2><div class="utm-grid">'
+    +'<div class="utm-field"><label>'+adEsc(t.account)+'</label><select id="cwAccount" class="url-input">'+accOpts+'</select></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.name)+'</label><input id="cwName" class="url-input"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.objective)+'</label><select id="cwObjective" class="url-input">'+objOpts+'</select></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.budget)+'</label><input id="cwBudget" class="url-input" inputmode="decimal"></div>'
+    +'</div><div class="utm-row" style="margin-top:10px"><button class="btn-p" id="cwCreateCamp" type="button"'+(cwMeta&&!cwMeta.write_actions_enabled?' disabled':'')+'>'+adEsc(t.createCamp)+'</button><span class="utm-msg" id="cwCampMsg"></span></div></div>'
+    +'<div id="cwAdsetBlock"></div>';
+  document.getElementById('cwCreateCamp').addEventListener('click', cwCreateCampaign);
+}
+async function cwCall(tool,args){
+  const r=await fetch('/api/ads/wizard/call',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tool,args})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.detail||cwT().err);
+  return d;
+}
+async function cwCreateCampaign(){
+  const t=cwT(),msg=document.getElementById('cwCampMsg');
+  const accId=document.getElementById('cwAccount').value,name=(document.getElementById('cwName').value||'').trim();
+  const objective=document.getElementById('cwObjective').value,budget=parseFloat((document.getElementById('cwBudget').value||'').replace(',','.'));
+  if(!name){msg.textContent=t.err;msg.style.color='var(--bad)';return}
+  msg.textContent='';
+  try{
+    const args={ad_account_id:accId,name,objective};if(budget>0)args.daily_budget=budget;
+    const d=await cwCall('create_campaign',args);
+    cwCampaignId=d.campaign_id;
+    msg.textContent=t.campOk+d.campaign_id;msg.style.color='var(--ok)';
+    cwRenderAdsetForm(accId);
+  }catch(e){msg.textContent=e.message;msg.style.color='var(--bad)'}
+}
+async function cwRenderAdsetForm(accId){
+  const t=cwT(),box=document.getElementById('cwAdsetBlock');if(!box)return;
+  let pixels=[];try{pixels=(await cwCall('list_pixels',{ad_account_id:accId})).pixels||[]}catch(e){}
+  const pixOpts='<option value="">—</option>'+pixels.map(p=>'<option value="'+adEsc(p.id)+'">'+adEsc(p.name||p.id)+'</option>').join('');
+  const goals=['OFFSITE_CONVERSIONS','LINK_CLICKS','IMPRESSIONS','REACH','THRUPLAY'];
+  box.innerHTML='<div class="box" style="margin-top:14px"><h2 style="font-size:17px;margin-bottom:12px">'+adEsc(t.adsetTitle)+'</h2><div class="utm-grid">'
+    +'<div class="utm-field"><label>'+adEsc(t.adsetName)+'</label><input id="cwAdsetName" class="url-input"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.optGoal)+'</label><select id="cwOptGoal" class="url-input">'+goals.map(g=>'<option value="'+g+'">'+g+'</option>').join('')+'</select></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.pixel)+'</label><select id="cwPixel" class="url-input">'+pixOpts+'</select></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.budget)+'</label><input id="cwAdsetBudget" class="url-input" inputmode="decimal"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.countries)+'</label><input id="cwCountries" class="url-input" value="BR"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.ageMin)+'</label><input id="cwAgeMin" class="url-input" inputmode="numeric" value="18"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.ageMax)+'</label><input id="cwAgeMax" class="url-input" inputmode="numeric" value="65"></div>'
+    +'<div class="utm-field"><label>'+adEsc(t.genders)+'</label><select id="cwGenders" class="url-input"><option value="">'+adEsc(t.g_all)+'</option><option value="1">'+adEsc(t.g_m)+'</option><option value="2">'+adEsc(t.g_f)+'</option></select></div>'
+    +'</div><div class="utm-row" style="margin-top:10px"><button class="btn-p" id="cwCreateAdset" type="button"'+(cwMeta&&!cwMeta.write_actions_enabled?' disabled':'')+'>'+adEsc(t.createAdset)+'</button><span class="utm-msg" id="cwAdsetMsg"></span></div>'
+    +'<p class="utm-hint" id="cwNextHint" style="display:none;margin-top:10px">'+adEsc(t.next)+'</p></div>';
+  document.getElementById('cwCreateAdset').addEventListener('click', cwCreateAdset);
+}
+async function cwCreateAdset(){
+  const t=cwT(),msg=document.getElementById('cwAdsetMsg');
+  const accId=document.getElementById('cwAccount').value;
+  const name=(document.getElementById('cwAdsetName').value||'').trim();
+  const optimization_goal=document.getElementById('cwOptGoal').value;
+  const pixel=document.getElementById('cwPixel').value;
+  const budget=parseFloat((document.getElementById('cwAdsetBudget').value||'').replace(',','.'));
+  const countries=(document.getElementById('cwCountries').value||'BR').split(',').map(c=>c.trim().toUpperCase()).filter(Boolean);
+  const ageMin=parseInt(document.getElementById('cwAgeMin').value,10)||18,ageMax=parseInt(document.getElementById('cwAgeMax').value,10)||65;
+  const genderVal=document.getElementById('cwGenders').value;
+  if(!name||!cwCampaignId){msg.textContent=t.err;msg.style.color='var(--bad)';return}
+  msg.textContent='';
+  try{
+    const targeting={geo_locations:{countries},age_min:ageMin,age_max:ageMax};
+    if(genderVal)targeting.genders=[parseInt(genderVal,10)];
+    const args={ad_account_id:accId,campaign_id:cwCampaignId,name,optimization_goal,targeting};
+    if(budget>0)args.daily_budget=budget;
+    if(pixel)args.promoted_object={pixel_id:pixel,custom_event_type:'PURCHASE'};
+    const d=await cwCall('create_adset',args);
+    msg.textContent=t.adsetOk+d.adset_id;msg.style.color='var(--ok)';
+    const hint=document.getElementById('cwNextHint');if(hint)hint.style.display='block';
+  }catch(e){msg.textContent=e.message;msg.style.color='var(--bad)'}
 }
 
 let V2H={};

@@ -1518,7 +1518,8 @@
     "empty_title": "Bu sürümde geliyor",
     "empty_desc": "Bu ekran yeniden tasarımın parçası ve yakında hazır olacak.",
     "back": "Geri",
-    "chat": "Sohbet"
+    "chat": "Sohbet",
+    "campwiz": "Kampanyayı Yayınla"
   },
   "v2home": {
     "reco_title": "Önerilen sonraki adım",

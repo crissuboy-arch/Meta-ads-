@@ -1518,7 +1518,8 @@
     "empty_title": "Coming in this version",
     "empty_desc": "This screen is part of the redesign and will be ready soon.",
     "back": "Back",
-    "chat": "Chat"
+    "chat": "Chat",
+    "campwiz": "Publish Campaign"
   },
   "v2home": {
     "reco_title": "Recommended next step",

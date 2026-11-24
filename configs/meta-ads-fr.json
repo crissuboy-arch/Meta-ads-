@@ -1518,7 +1518,8 @@
     "empty_title": "En cours dans cette version",
     "empty_desc": "Cet écran fait partie de la refonte et sera bientôt prêt.",
     "back": "Retour",
-    "chat": "Chat"
+    "chat": "Chat",
+    "campwiz": "Publier la campagne"
   },
   "v2home": {
     "reco_title": "Prochaine étape recommandée",

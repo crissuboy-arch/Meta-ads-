@@ -938,3 +938,46 @@ def register(app, d):
             print(f"[ads-mcp] {name} error: {scrub(str(exc))[:300]}", file=sys.stderr)
             return {"content": [{"type": "text", "text": "Erro inesperado ao falar com o Meta. Tente de novo."}], "isError": True}
     d["mcp"]["call"] = mcp_call
+
+    # ================================================================
+    # Assistente de campanha (Fase E): mesma tela web, mesmos handlers do
+    # MCP acima (sempre cria PAUSADO) - nao duplica logica nenhuma.
+    # ================================================================
+    _WRITE_TOOLS = {"create_campaign", "create_adset", "create_ad", "set_status"}
+
+    def write_actions_enabled():
+        return os.getenv("WRITE_ACTIONS_ENABLED", "").strip().lower() in ("1", "true", "yes", "on")
+
+    @app.get("/api/ads/wizard/meta")
+    def ads_wizard_meta():
+        """Dados estaticos para montar o wizard: objetivos validos e se a
+        criacao real esta ligada (ve "Fase F - WRITE_ACTIONS_ENABLED")."""
+        return {"objectives": OBJECTIVES, "write_actions_enabled": write_actions_enabled()}
+
+    @app.post("/api/ads/wizard/call")
+    async def ads_wizard_call(request: Request):
+        """Unico ponto de entrada do assistente de campanha pela web.
+        Ferramentas de leitura (list_*, get_insights, account_overview) sempre
+        funcionam. Ferramentas de escrita (create_campaign, create_adset,
+        create_ad, set_status) exigem WRITE_ACTIONS_ENABLED=true no ambiente;
+        sem isso, o wizard funciona só em modo leitura/preview, como pedido:
+        "inicialmente, todas as integracoes reais devem funcionar em modo de
+        leitura". Campanhas e conjuntos nascem SEMPRE pausados (ver t_create_*
+        acima); so set_status pode ativar, e exige user_confirmed=true."""
+        need_supabase()
+        email = request.state.user_email
+        body = await request.json()
+        name = str(body.get("tool") or "")
+        args = body.get("args") or {}
+        if name in _WRITE_TOOLS and not write_actions_enabled():
+            raise HTTPException(403, "write_actions_disabled")
+        out = mcp_call(email, name, args)
+        if out is None:
+            raise HTTPException(404, "unknown_tool")
+        text = (out.get("content") or [{}])[0].get("text", "")
+        if out.get("isError"):
+            raise HTTPException(400, text[:200])
+        try:
+            return json.loads(text)
+        except ValueError:
+            return {"result": text}
