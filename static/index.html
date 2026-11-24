@@ -558,6 +558,21 @@
         <div id="trkDaily"></div>
       </div>
       <div class="trk-block">
+        <div class="trk-block-title" id="trkDiagTitle"></div>
+        <div id="trkDiag"></div>
+      </div>
+      <div class="trk-block">
+        <div class="trk-block-title" id="trkCaixaTitle"></div>
+        <div class="utm-row"><select id="trkCaixaProd" class="app-select" style="width:auto"></select><select id="trkCaixaDays" class="app-select" style="width:auto"><option value="7">7</option><option value="30" selected>30</option><option value="90">90</option></select></div>
+        <div id="trkCaixaAcc"></div>
+        <div class="utm-grid">
+          <div class="utm-field"><label id="trkFeeLbl"></label><input id="trkFee" class="url-input" inputmode="decimal" autocomplete="off"></div>
+          <div class="utm-field"><label id="trkTaxLbl"></label><input id="trkTax" class="url-input" inputmode="decimal" autocomplete="off"></div>
+          <div class="utm-field"><label id="trkOtherLbl"></label><input id="trkOther" class="url-input" inputmode="decimal" autocomplete="off"></div>
+        </div>
+        <div id="trkCaixa"></div>
+      </div>
+      <div class="trk-block">
         <div class="trk-block-title" id="trkSalesTitle"></div>
         <div class="utm-row">
           <select id="trkSalesFilter" class="app-select" style="width:auto"></select>
@@ -893,6 +908,9 @@ document.getElementById('trkTest').addEventListener('click',trkTestConn);
 document.getElementById('trkSendTest').addEventListener('click',trkSendTest);
 document.getElementById('trkProdSel').addEventListener('change',function(e){trkSwitchProduct(e.target.value)});
 document.getElementById('trkProdNew').addEventListener('click',trkNewProduct);
+document.getElementById('trkCaixaProd').addEventListener('change',function(){trkRenderCaixaAcc();trkLoadCaixa()});
+document.getElementById('trkCaixaDays').addEventListener('change',trkLoadCaixa);
+for(const p of [['trkFee','fee'],['trkTax','tax'],['trkOther','other']]){document.getElementById(p[0]).addEventListener('input',function(e){const c=trkCaixaCfg();c[p[1]]=e.target.value;trkStoreSet('metaAdsCaixa',JSON.stringify(c));trkLoadCaixa()})}
 document.getElementById('trkProdRename').addEventListener('click',trkRenameProduct);
 document.getElementById('trkTokenToggle').addEventListener('click',()=>{const t=document.getElementById('trkToken');if(!t)return;t.type=t.type==='password'?'text':'password';const b=document.getElementById('trkTokenToggle');if(b)b.textContent=t.type==='password'?UI.trk_show:UI.trk_hide});
 document.getElementById('authPwToggle').addEventListener('click',()=>{const t=document.getElementById('authPassword');if(!t)return;const show=t.type==='password';t.type=show?'text':'password';const b=document.getElementById('authPwToggle');if(b){b.textContent=show?'🙈':'👁️';b.setAttribute('aria-label',show?'hide password':'show password');}});
@@ -1937,7 +1955,7 @@ function openTrackingScreen(){
   if(!trkSavedDisplays){trkSavedDisplays={};const ids=['heroSection','dashSection','toolsSection','utmSection','importsSection','nichesSection'];for(const id of ids){const el=document.getElementById(id);if(el)trkSavedDisplays[id]=el.style.display}}
   for(const id in trkSavedDisplays){const el=document.getElementById(id);if(el)el.style.display='none'}
   sec.style.display='block';currentModule='tracking';
-  applyTrackingTexts();trkRenderProdBar();trkLoadDraft();trkLoadConfig();trkLoadSales();trkLoadDaily();refreshTrackingDash();trk2Load();
+  applyTrackingTexts();trkRenderProdBar();trkLoadDraft();trkLoadConfig();trkLoadSales();trkLoadDaily();trkLoadDiag();trkCaixaRefresh();refreshTrackingDash();trk2Load();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function closeTrackingScreen(){
@@ -2091,7 +2109,7 @@ function trkClearFields(){
 function trkSwitchProduct(key){
   trkStoreSet('metaAdsTrackingActive',key);
   trkClearFields();trkRenderProdBar();trkRenderWebhook();trkRenderTokenHint();
-  trkLoadDraft();trkLoadConfig();trkLoadSales();
+  trkLoadDraft();trkLoadConfig();trkLoadSales();trkCaixaRefresh();
 }
 function trkNewProduct(){
   const name=(prompt(trkT('Nome do produto:','Product name:'))||'').trim().slice(0,60);
@@ -2104,14 +2122,14 @@ function trkRenameProduct(){
   const l=trkProducts();const k=trkKey();const p=l.find(function(x){return x.key===k});if(!p)return;
   const name=(prompt(trkT('Novo nome:','New name:'),p.name)||'').trim().slice(0,60);
   if(!name)return;p.name=name;
-  trkStoreSet('metaAdsTrackingProducts',JSON.stringify(l));trkRenderProdBar();trkLoadDaily();
+  trkStoreSet('metaAdsTrackingProducts',JSON.stringify(l));trkRenderProdBar();trkLoadDaily();trkCaixaRefresh();
 }
 function trkDayKey(ts){const d=new Date((ts||0)*1000);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 async function trkAllSales(){
   const out=[];
   await Promise.all(trkProducts().map(async function(p){
     try{const r=await fetch('/api/sales?key='+encodeURIComponent(p.key));if(!r.ok)return;const d=await r.json();
-      for(const s of (d.sales||[]))out.push(Object.assign({},s,{_prod:p.name}))}catch(e){}
+      for(const s of (d.sales||[]))out.push(Object.assign({},s,{_prod:p.name,_key:p.key}))}catch(e){}
   }));
   return out;
 }
@@ -2128,6 +2146,88 @@ async function trkLoadDaily(){
   const totTxt=Object.keys(tot).map(function(c){return trkFmtMoney(tot[c],c)}).join(' + ');
   box.innerHTML='<table class="trk-table"><thead><tr><th>'+trkEsc(trkT('Dia','Day'))+'</th><th>'+trkEsc(trkT('Produto','Product'))+'</th><th>'+trkEsc(trkT('Vendas','Sales'))+'</th><th>'+trkEsc(trkT('Total','Total'))+'</th></tr></thead><tbody>'+body+'</tbody></table><p class="utm-desc"><b>'+trkEsc(trkT('Total geral: ','Grand total: ')+totTxt)+'</b></p>';
 }
+function trkNum(v){const n=parseFloat(String(v||'').replace(',','.'));return isFinite(n)&&n>0?n:0}
+function trkCaixaCfg(){let c={};try{c=JSON.parse(trkStoreGet('metaAdsCaixa')||'{}')}catch(e){}return c||{}}
+function trkAccGet(key){try{const a=JSON.parse(trkStoreGet('metaAdsTrkAcc_'+key)||'[]');return Array.isArray(a)?a.filter(function(x){return /^\d+$/.test(x)}):[]}catch(e){return []}}
+async function trkLoadDiag(){
+  const box=document.getElementById('trkDiag');const tt=document.getElementById('trkDiagTitle');if(!box)return;
+  if(tt)tt.textContent=trkT('Diagnóstico do tracking (vendas enviadas para a Meta)','Tracking health (sales sent to Meta)');
+  const all=await trkAllSales();
+  const paid=all.filter(function(s){return s.status==='paid'});
+  if(!paid.length){box.innerHTML='<p class="utm-desc">'+trkEsc(trkT('Ainda sem vendas pagas para analisar.','No paid sales to analyze yet.'))+'</p>';return}
+  const sent=paid.filter(function(s){return s.capi_status==='sent'});
+  const err=all.filter(function(s){return String(s.capi_status||'').indexOf('error')===0});
+  const nocred=paid.filter(function(s){return s.capi_status==='no_credentials'});
+  const pct=Math.round(sent.length/paid.length*100);
+  const card=function(l,v,c){return '<div class="dash-card"><div class="d-top"><span class="d-lbl">'+trkEsc(l)+'</span></div><div class="d-val '+c+'">'+trkEsc(v)+'</div></div>'};
+  let h='<div class="dash-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">'+
+    card(trkT('Vendas pagas','Paid sales'),String(paid.length),'')+
+    card(trkT('Enviadas à Meta','Sent to Meta'),sent.length+' ('+pct+'%)',pct>=90?'green':pct>=60?'gold':'')+
+    card(trkT('Com erro','With error'),String(err.length),err.length?'':'green')+
+    card(trkT('Sem token configurado','No token set'),String(nocred.length),nocred.length?'':'green')+'</div>';
+  if(err.length){
+    const seen={};const lines=[];
+    for(const s of err){const d=String(s.capi_status).slice(0,140);if(!seen[d]){seen[d]=1;lines.push(d)}if(lines.length>=4)break}
+    h+='<p class="utm-desc">'+trkEsc(trkT('Últimos erros:','Latest errors:'))+'</p><ul class="utm-tips">'+lines.map(function(l){return '<li>'+trkEsc(l)+'</li>'}).join('')+'</ul>';
+  }
+  if(nocred.length)h+='<p class="utm-desc">'+trkEsc(trkT('Algumas vendas chegaram sem token: salve o token do produto e envie de novo.','Some sales arrived without a token: save the product token.'))+'</p>';
+  box.innerHTML=h;
+}
+function trkRenderCaixaControls(){
+  const set=function(id,v){const el=document.getElementById(id);if(el)el.textContent=v};
+  set('trkCaixaTitle',trkT('Caixa real (o que realmente sobrou)','Real cash (what is actually left)'));
+  set('trkFeeLbl',trkT('Taxa da plataforma (%)','Platform fee (%)'));
+  set('trkTaxLbl',trkT('Imposto (%)','Tax (%)'));
+  set('trkOtherLbl',trkT('Outras despesas no período (valor)','Other expenses in period (amount)'));
+  const c=trkCaixaCfg();
+  for(const p of [['trkFee','fee'],['trkTax','tax'],['trkOther','other']]){const el=document.getElementById(p[0]);if(el&&document.activeElement!==el)el.value=c[p[1]]||''}
+  const sel=document.getElementById('trkCaixaProd');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">'+trkEsc(trkT('Todos os produtos','All products'))+'</option>'+trkProducts().map(function(p){return '<option value="'+p.key+'">'+trkEsc(p.name)+'</option>'}).join('');
+  if(cur&&trkProducts().some(function(p){return p.key===cur}))sel.value=cur;
+  const d=document.getElementById('trkCaixaDays');if(d&&d.options[0])d.options[0].textContent=trkT('7 dias','7 days'),d.options[1].textContent=trkT('30 dias','30 days'),d.options[2].textContent=trkT('90 dias','90 days');
+}
+async function trkRenderCaixaAcc(){
+  const box=document.getElementById('trkCaixaAcc');const sel=document.getElementById('trkCaixaProd');if(!box||!sel)return;
+  const key=sel.value;if(!key){box.innerHTML='';return}
+  let accs=[];try{const r=await fetch('/api/ads/status');if(r.ok){const d=await r.json();accs=d.accounts||[]}}catch(e){}
+  if(!accs.length){box.innerHTML='<p class="utm-desc">'+trkEsc(trkT('Conecte suas contas de anúncio para calcular o gasto.','Connect your ad accounts to compute spend.'))+'</p>';return}
+  const chosen=trkAccGet(key);
+  box.innerHTML='<p class="utm-desc">'+trkEsc(trkT('Contas de anúncio deste produto (se não marcar nenhuma, usa todas):','Ad accounts for this product (none checked = all):'))+'</p>'+
+    accs.map(function(a){return '<label style="display:block;margin:4px 0"><input type="checkbox" class="trkAccCk" value="'+trkEsc(a.account_id)+'"'+(chosen.indexOf(String(a.account_id))>=0?' checked':'')+'> '+trkEsc(a.name||a.account_id)+'</label>'}).join('');
+  for(const ck of box.querySelectorAll('.trkAccCk')){ck.addEventListener('change',function(){
+    const v=Array.from(box.querySelectorAll('.trkAccCk')).filter(function(x){return x.checked}).map(function(x){return x.value});
+    trkStoreSet('metaAdsTrkAcc_'+key,JSON.stringify(v));trkLoadCaixa()})}
+}
+async function trkLoadCaixa(){
+  const box=document.getElementById('trkCaixa');if(!box)return;
+  const days=parseInt((document.getElementById('trkCaixaDays')||{}).value||'30',10)||30;
+  const pk=(document.getElementById('trkCaixaProd')||{}).value||'';
+  const since=Date.now()/1000-days*86400;
+  const sales=(await trkAllSales()).filter(function(s){return s.status==='paid'&&(s.ts||0)>=since&&(!pk||s._key===pk)});
+  const cnt={};for(const s of sales){const c=s.currency||'BRL';cnt[c]=(cnt[c]||0)+1}
+  const cur=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]})[0]||'BRL';
+  const fat=sales.filter(function(s){return (s.currency||'BRL')===cur}).reduce(function(a,s){return a+(s.amount||0)},0);
+  let ids=[];if(pk)ids=trkAccGet(pk);else for(const p of trkProducts())ids=ids.concat(trkAccGet(p.key));
+  ids=ids.filter(function(x,i){return ids.indexOf(x)===i});
+  let spend=0,spendNote='';
+  try{const r=await fetch('/api/ads/insights?days='+days+(ids.length?'&account_ids='+ids.join(','):''));
+    if(r.ok){const d=await r.json();spend=(d.totals&&d.totals.spend)||0}else spendNote=trkT('Não consegui ler o gasto dos anúncios (conecte as contas).','Could not read ad spend (connect accounts).')}
+  catch(e){spendNote=trkT('Não consegui ler o gasto dos anúncios.','Could not read ad spend.')}
+  const c=trkCaixaCfg();const fee=fat*trkNum(c.fee)/100,tax=fat*trkNum(c.tax)/100,other=trkNum(c.other);
+  const lucro=fat-fee-tax-spend-other;const margem=fat>0?lucro/fat*100:0;const roas=spend>0?fat/spend:0;
+  const money=function(v){return trkFmtMoney(v,cur)};
+  const card=function(l,v,k){return '<div class="dash-card"><div class="d-top"><span class="d-lbl">'+trkEsc(l)+'</span></div><div class="d-val '+(k||'')+'">'+trkEsc(v)+'</div></div>'};
+  box.innerHTML='<div class="dash-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">'+
+    card(trkT('Faturamento','Revenue'),money(fat),'gold')+
+    card(trkT('Anúncios','Ad spend'),money(spend))+
+    card(trkT('Taxas + imposto + outras','Fees + tax + other'),money(fee+tax+other))+
+    card(trkT('Lucro real','Real profit'),money(lucro),lucro>=0?'green':'')+
+    card(trkT('Margem','Margin'),margem.toFixed(1)+'%')+
+    card('ROAS',roas?roas.toFixed(2)+'x':'—')+'</div>'+
+    '<p class="utm-desc">'+trkEsc(trkT('Conta só vendas pagas em '+cur+'. O gasto vem das contas de anúncio conectadas, na moeda de cada conta; confira se é a mesma moeda das vendas.','Counts paid sales in '+cur+' only. Ad spend comes from connected ad accounts, in each account currency; make sure it matches the sales currency.'))+(spendNote?' '+trkEsc(spendNote):'')+'</p>';
+}
+async function trkCaixaRefresh(){trkRenderCaixaControls();await trkRenderCaixaAcc();await trkLoadCaixa()}
 function trkRenderSales(){
   const box=document.getElementById('trkSalesList');if(!box)return;
   if(!trkSalesCache.length){box.innerHTML='<p class="utm-desc">'+trkEsc(UI.trk_no_sales)+'</p>';return}

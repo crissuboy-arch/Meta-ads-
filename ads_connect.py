@@ -374,7 +374,13 @@ def register(app, d):
         aid = request.query_params.get("account_id")
         if aid and aid.isdigit():
             params["account_id"] = f"eq.{aid}"
+        ids = [x for x in (request.query_params.get("account_ids") or "").split(",") if x.isdigit()][:50]
+        if ids:
+            params["account_id"] = "in.(" + ",".join(ids) + ")"
         rows = sb_req("GET", "ads_insights", params=params) or []
+        daily = {}
+        for r in rows:
+            daily[r["day"]] = daily.get(r["day"], 0) + (r.get("spend") or 0)
         camp = {}
         for r in rows:
             c = camp.setdefault(r["campaign_id"], {"campaign_id": r["campaign_id"],
@@ -392,7 +398,8 @@ def register(app, d):
         tot = {k: sum(c[k] for c in camps) for k in ("spend", "impressions", "clicks", "purchases", "purchase_value")}
         tot["ctr"] = (tot["clicks"] / tot["impressions"] * 100) if tot["impressions"] else 0
         tot["roas"] = (tot["purchase_value"] / tot["spend"]) if tot["spend"] else 0
-        return {"days": days, "totals": tot, "campaigns": camps, "accounts": list(per.values())}
+        return {"days": days, "totals": tot, "campaigns": camps, "accounts": list(per.values()),
+                "daily": [{"day": d, "spend": v} for d, v in sorted(daily.items())]}
 
     @app.post("/api/ads/meta/token")
     async def ads_meta_token(request: Request):
