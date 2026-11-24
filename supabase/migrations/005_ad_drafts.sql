@@ -1,4 +1,4 @@
--- Rascunhos do Criar anúncio (Meta Ads Expert PRO, redesign-v2).
+-- Rascunhos do Criar anúncio (Ofensiva TrÃ¡fego IA, redesign-v2).
 -- Run once in Supabase: SQL Editor -> paste -> Run.
 -- RLS on, no public policies: only the service_role key (server-side) can
 -- read/write.

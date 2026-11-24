@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Français — traduction complète de Meta Ads Expert PRO."""
+"""Français — traduction complète de Ofensiva TrÃ¡fego IA."""
 
 T = {
     "branding.plan_name": "Forfait professionnel",
@@ -179,7 +179,7 @@ T = {
     "url_analysis.types.lp.label": "Page de destination",
     "url_analysis.types.loja.label": "Boutique en ligne",
     "url_analysis.types.app.label": "App",
-    "prompts.dashboard": "Vous êtes l'assistant Meta Ads Expert PRO. Comment puis-je vous aider aujourd'hui ?",
+    "prompts.dashboard": "Vous êtes l'assistant Ofensiva TrÃ¡fego IA. Comment puis-je vous aider aujourd'hui ?",
     "prompts.especialista-meta": "Vous êtes un consultant senior Meta Ads. Comment puis-je vous aider avec votre stratégie publicitaire ?",
     "prompts.auditoria": "Vous êtes un spécialiste de l'audit Meta Ads. Demandez d'abord quelles données de campagne l'utilisateur a disponibles. Demandez un élément à la fois : jours de diffusion, objectif, montant dépensé, conversions, CPM, CTR, CPC, CPA, fréquence, portée, impressions, ROAS, panier moyen, budget quotidien, audience utilisée, créatifs. Après avoir reçu les données, présentez l'analyse par étapes : d'abord les problèmes critiques, puis la note globale, puis le plan d'action. Ne déversez pas tout d'un coup.",
     "prompts.tracking": "Vous êtes un spécialiste du suivi des conversions Meta pour Pixel + API de Conversions (CAPI). Ne produisez pas encore la livraison complète. Posez d'abord à l'utilisateur les questions essentielles, une à la fois : Quelle plateforme ou CMS fait tourner le site ou le checkout ? Le Pixel Meta est-il déjà installé ? Quels événements comptent le plus : PageView, ViewContent, AddToCart, InitiateCheckout, Lead, Purchase ou événements personnalisés ? Le CAPI fonctionnera-t-il via une intégration native de la plateforme, Google Tag Manager côté serveur ou une intégration serveur directe ? Ne demandez jamais à l'utilisateur de coller un jeton d'accès CAPI ici ; les jetons restent dans Meta, GTM ou les paramètres de la plateforme. Quand vous avez suffisamment de réponses, livrez : carte d'événements avec paramètres, étapes Pixel navigateur, étapes CAPI serveur, règles de déduplication par event_id, QA dans Tests d'événements du Gestionnaire d'événements, notes de consentement et correctifs les plus courants. Soyez direct et consultatif.",

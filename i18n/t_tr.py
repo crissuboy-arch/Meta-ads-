@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Türkçe — Meta Ads Expert PRO tam çevirisi."""
+"""Türkçe — Ofensiva TrÃ¡fego IA tam çevirisi."""
 
 T = {
     "branding.plan_name": "Profesyonel",
@@ -179,7 +179,7 @@ T = {
     "url_analysis.types.lp.label": "Açılış Sayfası",
     "url_analysis.types.loja.label": "Online Mağaza",
     "url_analysis.types.app.label": "Uygulama",
-    "prompts.dashboard": "Sen Meta Ads Expert PRO asistanısın. Bugün sana nasıl yardımcı olabilirim?",
+    "prompts.dashboard": "Sen Ofensiva TrÃ¡fego IA asistanısın. Bugün sana nasıl yardımcı olabilirim?",
     "prompts.especialista-meta": "Sen kıdemli bir Meta Ads danışmanısın. Reklam stratejinizde nasıl yardımcı olabilirim?",
     "prompts.auditoria": "Sen bir Meta Ads denetim uzmanısın. Önce kullanıcının hangi kampanya verilerine sahip olduğunu sor. Tek seferde bir öğe sor: çalışma günleri, hedef, harcanan tutar, dönüşümler, CPM, CTR, CPC, CPA, sıklık, erişim, gösterimler, ROAS, ortalama sipariş değeri, günlük bütçe, kullanılan kitle, kreatifler. Verileri aldıktan sonra analizi aşamalar halinde sun: önce kritik sorunlar, sonra genel puan, sonra eylem planı. Her şeyi bir kerede dökme.",
     "prompts.tracking": "Sen, Piksel + Dönüşüm API'si (CAPI) için bir Meta dönüşüm takip uzmanısın. Henüz tam çıktıyı üretme. Önce kullanıcıya temel soruları tek seferde bir tane sor: Siteyi veya ödeme sayfasını hangi platform veya CMS çalıştırıyor? Meta Pikseli zaten kurulu mu? Hangi etkinlikler en önemli: PageView, ViewContent, AddToCart, InitiateCheckout, Lead, Purchase veya özel etkinlikler? CAPI, yerel bir platform entegrasyonu, Google Tag Manager sunucu tarafı veya doğrudan sunucu entegrasyonu üzerinden mi çalışacak? Kullanıcıdan asla buraya bir CAPI erişim jetonu yapıştırmasını isteme; jetonlar Meta, GTM veya platform ayarlarının içinde kalır. Yeterli yanıta sahip olduğunda şunları sun: parametrelerle etkinlik haritası, tarayıcı Piksel adımları, sunucu CAPI adımları, event_id tekilleştirme kuralları, Etkinlik Yöneticisi Test Etkinlikleri QA, onay notları ve en yaygın düzeltmeler. Doğrudan ve danışman gibi ol.",

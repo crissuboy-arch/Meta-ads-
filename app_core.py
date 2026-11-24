@@ -73,7 +73,7 @@ API_PROVIDERS = {
         "label": "OpenRouter",
         "base_url": "https://openrouter.ai/api/v1",
         "key_env": "OPENROUTER_API_KEY",
-        "headers": {"X-Title": "Meta Ads Expert PRO"},
+        "headers": {"X-Title": "Ofensiva TrÃ¡fego IA"},
     },
     "agnes": {
         "label": "Agnes AI (free)",
@@ -285,8 +285,8 @@ SKILL_ROUTES = CONFIG.get("skill_routes", {}) if isinstance(CONFIG, dict) else {
 PROMPTS = CONFIG.get("prompts", {}) if isinstance(CONFIG, dict) else {}
 
 _BASE_SYSTEM_EN = (
-    "You are Meta Ads Expert PRO, a senior paid-media consultant inside the "
-    "Meta Ads Expert PRO app. Always answer in clear US English. Be direct, practical, "
+    "You are Ofensiva TrÃ¡fego IA, a senior paid-media consultant inside the "
+    "Ofensiva TrÃ¡fego IA app. Always answer in clear US English. Be direct, practical, "
     "and specific. Never invent metrics, testimonials, results, prices, or "
     "guarantees. If essential data is missing, ask one focused question at a "
     "time before producing the full deliverable. When the user provides enough "
@@ -813,6 +813,38 @@ def _trk_utms(*dicts):
     return out
 
 
+def _is_cakto(body):
+    """Formato da Cakto: {"secret", "event": "purchase_approved", "data": {...}}."""
+    if not isinstance(body, dict) or not isinstance(body.get("event"), str):
+        return False
+    d = body.get("data")
+    if isinstance(d, list):
+        d = d[0] if d and isinstance(d[0], dict) else None
+    return isinstance(d, dict) and bool(d.get("refId") or d.get("paymentMethod"))
+
+
+def _cakto_verify(headers, raw, body):
+    """Confere se o webhook veio mesmo da Cakto. Só exige quando a variável
+    CAKTO_WEBHOOK_SECRET existe (o 'secret' do webhook na Cakto). Sem ela, aceita
+    como antes. Prefere a assinatura (X-Cakto-Signature); senão compara o secret do corpo."""
+    secret = os.getenv("CAKTO_WEBHOOK_SECRET", "")
+    sig = headers.get("x-cakto-signature") or ""
+    if not secret or not (sig or _is_cakto(body)):
+        return True, "ok"
+    if sig:
+        ts = headers.get("x-cakto-timestamp") or ""
+        try:
+            if abs(time.time() - int(ts)) > 300:
+                return False, "stale_timestamp"
+        except ValueError:
+            return False, "bad_timestamp"
+        want = "v1=" + hmac.new(secret.encode(), ts.encode() + b"." + raw,
+                                hashlib.sha256).hexdigest()
+        return (hmac.compare_digest(sig.encode(), want.encode()), "bad_signature")
+    got = str((body or {}).get("secret") or "")
+    return (hmac.compare_digest(got.encode(), secret.encode()), "bad_secret")
+
+
 def _trk_extract_sale(body):
     """Best-effort normalization of checkout webhooks (Hotmart, Kiwify,
     Stripe, generic). Returns only non-PII fields plus the raw PII values
@@ -850,6 +882,33 @@ def _trk_extract_sale(body):
                     status="paid" if obj.get("payment_status") == "paid" else "pending")
         base["_pii"].update(email=cust.get("email"), name=cust.get("name"), phone=cust.get("phone"))
         return base
+    if _is_cakto(body) and not purchase:  # Cakto (Pix, boleto, cartão)
+        cdata = body.get("data")
+        if isinstance(cdata, list):  # Webhook V2 pode mandar uma lista
+            cdata = cdata[0] if cdata and isinstance(cdata[0], dict) else {}
+        c_utms = _trk_utms(cdata)
+        ccust = cdata.get("customer") if isinstance(cdata.get("customer"), dict) else {}
+        event = _trk_clean(body.get("event"), 60).lower()
+        # Só estes eventos viram evento na Meta. Os outros (expirou, reembolso,
+        # recusado, abandono...) são recebidos com 200 e ignorados.
+        status = {"purchase_approved": "paid", "pix_gerado": "pending",
+                  "boleto_gerado": "pending", "picpay_gerado": "pending"}.get(event, "ignored")
+        amount = _trk_amount(cdata.get("amount"))
+        if amount is None and status == "ignored":
+            amount = 0.0
+        sale_id = _trk_clean(cdata.get("id"), 80)
+        return {"platform": "cakto", "amount": amount,
+                "currency": _trk_clean(cdata.get("currency"), 3).upper() or "BRL",
+                "method": _trk_method(cdata.get("paymentMethod") or event),
+                "status": status,
+                # Mesmo id para o mesmo evento: reenvio da Cakto não duplica a venda.
+                "event_id": (f"cakto-{sale_id}-{event}" if sale_id else None),
+                "utm_source": c_utms.get("utm_source", ""), "utm_medium": c_utms.get("utm_medium", ""),
+                "utm_campaign": c_utms.get("utm_campaign", ""), "utm_term": c_utms.get("utm_term", ""),
+                "utm_content": c_utms.get("utm_content", ""),
+                "_pii": {"fbp": c_utms.get("fbp"), "fbc": c_utms.get("fbc"),
+                         "email": ccust.get("email"), "name": ccust.get("name"),
+                         "phone": ccust.get("phone")}}
     if body.get("order_status") or body.get("payment_method"):  # Kiwify-like
         base.update(platform="kiwify",
                     amount=_trk_amount(body.get("order_amount") or body.get("amount") or body.get("value")),
@@ -1248,7 +1307,7 @@ _MCP_PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
 _MCP_KEY_RE = re.compile(r"^mk_[A-Za-z0-9_-]{20,80}$")
 _MCP_CACHE = None
 _MCP_INSTRUCTIONS = (
-    "Meta Ads Expert PRO: an AI media buyer for Facebook and Instagram ads. "
+    "Ofensiva TrÃ¡fego IA: an AI media buyer for Facebook and Instagram ads. "
     "Start with the prompt 'start' (or call list_commands). Start from the user's real data: "
     "call list_ad_accounts and account_overview BEFORE asking questions, and never open with a generic questionnaire. "
     "Each command tells you which "
@@ -1368,7 +1427,7 @@ _MCP_NAME_SCHEMA = {"type": "object", "properties": {"name": {"type": "string",
                     "required": ["name"], "additionalProperties": False}
 _MCP_TOOLS = [
     {"name": "list_commands", "title": "List commands",
-     "description": "List the Meta Ads Expert PRO commands (start, setup, research, creative, campaign, publish, analyze, ...) with a one-line description each.",
+     "description": "List the Ofensiva TrÃ¡fego IA commands (start, setup, research, creative, campaign, publish, analyze, ...) with a one-line description each.",
      "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
     {"name": "get_command", "title": "Get a command",
      "description": "Return the full instructions of one command (for example 'start' or 'publish'). Follow them step by step.",
@@ -1415,7 +1474,7 @@ def _mcp_prompt(name, args):
         return None
     extra = str((args or {}).get("arguments") or "").strip()
     body = it["body"].replace("$ARGUMENTS", extra or "(none)")
-    text = (f"You are running the Meta Ads Expert PRO command /{name}.\n"
+    text = (f"You are running the Ofensiva TrÃ¡fego IA command /{name}.\n"
             "Specialist skills named below are available through the get_specialist tool: "
             "call it with the skill name and follow the instructions it returns. "
             "Ads are created with this server's own Meta tools (list_ad_accounts, list_pages, list_pixels, create_campaign, create_adset, create_ad, list_objects, get_insights, set_status) and are always paused.\n\n"
@@ -1440,7 +1499,7 @@ def _mcp_rpc_one(msg, email=None):
         return _rpc_ok(mid, {
             "protocolVersion": asked if asked in _MCP_PROTOCOLS else _MCP_PROTOCOLS[0],
             "capabilities": {"tools": {"listChanged": False}, "prompts": {"listChanged": False}},
-            "serverInfo": {"name": "meta-ads-expert-pro", "title": "Meta Ads Expert PRO", "version": "1.0.0"},
+            "serverInfo": {"name": "meta-ads-expert-pro", "title": "Ofensiva TrÃ¡fego IA", "version": "1.0.0"},
             "instructions": _MCP_INSTRUCTIONS})
     if method == "ping":
         return _rpc_ok(mid, {})
@@ -2292,14 +2351,23 @@ def create_app():
             body = json.loads(raw.decode("utf-8", "replace"))
         except Exception:
             raise HTTPException(400, "invalid_json")
+        ok_origin, why = _cakto_verify(request.headers, raw, body)
+        if not ok_origin:
+            raise HTTPException(401, why)
+        if isinstance(body, dict) and body.get("event") == "checkout_abandonment":
+            return {"ok": True, "ignored": True}  # formato diferente, sem venda
         sale = _trk_extract_sale(body)
         if not sale or sale.get("amount") is None:
             raise HTTPException(400, "unrecognized_payload")
+        if sale.get("status") == "ignored":  # ex.: pix_expirado, reembolso
+            return {"ok": True, "ignored": True}
         rec = _store_get(key) or {"config": {}, "sales": []}
         cfg = rec.get("config") or {}
+        event_id = sale.get("event_id") or ("sale-" + uuid.uuid4().hex[:24])
+        if sale.get("event_id") and any(s.get("id") == event_id for s in (rec.get("sales") or [])):
+            return {"ok": True, "duplicate": True, "sale_id": event_id}
         event_name = _trk_sale_event(sale["status"], sale["method"])
         capi_status = "skipped"
-        event_id = "sale-" + uuid.uuid4().hex[:24]
         if event_name and cfg.get("pixel_id") and cfg.get("token"):
             ok, detail = _capi_send(
                 cfg, event_name, event_id, value=sale["amount"], currency=sale["currency"],
