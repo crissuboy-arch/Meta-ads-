@@ -1235,9 +1235,11 @@ function provRender(){
     html+='<div class="box" style="margin-bottom:16px"><h2 style="font-size:18px;margin-bottom:12px">'+adEsc(g[1])+'</h2>';
     [['primary',t.primary],['backup',t.backup]].forEach(rl=>{
       const role=rl[0],p=byKey[kind+'|'+role],slot=kind+'|'+role;
-      const st=p?('<span class="badge '+(p.last_test_ok?'ok':'')+'">'+adEsc(p.has_key?(p.last_test_ok?t.test_ok:t.no_key):t.no_key)+'</span>'):'';
+      const st=p?('<span class="badge '+(p.last_test_ok?'ok':'')+'">'+adEsc(p.has_key?(p.last_test_ok?t.test_ok:t.no_key):t.no_key)+'</span>'
+        +(p.calls_count?' <span class="utm-hint" style="margin:0">'+adEsc(p.calls_count)+'x</span>':'')):'';
+      const opts=kind==='text'?['gemini','openai','openrouter','anthropic']:['gemini','openai','openrouter'];
       html+='<div class="prov-row"><b>'+adEsc(rl[1])+'</b>'
-        +'<select data-p="prov" data-slot="'+slot+'" class="url-input">'+['gemini','openai','openrouter'].map(v=>'<option value="'+v+'"'+(p&&p.provider===v?' selected':'')+'>'+v+'</option>').join('')+'</select>'
+        +'<select data-p="prov" data-slot="'+slot+'" class="url-input">'+opts.map(v=>'<option value="'+v+'"'+(p&&p.provider===v?' selected':'')+'>'+v+'</option>').join('')+'</select>'
         +'<input data-p="model" data-slot="'+slot+'" class="url-input" placeholder="'+adEsc(t.model_l)+'" value="'+adEsc(p?p.model:'')+'">'
         +'<input data-p="key" data-slot="'+slot+'" type="password" class="url-input" autocomplete="new-password" placeholder="'+adEsc(p&&p.has_key?p.key_hint:t.key_ph)+'">'
         +'<span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-s" data-pv="save" data-slot="'+slot+'" type="button">'+adEsc(t.save)+'</button>'
