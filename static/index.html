@@ -2845,8 +2845,47 @@ function premiumCustomView(id){
     const all=document.getElementById('toolsSection');target.insertAdjacentHTML('beforeend','<p class="metric-note">Todas as ferramentas existentes continuam disponíveis na Visão geral.</p>');
   }
   if(id==='settings')document.getElementById('settingsBody').innerHTML=premiumHeading('PREFERÊNCIAS','O seu espaço de trabalho','Gerencie as conexões e as preferências que já estão disponíveis na aplicação.')+'<div class="connection-grid">'+[['ads-connect','Meta Ads','Contas de anúncios e permissões.','link'],['claude-connect','Claude e MCP','Conector pessoal e pacote de especialistas.','link'],['provedores','Fornecedores de IA','Modelos, chaves próprias e testes de conexão.','spark']].map(([k,n,d,ico])=>'<article class="connection-card"><span class="agent-symbol">'+premiumIcon(ico)+'</span><h3>'+n+'</h3><p>'+d+'</p><button class="btn-s" data-premium-go="'+k+'">Gerenciar conexão</button></article>').join('')+'</div><div class="box"><h3>Idioma da interface</h3><p class="metric-note">Use o seletor de idioma no topo para alternar entre os seis idiomas existentes.</p><h3>Conta e sessão</h3><p class="metric-note">A autenticação e o botão Sair mantêm o funcionamento atual.</p></div>';
-  if(id==='mode')document.getElementById('modeBody').innerHTML=premiumHeading('AMBIENTE DE EXECUÇÃO','O seu trabalho, no seu ambiente.','Consulte o estado de implementação dos modos de utilização.')+'<div class="metrics-state">Aplicação atual: interface web e instalador desktop que abre a aplicação hospedada. Não existe alternância funcional entre os modos abaixo.</div><div class="split-panels"><article class="box"><span class="agent-symbol">'+premiumIcon('box')+'</span><h3>Modo Local</h3><span class="badge">Implementação pendente</span><p>Backend e agentes no computador do utilizador, com as suas próprias contas.</p><p>O instalador atual ainda não inclui um runtime local de agentes.</p><button class="btn-s" disabled>Indisponível nesta versão</button></article><article class="box"><span class="agent-symbol">'+premiumIcon('server')+'</span><h3>Servidor 24h</h3><span class="badge">Implementação pendente</span><p>Operação contínua num servidor do utilizador, com instalação guiada.</p><p>O assistente de instalação e a integração com OpenBot ainda não estão implementados.</p><button class="btn-s" disabled>Indisponível nesta versão</button></article></div>';
+  if(id==='mode')modeBodyRender();
 }
+// Modo Local (Fase III/IV): so funciona dentro do instalador desktop, que
+// expoe window.__TAURI__ (withGlobalTauri=true em tauri.conf.json). Na
+// versao web (app.ofensivacriativa.com no navegador) nao existe ponte
+// nativa - a tela mostra isso honestamente, sem botao ilustrativo.
+function isTauriApp(){return typeof window!=='undefined'&&!!window.__TAURI__&&!!window.__TAURI__.core}
+let modeLocalPort=null;
+async function modeBodyRender(){
+  const el=document.getElementById('modeBody');if(!el)return;
+  const heading=premiumHeading('AMBIENTE DE EXECUÇÃO','O seu trabalho, no seu ambiente.','Consulte e controle o modo de execução dos agentes.');
+  if(!isTauriApp()){
+    el.innerHTML=heading+'<div class="metrics-state">Você está na versão web. O Modo Local (motor próprio e login nativo das CLIs de IA no seu computador) só está disponível no aplicativo desktop instalável.</div><div class="split-panels"><article class="box"><span class="agent-symbol">'+premiumIcon('box')+'</span><h3>Modo Local</h3><span class="badge">Disponível no instalador desktop</span><p>Backend e agentes no seu computador, com as suas próprias contas de IA.</p></article><article class="box"><span class="agent-symbol">'+premiumIcon('server')+'</span><h3>Servidor 24h</h3><span class="badge">Implementação pendente</span><p>Operação contínua num servidor próprio, com instalação guiada.</p><p>O assistente de instalação guiada ainda não está implementado nesta versão.</p><button class="btn-s" disabled>Indisponível nesta versão</button></article></div>';
+    return;
+  }
+  el.innerHTML=heading+'<div class="metrics-state" id="modeEngineStatus">Iniciando o motor local…</div><div class="box"><h3>Contas de IA (login nativo)</h3><p class="metric-note">Cada CLI abre o próprio fluxo oficial de autenticação num terminal — esta aplicação nunca vê nem guarda a sua senha ou token.</p><div id="modeProvidersList">Detectando CLIs instaladas…</div></div><div class="box"><h3>Servidor 24h</h3><span class="badge">Implementação pendente</span><p>Operação contínua num servidor próprio, com instalação guiada.</p><p>O assistente de instalação guiada ainda não está implementado nesta versão.</p><button class="btn-s" disabled>Indisponível nesta versão</button></div>';
+  const inv=window.__TAURI__.core.invoke;
+  try{
+    modeLocalPort=await inv('start_local_engine');
+    const s=document.getElementById('modeEngineStatus');if(s)s.textContent='Motor local ativo em 127.0.0.1:'+modeLocalPort+'.';
+  }catch(e){
+    const s=document.getElementById('modeEngineStatus');if(s)s.textContent='Não foi possível iniciar o motor local: '+(e&&e.message?e.message:e);
+  }
+  try{
+    const status=await inv('detect_providers');
+    const names={claude:'Claude Code',codex:'ChatGPT / Codex',opencode:'OpenCode'};
+    const list=document.getElementById('modeProvidersList');
+    if(list)list.innerHTML=Object.keys(names).map(k=>{
+      const found=!!status[k];
+      return '<div class="connection-card" style="margin-bottom:8px"><span class="badge'+(found?' ok':'')+'">'+(found?'Instalado':'Não encontrado')+'</span> <strong>'+adEsc(names[k])+'</strong> '+(found?'<button class="btn-s" data-open-terminal="'+k+'" type="button">Abrir terminal e autenticar</button>':'<span class="metric-note">Instale o CLI oficial primeiro.</span>')+'</div>';
+    }).join('');
+  }catch(e){
+    const list=document.getElementById('modeProvidersList');if(list)list.textContent='Não foi possível detectar as CLIs instaladas: '+(e&&e.message?e.message:e);
+  }
+}
+document.querySelector('.app').addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-open-terminal]');if(!btn||!isTauriApp())return;
+  const provider=btn.dataset.openTerminal;
+  try{await window.__TAURI__.core.invoke('open_provider_terminal',{provider});btn.textContent='Terminal aberto ✓';btn.disabled=true}
+  catch(err){btn.textContent='Falhou: '+(err&&err.message?err.message:err)}
+});
 document.querySelector('.app').addEventListener('click',e=>{
   const action=e.target.closest('[data-premium-go]');if(action){premiumGo(action.dataset.premiumGo);return}
 });

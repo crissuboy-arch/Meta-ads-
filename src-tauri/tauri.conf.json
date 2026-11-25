@@ -7,6 +7,7 @@
     "frontendDist": "https://app.ofensivacriativa.com"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "OFENSIVA CRIATIVA TRÁFEGO IA",
