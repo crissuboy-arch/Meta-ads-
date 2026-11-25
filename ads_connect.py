@@ -302,12 +302,23 @@ def register(app, d):
         except Exception:
             return 0.0
 
+    def derive_metrics(d):
+        """CPA, CPC, CPM e frequencia a partir de spend/impressions/reach/clicks/purchases."""
+        spend, impressions = d.get("spend") or 0, d.get("impressions") or 0
+        reach, clicks, purchases = d.get("reach") or 0, d.get("clicks") or 0, d.get("purchases") or 0
+        return {
+            "cpa": (spend / purchases) if purchases else None,
+            "cpc": (spend / clicks) if clicks else None,
+            "cpm": (spend / impressions * 1000) if impressions else None,
+            "frequency": (impressions / reach) if reach else None,
+        }
+
     def sync_account(email, token, aid, days):
         since = (date.today() - timedelta(days=days)).isoformat()
         until = date.today().isoformat()
         params = {
             "level": "campaign", "time_increment": 1, "limit": 500,
-            "fields": "campaign_id,campaign_name,spend,impressions,clicks,ctr,actions,action_values",
+            "fields": "campaign_id,campaign_name,spend,impressions,reach,clicks,ctr,actions,action_values",
             "time_range": json.dumps({"since": since, "until": until}),
         }
         data = gget(f"/act_{aid}/insights", token, params, timeout=40)
@@ -322,6 +333,7 @@ def register(app, d):
                             "day": r.get("date_start"), "campaign_id": r.get("campaign_id") or "",
                             "campaign_name": r.get("campaign_name") or "",
                             "spend": num(r.get("spend")), "impressions": int(num(r.get("impressions"))),
+                            "reach": int(num(r.get("reach"))),
                             "clicks": int(num(r.get("clicks"))), "ctr": num(r.get("ctr")),
                             "purchases": purchases, "purchase_value": value})
             nxt = (data.get("paging") or {}).get("next")
@@ -369,7 +381,7 @@ def register(app, d):
         days = max(0, min(int(request.query_params.get("days", "30")), 90))
         since = (date.today() - timedelta(days=days)).isoformat()
         params = {"email": f"eq.{email}", "platform": "eq.meta", "day": f"gte.{since}",
-                  "select": "account_id,day,campaign_id,campaign_name,spend,impressions,clicks,purchases,purchase_value",
+                  "select": "account_id,day,campaign_id,campaign_name,spend,impressions,reach,clicks,purchases,purchase_value",
                   "order": "day.desc", "limit": "5000"}
         aid = request.query_params.get("account_id")
         if aid and aid.isdigit():
@@ -379,8 +391,8 @@ def register(app, d):
         for r in rows:
             c = camp.setdefault(r["campaign_id"], {"campaign_id": r["campaign_id"],
                                 "campaign_name": r["campaign_name"], "spend": 0, "impressions": 0,
-                                "clicks": 0, "purchases": 0, "purchase_value": 0})
-            for k in ("spend", "impressions", "clicks", "purchases", "purchase_value"):
+                                "reach": 0, "clicks": 0, "purchases": 0, "purchase_value": 0})
+            for k in ("spend", "impressions", "reach", "clicks", "purchases", "purchase_value"):
                 c[k] += r.get(k) or 0
         per = {}
         for r in rows:
@@ -389,9 +401,12 @@ def register(app, d):
             a["clicks"] += r.get("clicks") or 0
             a["impressions"] += r.get("impressions") or 0
         camps = sorted(camp.values(), key=lambda c: -c["spend"])
-        tot = {k: sum(c[k] for c in camps) for k in ("spend", "impressions", "clicks", "purchases", "purchase_value")}
+        for c in camps:
+            c.update(derive_metrics(c))
+        tot = {k: sum(c[k] for c in camps) for k in ("spend", "impressions", "reach", "clicks", "purchases", "purchase_value")}
         tot["ctr"] = (tot["clicks"] / tot["impressions"] * 100) if tot["impressions"] else 0
         tot["roas"] = (tot["purchase_value"] / tot["spend"]) if tot["spend"] else 0
+        tot.update(derive_metrics(tot))
         return {"days": days, "totals": tot, "campaigns": camps, "accounts": list(per.values())}
 
     @app.post("/api/ads/meta/token")
