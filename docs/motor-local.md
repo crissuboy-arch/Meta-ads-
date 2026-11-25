@@ -75,12 +75,16 @@ de teste real diferentes, por isso a separação explícita abaixo.
   pendência antes de distribuir comercialmente.
 - **Compilação do lado Rust/Tauri** (`src-tauri/src/main.rs`): este
   ambiente de desenvolvimento não tem `cargo`/`rustc` instalado, então o
-  código Rust novo não foi compilado localmente. A validação real vem do
-  GitHub Actions (`redesign-build.yml`, que builda em `windows-latest` e
-  `macos-latest` com Rust/Tauri de verdade) — adicionei a branch
-  `finalizacao-funcional` ao gatilho desse workflow justamente para isso.
-  **Não anuncie o motor local como "funcionando no instalador" até essa
-  build do CI terminar com sucesso.**
+  código Rust novo não foi compilado localmente por mim. Validado via
+  GitHub Actions (`redesign-build.yml`, branch `finalizacao-funcional`
+  adicionada ao gatilho justamente para isso): **build concluída com
+  sucesso em `windows-latest` e `macos-latest`**, confirmando que o código
+  compila de verdade nos dois sistemas —
+  https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45657440398.
+  Isso confirma compilação, não comportamento em uso real: os comandos
+  (`detect_providers`, `open_provider_terminal`, `start_local_engine` etc.)
+  ainda precisam ser testados dentro do instalador instalado de verdade
+  pelo próprio usuário antes de considerar o Modo Local "funcionando".
 - **Empacotamento para distribuição comercial**: esta primeira versão do
   motor local depende do Python do sistema do próprio comprador
   (`local_engine/` não tem dependências externas de propósito, só
