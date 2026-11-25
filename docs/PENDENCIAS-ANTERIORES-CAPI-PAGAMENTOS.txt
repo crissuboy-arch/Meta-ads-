@@ -1,0 +1,44 @@
+PENDÊNCIAS ANTERIORES AO REDESIGN — 25/11/2026
+
+Este documento separa limitações da base f73713f de eventuais regressões
+do redesign aprovado. Não se deve alterar estes fluxos ou dados por assumir
+que a publicação do visual os criou.
+
+CAPI E PIXEL
+- Antes do merge, os resultados guardados dos testes CAPI incluíam um
+  aprovado, um reprovado e configurações sem resultado.
+- O painel original mostrava associação CAPI em uma conta selecionada e
+  ausência de associação nas demais. Ter um token guardado não comprova
+  validade nem associação ao Pixel correto.
+- Deduplicação navegador/servidor depende de event_id igual dos dois lados.
+  O servidor Cakto usa cakto-<id>-<evento>; o gerador do Pixel produz IDs
+  locais. O alinhamento ainda exige trabalho funcional específico.
+- Valor/moeda, hash de identificadores e tratamento de eventos foram
+  preservados e cobertos por testes com transporte simulado.
+- Não foram enviados eventos reais para a Meta durante a publicação.
+
+CAKTO E OUTROS PAGAMENTOS
+- O código existente processa notificações, não implementa um gateway de
+  cobrança. Não confundir o rótulo visual de plano com confirmação de compra.
+- Não havia evidência de compra Cakto processada no banco consultado antes
+  da publicação. A notificação existente era pendente e de outro checkout.
+- CAKTO_WEBHOOK_SECRET e HOTMART_HOTTOK não constavam no inventário das
+  variáveis do projeto consultado. Não foram criadas, copiadas ou alteradas.
+- Eventos Cakto de refund, chargeback, expiração, recusa e abandono seguem
+  o comportamento anterior de serem ignorados no rastreamento.
+- Webhooks de compra/reembolso Hotmart para concessão/revogação de acesso
+  permanecem com o controle original; foram testados em armazenamento isolado.
+- Não houve compra, cobrança, estorno ou mudança de acesso de cliente real.
+
+VALIDAÇÃO FUTURA, EM TAREFA SEPARADA
+Conferir cada associação conta/Pixel/token, preparar um teste controlado de
+CAPI e obter evidência de uma transação de teste autorizada no checkout.
+Rever autenticação dos webhooks e política de estornos antes de expandir
+licenciamento. Não modificar campanhas reais sem autorização específica.
+
+EVIDÊNCIA DE PRESERVAÇÃO NA PUBLICAÇÃO
+Foram comparados resumos de integridade calculados no banco antes e depois
+do merge/publicação: utilizadores, acessos, conexão e contas Meta, métricas,
+configurações de tracking, notificações e provedores permaneceram idênticos.
+Os segredos não foram extraídos; o inventário e datas das variáveis Vercel
+também permaneceram iguais. Detalhes privados ficam no relatório local da dona.

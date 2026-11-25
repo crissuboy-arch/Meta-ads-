@@ -1,0 +1,78 @@
+ENTREGA AO CLAUDE — PRODUTO EXISTENTE CONSOLIDADO
+Data: 25/11/2026
+
+ESTADO ATUAL
+- Redesign aprovado explicitamente pela proprietária.
+- PR #13 mesclado por merge commit 75185d20d381379a109a3111b66026566aa33f61.
+- Fonte de continuação: branch main de crissuboy-arch/Meta-ads-.
+- Mesmo produto, mesmo Supabase e mesmo projeto Vercel; nenhum cadastro novo.
+- Endereço de produção: https://meta-ads-unmc.vercel.app
+- Projeto Vercel: meta-ads-unmc, prj_N2CV7AqnvJ43aN1CPYDA8CABy1mM.
+- Supabase: Meta ads, wsdtiwdnbmijxiqlhasp.
+- Primeiro deployment consolidado: dpl_GiTPFswpzGVtx4Ztbv1PuaKNJvK5,
+  READY e com o domínio de produção atribuído.
+- Este commit de entrega acrescenta somente documentação; não muda a app.
+
+CHECKPOINT E ROLLBACK
+- Tag: checkpoint/pre-publicacao-redesign-20261125-f73713f, enviada ao GitHub.
+- Base anterior: f73713f3f89b17bf8b42a8fef741708a83302a23.
+- Deployment anterior: dpl_HrVbrbwoSzYKyRHwfLFaX8c36wni, mesmo projeto.
+- Em regressão crítica, restaurar o tráfego ao deployment anterior do mesmo
+  projeto; não apagar/restaurar tabelas para reverter uma alteração visual.
+- Há também um git bundle com o histórico anterior entregue localmente à dona.
+
+VALIDAÇÃO EXECUTADA
+- 69 testes aprovados: 51 anteriores + 18 checkout/Pixel/CAPI/webhooks.
+- Frontend: seis unidades JavaScript, IDs HTML e ícones válidos.
+- 29 verificações de navegador aprovadas em seis resoluções no CI.
+- Builds desktop Windows NSIS e macOS APP/DMG aprovados anteriormente; a
+  configuração desktop não mudou desde o build verificado.
+- Auditoria: f73713f e fases A–H preservados, 186 arquivos protegidos iguais,
+  nenhum arquivo/ID literal/função nomeada original removido.
+- Configurações funcionais preservadas; Tauri conserva URL e identificador.
+- Produção respondeu com o novo HTML e API de saúde saudável. A sessão
+  existente permaneceu autenticada e o dashboard mostrou dados Meta reais.
+- Resumos das oito tabelas monitorizadas idênticos antes/depois da publicação.
+- Metadados das variáveis de produção idênticos; segredos não exportados.
+- Não houve alteração de campanhas, criação de transações, migração ou
+  modificação administrativa de Supabase/Vercel.
+
+INTEGRAÇÕES PRESERVADAS
+Meta Ads/OAuth/tokens, leitura de métricas, criação sempre pausada com trava
+de escrita e teto de orçamento, Pixels, CAPI, webhooks Cakto/Hotmart/outros,
+financeiro, biblioteca/rascunhos, MCP/aprovações, provedores e Athena.
+O código e variáveis Athena existentes não foram alterados. O OpenBot externo
+e suas contas/instalações não foram modificados; o motor OpenBot dentro deste
+produto continua como integração futura, sem alegação de execução atual.
+
+PENDÊNCIAS ANTERIORES — DOCUMENTO SEPARADO
+Ler docs/PENDENCIAS-ANTERIORES-CAPI-PAGAMENTOS.txt. Configurações guardadas não
+equivalem a uma validação integral com compras/eventos reais. A publicação
+não pretende resolver silenciosamente essas pendências.
+
+PRÓXIMA ETAPA FUNCIONAL (MESMO PRODUTO)
+1. Empacotar backend e motor local dentro do instalador; a casca Tauri atual
+   continua abrindo a aplicação hospedada e não inclui agentes em execução.
+2. Integrar autenticação nativa ChatGPT/Codex e Claude usando mecanismos
+   oficiais aplicáveis e credenciais individuais no ambiente do comprador.
+3. Integrar funcionalmente os nove agentes, coordenação, estados reais,
+   aprovações e observabilidade. Hoje a área visual identifica pendência.
+4. Entregar instaladores Windows/macOS definitivos, testar instalação,
+   atualizações e desinstalação; preservar identificador do aplicativo.
+5. Manter Modo Local sem VPS obrigatória e Servidor 24h opcional, conforme
+   docs/modelo-produto-local-servidor.md. Não criar outro produto ou banco.
+6. Manter simplicidade de uso inspirada no Carrossell e organização de
+   conexões/agentes inspirada no OpenBot, com identidade própria.
+
+LEITURA TÉCNICA
+docs/handoff-tecnico.md: fases A–H.
+docs/modelo-produto-local-servidor.md: arquitetura acordada.
+docs/consolidacao-produto-unico.txt: auditoria prévia e causa dos dados ausentes
+na prévia local. Trata-se de histórico; a autorização posterior e o merge
+estão registrados neste documento.
+scripts/audit_consolidation.py: preservação de código/histórico.
+scripts/check_frontend.py e scripts/verify_redesign.py: validações reproduzíveis.
+test_checkout_preservation.py: cobertura adicional das integrações preservadas.
+
+Não repetir o cadastro da proprietária, trocar credenciais, recriar projeto
+Vercel/Supabase ou executar alterações em campanhas reais como parte do setup.
