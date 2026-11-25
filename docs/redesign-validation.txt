@@ -1,0 +1,78 @@
+OFENSIVA CRIATIVA TRÁFEGO IA — redesign premium
+
+Base: f73713f
+Checkpoint: checkpoint/pre-redesign-f73713f
+Branch: redesign/premium-ofensiva-criativa
+
+Estrutura analisada antes das alterações:
+- static/index.html: interface principal, navegação, autenticação, chat,
+  tracking, contas Meta, MCP, biblioteca, provedores, financeiro e campanhas.
+- configs/meta-ads*.json: identidade e traduções nos seis idiomas existentes.
+- app_core.py + server.py + api/index.py: aplicação FastAPI e entrada Vercel.
+- ads_connect.py: Meta OAuth/token, métricas ao vivo, sincronização e wizard.
+- finance.py: cálculo financeiro; athena_integration.py: diagnóstico Athena.
+- mcp/: servidor, propostas, aprovações e testes; skills/ e mcp_content/:
+  material de especialistas, preservado.
+- supabase/: schema e migrações, apenas inventariados, sem alterações.
+- src-tauri/: casca desktop, configuração de nome/ícone e builds.
+- .github/workflows/: testes, instaladores e Pages; produção limitada à main.
+- apps/, assets/ e shared/: diretórios reservados (.gitkeep).
+- 215 arquivos de código, configuração e documentação inventariados.
+
+Preservação:
+- Nenhum arquivo Python do backend, migração, segredo ou configuração da
+  Vercel alterado. Nenhuma chamada administrativa ao Supabase realizada.
+- Todos os IDs literais de static/index.html presentes no commit base
+  continuam presentes. data-id e handlers originais continuam em uso.
+- Correções localizadas no frontend: acesso incorreto a traduções (t chamado
+  como função), variável bad fora do escopo e retry de modelos que reiniciava
+  a interface durante a navegação.
+- Somente a branch de redesign e a tag de checkpoint são enviadas ao GitHub.
+  Sem merge, release ou publicação em produção.
+
+Alterações:
+- Paleta azul, navy e dourado, ícones SVG, login com logo oficial, favicon,
+  PWA e fonte oficial dos ícones Windows/macOS.
+- Menu reorganizado, sem remover campanhas, públicos, criativos, biblioteca,
+  importações, nichos, UTM e chat.
+- Visão geral com 12 indicadores, período, atualização e separação de moedas.
+- Receita/compras atribuídas pelo Meta; CPA calculado por compra atribuída.
+- Lucro líquido e ROI indisponíveis sem custos completos. Frequência exibida
+  apenas para uma conta; não se somam públicos sobrepostos entre contas.
+- Nove agentes apresentados como integração pendente.
+- Central de IA conserva API OpenAI, Gemini, OpenRouter e Anthropic, com as
+  ações existentes. ChatGPT/Codex, Claude Code e OpenCode têm estado explícito.
+- Modos Local/Servidor descrevem o estado real, sem seletor funcional fictício.
+- Chat recolhível; navegação móvel; preferência do chat persistida localmente.
+- Resumos reais de vendas continuam disponíveis; valores monetários separados
+  por moeda. Não são mostrados os antigos exemplos ilustrativos da home.
+
+Validação reproduzível:
+1. python -m pytest -q
+2. python scripts/check_frontend.py
+3. Iniciar o app em ambiente de teste sem credenciais externas e com
+   META_ADS_DATA_DIR isolado; executar python scripts/verify_redesign.py.
+   Dependências adicionais do passo 3: playwright e Chromium/Edge.
+   BROWSER_EXE permite indicar o executável; REDESIGN_OUTPUT_DIR define a saída.
+4. Build desktop: .github/workflows/redesign-build.yml. Executa cargo tauri
+   build em Windows/macOS e salva artifacts; não cria GitHub Release.
+
+Resultados locais: 51 testes existentes passaram; regressão de navegador com
+29 verificações passou, sem erros JavaScript. Foram verificadas resoluções
+1920x1080, 1366x768, 1024x768, 768x1024, 390x844 e 360x800.
+
+Limitações:
+- OAuth Meta, chamadas pagas a IA, webhooks e pixels em produção não foram
+  exercitados com credenciais reais. A suíte preservada usa mocks e a
+  validação de navegador usa conta descartável no backend local.
+- Fixtures de métricas são interceptadas apenas no navegador de teste;
+  não entram nos dados do app nem nas screenshots entregues.
+- Novos textos de agentes/modos e organização usam português; os seis
+  idiomas e traduções das funcionalidades anteriores continuam acessíveis.
+- O instalador continua abrindo a URL hospedada já existente, conforme a
+  configuração original. O redesign aparecerá nessa URL após aprovação e
+  publicação futura. Nenhum runtime local de agentes foi introduzido.
+- Build não equivale à validação interativa em máquinas Windows/macOS.
+- Os binários continuam sem assinatura de código, conforme a base existente.
+
+Screenshots: ver docs/redesign/screenshots e o relatório visual entregue.

@@ -414,6 +414,19 @@ body{background:var(--bg);font-size:14px}button,input,select,textarea{font:inher
 
 
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+#financeBody{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;max-width:980px}
+#financeBody .utm-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+#financeBody .utm-desc{line-height:1.8;font-size:13px;max-width:680px}
+#financeBody #finCalc{margin-top:16px;min-width:180px}
+#financeSection .sec-h,#campwizSection .sec-h,#criarSection .sec-h{margin:14px 0 28px}
+#financeSection .sec-h h3,#campwizSection .sec-h h3,#criarSection .sec-h h3{font-size:25px;letter-spacing:-.035em}
+#finResult{background:var(--side);border-radius:10px;padding:0 18px}
+.chat-head .ch-t{font-size:0}.chat-head .ch-t #assistantLabel{font-size:12px}
+.empty-state .glyph{font-size:0}.empty-state .glyph:after{content:'OC';font-size:18px;color:var(--gold);letter-spacing:.05em}
+@media(max-width:700px){#financeBody{padding:20px}#financeBody .utm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){#financeBody .utm-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -917,7 +930,7 @@ document.getElementById('trkProdSel').addEventListener('change',function(e){trkS
 document.getElementById('trkProdNew').addEventListener('click',trkNewProduct);
 document.getElementById('trkProdRename').addEventListener('click',trkRenameProduct);
 document.getElementById('trkTokenToggle').addEventListener('click',()=>{const t=document.getElementById('trkToken');if(!t)return;t.type=t.type==='password'?'text':'password';const b=document.getElementById('trkTokenToggle');if(b)b.textContent=t.type==='password'?UI.trk_show:UI.trk_hide});
-document.getElementById('authPwToggle').addEventListener('click',()=>{const t=document.getElementById('authPassword');if(!t)return;const show=t.type==='password';t.type=show?'text':'password';const b=document.getElementById('authPwToggle');if(b){b.textContent=show?'🙈':'👁️';b.setAttribute('aria-label',show?'hide password':'show password');}});
+document.getElementById('authPwToggle').addEventListener('click',()=>{const t=document.getElementById('authPassword');if(!t)return;const show=t.type==='password';t.type=show?'text':'password';const b=document.getElementById('authPwToggle');if(b){b.textContent=show?'◎':'◉';b.setAttribute('aria-label',show?'hide password':'show password');}});
 document.getElementById('trkCopyScript').addEventListener('click',()=>{trkCopyTo(document.getElementById('trkScript').textContent,document.getElementById('trkScriptMsg'))});
 document.getElementById('trkCopyWebhook').addEventListener('click',()=>{trkCopyTo(document.getElementById('trkWebhookUrl').textContent,document.getElementById('trkWebhookMsg'))});
 document.getElementById('trkSalesRefresh').addEventListener('click',trkLoadSales);
@@ -987,9 +1000,9 @@ function v2ApplyTexts(){
   const t=v2T();
   const map={bibTitle:'biblioteca',criarTitle:'criar',provTitle:'provedores',financeTitle:'finance',campwizTitle:'campwiz'};
   for(const [id,key] of Object.entries(map)){const el=document.getElementById(id);if(el)el.textContent=t[key]||key}
-  document.querySelectorAll('.v2-empty-t').forEach(el=>{el.textContent=t('empty_title')||''});
-  document.querySelectorAll('.v2-empty-d').forEach(el=>{el.textContent=t('empty_desc')||''});
-  document.querySelectorAll('.v2-back').forEach(el=>{el.textContent='\u2190 '+(t('back')||'')});
+  document.querySelectorAll('.v2-empty-t').forEach(el=>{el.textContent=t.empty_title||''});
+  document.querySelectorAll('.v2-empty-d').forEach(el=>{el.textContent=t.empty_desc||''});
+  document.querySelectorAll('.v2-back').forEach(el=>{el.textContent='\u2190 '+(t.back||'')});
 }
 function v2EmptyHTML(){const t=v2T();return '<div class="empty-box"><h3>'+(t.empty_title||'')+'</h3><p>'+(t.empty_desc||'')+'</p></div>'}
 const LIB={"en": {"f_all": "All", "f_topo": "Top", "f_meio": "Middle", "f_fundo": "Bottom", "search_ph": "Search structures…", "use_product": "Use with my product", "count_n": "{n} structures", "active": "Active", "inactive": "Inactive", "manage": "Manage", "add_new": "New structure", "name_l": "Name", "desc_l": "Description", "stage_l": "Funnel stage", "category_l": "Category", "trigger_l": "Trigger", "save": "Save", "cancel": "Cancel", "err_load": "Could not load the library", "close": "Close", "st_topo": "Top of funnel", "st_meio": "Middle of funnel", "st_fundo": "Bottom of funnel"}, "pt": {"f_all": "Todas", "f_topo": "Topo", "f_meio": "Meio", "f_fundo": "Fundo", "search_ph": "Buscar estruturas…", "use_product": "Usar com o meu produto", "count_n": "{n} estruturas", "active": "Ativa", "inactive": "Inativa", "manage": "Gerenciar", "add_new": "Nova estrutura", "name_l": "Nome", "desc_l": "Descrição", "stage_l": "Etapa do funil", "category_l": "Categoria", "trigger_l": "Gatilho", "save": "Salvar", "cancel": "Cancelar", "err_load": "Não foi possível carregar a biblioteca", "close": "Fechar", "st_topo": "Topo de funil", "st_meio": "Meio de funil", "st_fundo": "Fundo de funil"}, "es": {"f_all": "Todas", "f_topo": "Arriba", "f_meio": "Medio", "f_fundo": "Abajo", "search_ph": "Buscar estructuras…", "use_product": "Usar con mi producto", "count_n": "{n} estructuras", "active": "Activa", "inactive": "Inactiva", "manage": "Gestionar", "add_new": "Nueva estructura", "name_l": "Nombre", "desc_l": "Descripción", "stage_l": "Etapa del embudo", "category_l": "Categoría", "trigger_l": "Disparador", "save": "Guardar", "cancel": "Cancelar", "err_load": "No se pudo cargar la biblioteca", "close": "Cerrar", "st_topo": "Parte alta del embudo", "st_meio": "Parte media del embudo", "st_fundo": "Parte baja del embudo"}, "fr": {"f_all": "Toutes", "f_topo": "Haut", "f_meio": "Milieu", "f_fundo": "Bas", "search_ph": "Rechercher…", "use_product": "Utiliser avec mon produit", "count_n": "{n} structures", "active": "Active", "inactive": "Inactive", "manage": "Gérer", "add_new": "Nouvelle structure", "name_l": "Nom", "desc_l": "Description", "stage_l": "Étape de l'entonnoir", "category_l": "Catégorie", "trigger_l": "Déclencheur", "save": "Enregistrer", "cancel": "Annuler", "err_load": "Bibliothèque introuvable", "close": "Fermer", "st_topo": "Haut de l'entonnoir", "st_meio": "Milieu de l'entonnoir", "st_fundo": "Bas de l'entonnoir"}, "tr": {"f_all": "Tümü", "f_topo": "Üst", "f_meio": "Orta", "f_fundo": "Alt", "search_ph": "Yapı ara…", "use_product": "Ürünümle kullan", "count_n": "{n} yapı", "active": "Aktif", "inactive": "Pasif", "manage": "Yönet", "add_new": "Yeni yapı", "name_l": "Ad", "desc_l": "Açıklama", "stage_l": "Huni aşaması", "category_l": "Kategori", "trigger_l": "Tetikleyici", "save": "Kaydet", "cancel": "İptal", "err_load": "Kitaplık yüklenemedi", "close": "Kapat", "st_topo": "Huni üstü", "st_meio": "Huni ortası", "st_fundo": "Huni altı"}, "de": {"f_all": "Alle", "f_topo": "Top", "f_meio": "Mitte", "f_fundo": "Bottom", "search_ph": "Strukturen suchen…", "use_product": "Mit meinem Produkt nutzen", "count_n": "{n} Strukturen", "active": "Aktiv", "inactive": "Inaktiv", "manage": "Verwalten", "add_new": "Neue Struktur", "name_l": "Name", "desc_l": "Beschreibung", "stage_l": "Funnel-Stufe", "category_l": "Kategorie", "trigger_l": "Trigger", "save": "Speichern", "cancel": "Abbrechen", "err_load": "Bibliothek konnte nicht geladen werden", "close": "Schließen", "st_topo": "Oberer Funnel", "st_meio": "Mittlerer Funnel", "st_fundo": "Unterer Funnel"}};
@@ -1547,6 +1560,7 @@ function homeRender(){
       if(un)box.innerHTML=band((t.reco_payment||'').replace('{name}',un.name||un.account_id),t.reco_payment_d,true);
       else if(nospend)box.innerHTML=band((t.reco_nospend||'').replace('{name}',nospend.name||nospend.account_id),t.reco_nospend_d,true);
       else if(nocamp)box.innerHTML=band((t.reco_nocamp||'').replace('{name}',nocamp.name||nocamp.account_id),t.reco_nocamp_d,true);
+      else if(bad.length)box.innerHTML=band('Verifique as conexões das contas','Uma ou mais contas não responderam. Consulte o painel de anúncios antes de decidir.',true);
       else box.innerHTML=band(t.reco_ok,t.reco_ok_d,false);
       void bad;
     }
@@ -2886,7 +2900,7 @@ function premiumRenderOverview(){
 const premiumProvRender=provRender;
 provRender=function(){premiumProvRender();const el=document.getElementById('provBody');el.insertAdjacentHTML('afterbegin',premiumHeading('CONEXÕES E MODELOS','Central de inteligência artificial','Escolha o seu fornecedor. As conexões por chave de API mantêm os testes e configurações existentes.')+'<div class="connection-grid">'+[['ChatGPT / Codex','Login por assinatura e execução local ainda não integrados. OpenAI por API está disponível abaixo.','Integração pendente'],['Claude Code','Execução local por CLI ainda não integrada. O conector Claude/MCP e a API Anthropic continuam disponíveis.','Integração pendente'],['OpenCode','Runtime e autenticação ainda não implementados nesta aplicação.','Indisponível'],['Gemini','Configure a sua chave e teste a conexão nos formulários abaixo.','API disponível'],['APIs próprias','OpenAI, Anthropic, Gemini e OpenRouter: modelos de texto e imagem conforme o suporte existente.','Configuração por API']].map(([n,d,b])=>'<article class="connection-card"><span class="agent-symbol">'+premiumIcon('spark')+'</span><h3>'+n+'</h3><p>'+d+'</p><span class="badge">'+b+'</span></article>').join('')+'</div>')};
 const premiumApply=applyConfig;
-applyConfig=function(cfg){premiumApply(cfg);document.title='OFENSIVA CRIATIVA TRÁFEGO IA';document.getElementById('appTitle').textContent='OFENSIVA CRIATIVA TRÁFEGO IA';document.getElementById('authTagline').textContent='Marketing Digital sem Filtros.';document.getElementById('liveBadge').hidden=true;document.getElementById('planSub').textContent='Marketing Digital sem Filtros.';document.getElementById('authPwToggle').textContent='◉';document.getElementById('authPwToggle').style.color='var(--text-dim)';document.getElementById('authThemeToggle').textContent='◐';premiumRenderOverview()};
+applyConfig=function(cfg){premiumApply(cfg);UI.status_connected=LANG==='pt'?'Servidor disponível':(UI.status_connected||'Available');document.title='OFENSIVA CRIATIVA TRÁFEGO IA';document.getElementById('appTitle').textContent='OFENSIVA CRIATIVA TRÁFEGO IA';document.getElementById('authTagline').textContent='Marketing Digital sem Filtros.';document.getElementById('liveBadge').hidden=true;document.getElementById('planSub').textContent='Marketing Digital sem Filtros.';document.getElementById('authPwToggle').textContent='◉';document.getElementById('authPwToggle').style.color='var(--text-dim)';document.getElementById('authThemeToggle').textContent='◐';premiumRenderOverview()};
 
 
 async function premiumLoadModels(n){
