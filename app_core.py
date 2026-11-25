@@ -1949,6 +1949,22 @@ def create_app():
     def index():
         return FileResponse(static_dir / "index.html")
 
+    @app.get("/manifest.json")
+    def pwa_manifest():
+        return FileResponse(static_dir / "manifest.json", media_type="application/manifest+json")
+
+    @app.get("/sw.js")
+    def pwa_service_worker():
+        return FileResponse(static_dir / "sw.js", media_type="application/javascript")
+
+    @app.get("/icons/{fname}")
+    def pwa_icon(fname: str):
+        safe = "".join(c for c in fname if c.isalnum() or c in ("-", "_", "."))
+        p = static_dir / "icons" / safe
+        if not safe or p.suffix.lower() != ".png" or not p.is_file():
+            return JSONResponse({"error": "not_found"}, status_code=404)
+        return FileResponse(p, media_type="image/png")
+
     @app.get("/img/{fname}")
     def login_img(fname: str):
         safe = "".join(c for c in fname if c.isalnum() or c in ("-", "_", "."))

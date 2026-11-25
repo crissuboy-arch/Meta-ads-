@@ -7,3 +7,12 @@ node_modules/
 data/
 mcp/.env
 mcp/proposals.local.json
+
+# Tauri (Fase G): build gerado localmente/CI, e icones derivados do source
+src-tauri/target/
+src-tauri/icons/icon.png
+src-tauri/icons/icon.ico
+src-tauri/icons/icon.icns
+src-tauri/icons/*.png
+!src-tauri/icons/icon-source.png
+src-tauri/Cargo.lock
