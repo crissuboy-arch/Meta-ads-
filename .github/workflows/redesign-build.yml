@@ -2,7 +2,7 @@ name: Redesign desktop build (no release)
 
 on:
   push:
-    branches: [redesign/premium-ofensiva-criativa]
+    branches: [redesign/premium-ofensiva-criativa, finalizacao-funcional]
     paths:
       - 'src-tauri/**'
       - '.github/workflows/redesign-build.yml'

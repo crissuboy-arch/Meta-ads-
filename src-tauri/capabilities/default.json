@@ -1,0 +1,14 @@
+{
+  "identifier": "default",
+  "description": "Janela principal: a URL hospedada e remota (Tauri v2 exige a lista explicita de dominios remotos para que window.__TAURI__ funcione), e os comandos novos do Modo Local (deteccao de CLI, motor local).",
+  "windows": ["main"],
+  "remote": {
+    "urls": [
+      "https://app.ofensivacriativa.com/*",
+      "https://meta-ads-unmc.vercel.app/*"
+    ]
+  },
+  "permissions": [
+    "core:default"
+  ]
+}
