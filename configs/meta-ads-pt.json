@@ -1526,7 +1526,8 @@
     "empty_desc": "Esta tela faz parte do redesign e fica pronta em breve.",
     "back": "Voltar",
     "chat": "Chat",
-    "finance": "Financeiro"
+    "finance": "Financeiro",
+    "campwiz": "Publicar Campanha"
   },
   "v2home": {
     "reco_title": "Próximo passo recomendado",

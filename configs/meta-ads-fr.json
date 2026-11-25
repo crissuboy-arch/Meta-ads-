@@ -1526,7 +1526,8 @@
     "empty_desc": "Cet écran fait partie de la refonte et sera bientôt prêt.",
     "back": "Retour",
     "chat": "Chat",
-    "finance": "Finances"
+    "finance": "Finances",
+    "campwiz": "Publier la campagne"
   },
   "v2home": {
     "reco_title": "Prochaine étape recommandée",

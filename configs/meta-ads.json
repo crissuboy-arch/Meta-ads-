@@ -1526,7 +1526,8 @@
     "empty_desc": "This screen is part of the redesign and will be ready soon.",
     "back": "Back",
     "chat": "Chat",
-    "finance": "Finance"
+    "finance": "Finance",
+    "campwiz": "Publish Campaign"
   },
   "v2home": {
     "reco_title": "Recommended next step",

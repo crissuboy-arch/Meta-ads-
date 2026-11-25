@@ -1526,7 +1526,8 @@
     "empty_desc": "Esta pantalla es parte del rediseño y estará lista pronto.",
     "back": "Volver",
     "chat": "Chat",
-    "finance": "Finanzas"
+    "finance": "Finanzas",
+    "campwiz": "Publicar Campaña"
   },
   "v2home": {
     "reco_title": "Próximo paso recomendado",
