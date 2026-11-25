@@ -839,6 +839,18 @@ function addActionButtons(target){
 }
 
 async function streamChat(model,msgs,h,module){
+  if(isTauriApp()&&localStorage.getItem('ofensivaLocalProvider')){
+    const provider=localStorage.getItem('ofensivaLocalProvider');
+    let context={status:'Dados Meta não disponíveis nesta conversa'};
+    try{
+      const data=await fetch('/api/ads/live?preset='+encodeURIComponent(lvPreset||'today')+'&view=overview');
+      if(data.ok)context={source:'Meta Ads',preset:lvPreset||'today',data:await data.json(),read_only:true};
+      else context={status:'Integração Meta indisponível',http_status:data.status};
+    }catch(e){context={status:'Falha ao consultar Meta Ads'}}
+    const result=await window.__TAURI__.core.invoke('local_chat',{payload:{provider,module:module||'',messages:msgs,lang:LANG,context}});
+    if(!result||!result.ok)throw new Error(result&&result.error||'Falha no motor local');
+    h.onChunk&&h.onChunk(result.text);h.onDone&&h.onDone();return;
+  }
   const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,model,module:module||undefined,lang:LANG})});
   if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
   if((r.headers.get('content-type')||'').includes('application/json')){const d=await r.json();if(d.error) throw new Error(d.error);d.content&&h.onChunk&&h.onChunk(d.content);h.onDone&&h.onDone();return}
@@ -1423,7 +1435,9 @@ async function campwizBodyRender(){
   document.getElementById('cwCreateCamp').addEventListener('click', cwCreateCampaign);
 }
 async function cwCall(tool,args){
-  const r=await fetch('/api/ads/wizard/call',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tool,args})});
+  const writing=['create_campaign','create_adset','create_ad','set_status'].includes(tool);
+  if(writing&&!window.confirm('Autoriza esta ação real no Meta Ads?\n'+tool+'\n'+JSON.stringify(args,null,2)))throw new Error('Ação cancelada pelo utilizador');
+  const r=await fetch('/api/ads/wizard/call',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tool,args,human_confirmed:writing})});
   const d=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(d.detail||cwT().err);
   return d;
@@ -2186,7 +2200,7 @@ function trkRenderScript(){
   const extra=trkSelectedEvents().filter(function(e){return e!=='PageView'});
   const lines=extra.map(function(e){return "  fbq('track', '"+e+"', {}, {eventID: maepId('"+e.toLowerCase()+"')});"});
   let s='<!-- Meta Pixel - OFENSIVA CRIATIVA TRÁFEGO IA -->\n<script>\n'+
-    "  function maepId(p){if(p==='purchase'&&window.OFENSIVA_SALE_PLATFORM&&window.OFENSIVA_SALE_ID){return window.OFENSIVA_SALE_PLATFORM+'-'+window.OFENSIVA_SALE_ID+'-paid'}return (p||'ev')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,10)}\n"+
+    "  function maepId(p){if(p==='purchase'&&window.OFENSIVA_SALE_PLATFORM&&window.OFENSIVA_SALE_ID){return window.OFENSIVA_SALE_PLATFORM+'-'+window.OFENSIVA_SALE_ID+'-'+(window.OFENSIVA_SALE_PLATFORM==='cakto'?'purchase_approved':'paid')}return (p||'ev')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,10)}\n"+
     "  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');\n"+
     "  fbq('init', '"+px+"');\n"+
     "  fbq('track', 'PageView', {}, {eventID: maepId('pageview')});\n"+
@@ -2876,13 +2890,21 @@ async function modeBodyRender(){
     const list=document.getElementById('modeProvidersList');
     if(list)list.innerHTML=Object.keys(names).map(k=>{
       const found=!!status[k];
-      return '<div class="connection-card" style="margin-bottom:8px"><span class="badge'+(found?' ok':'')+'">'+(found?'Instalado':'Não encontrado')+'</span> <strong>'+adEsc(names[k])+'</strong> '+(found?'<button class="btn-s" data-open-terminal="'+k+'" type="button">Abrir terminal e autenticar</button>':'<span class="metric-note">Instale o CLI oficial primeiro.</span>')+'</div>';
+      return '<div class="connection-card" style="margin-bottom:8px"><span class="badge'+(found?' ok':'')+'">'+(found?'Instalado':'Não encontrado')+'</span> <strong>'+adEsc(names[k])+'</strong> '+(found?'<button class="btn-s" data-open-terminal="'+k+'" type="button">Abrir terminal e autenticar</button> <button class="btn-s" data-use-local="'+k+'" type="button">Usar no chat</button>':'<span class="metric-note">Instale o CLI oficial primeiro.</span>')+'</div>';
     }).join('');
+    if(list)list.insertAdjacentHTML('beforeend','<p class="metric-note" id="localChatChoice">Chat: '+adEsc(localStorage.getItem('ofensivaLocalProvider')||'provedor hospedado')+'. Instalação detectada não confirma autenticação.</p><button class="btn-s" data-use-hosted type="button">Usar provedor hospedado</button>');
   }catch(e){
     const list=document.getElementById('modeProvidersList');if(list)list.textContent='Não foi possível detectar as CLIs instaladas: '+(e&&e.message?e.message:e);
   }
 }
 document.querySelector('.app').addEventListener('click',async e=>{
+  const chosen=e.target.closest('[data-use-local],[data-use-hosted]');
+  if(chosen&&isTauriApp()){
+    if(chosen.hasAttribute('data-use-hosted'))localStorage.removeItem('ofensivaLocalProvider');
+    else localStorage.setItem('ofensivaLocalProvider',chosen.dataset.useLocal);
+    const label=document.getElementById('localChatChoice');if(label)label.textContent='Chat: '+(localStorage.getItem('ofensivaLocalProvider')||'provedor hospedado')+'.';
+    return;
+  }
   const btn=e.target.closest('[data-open-terminal]');if(!btn||!isTauriApp())return;
   const provider=btn.dataset.openTerminal;
   try{await window.__TAURI__.core.invoke('open_provider_terminal',{provider});btn.textContent='Terminal aberto ✓';btn.disabled=true}

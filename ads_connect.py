@@ -950,12 +950,14 @@ def register(app, d):
     def write_actions_enabled():
         return os.getenv("WRITE_ACTIONS_ENABLED", "").strip().lower() in ("1", "true", "yes", "on")
 
-    def mcp_call(email, name, args):
+    def mcp_call(email, name, args, *, human_request=False):
         h = handlers.get(name)
         if not h:
             return None
         if name in _WRITE_TOOLS and not write_actions_enabled():
             return {"content": [{"type": "text", "text": "write_actions_disabled"}], "isError": True}
+        if name in _WRITE_TOOLS and not human_request:
+            return {"content": [{"type": "text", "text": "human_approval_required_use_web_wizard"}], "isError": True}
         try:
             need_supabase()
             token, _row = get_token(email)
@@ -1000,7 +1002,9 @@ def register(app, d):
         args = body.get("args") or {}
         if name in _WRITE_TOOLS and not write_actions_enabled():
             raise HTTPException(403, "write_actions_disabled")
-        out = mcp_call(email, name, args)
+        if name in _WRITE_TOOLS and body.get("human_confirmed") is not True:
+            raise HTTPException(403, "human_approval_required")
+        out = mcp_call(email, name, args, human_request=True)
         if out is None:
             raise HTTPException(404, "unknown_tool")
         text = (out.get("content") or [{}])[0].get("text", "")

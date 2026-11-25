@@ -16,3 +16,6 @@ src-tauri/icons/icon.icns
 src-tauri/icons/*.png
 !src-tauri/icons/icon-source.png
 src-tauri/Cargo.lock
+src-tauri/runtime/
+build/
+*.spec

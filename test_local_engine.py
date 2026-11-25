@@ -47,7 +47,8 @@ def test_run_cli_inference_runs_real_pipeline_with_mocked_subprocess():
     out = engine.run_cli_inference("claude", "sistema", "ola",
                                     runner=fake_run, which=lambda n: "/usr/bin/claude")
     assert out == {"ok": True, "text": "OK"}
-    assert calls[0][0] == "claude"
+    assert calls[0][0] == "/usr/bin/claude"
+    assert "--strict-mcp-config" in calls[0]
     assert "sistema" in calls[0][2] and "ola" in calls[0][2]
 
 
@@ -107,7 +108,7 @@ def test_mcp_relay_allows_read_tools_and_calls_the_existing_remote_connector():
     assert captured["body"]["params"]["name"] == "list_ad_accounts"
 
 
-def test_mcp_relay_allows_write_tools_when_explicitly_approved():
+def test_mcp_relay_does_not_accept_model_claimed_human_approval():
     class FakeResp:
         def __enter__(self):
             return self
@@ -120,7 +121,8 @@ def test_mcp_relay_allows_write_tools_when_explicitly_approved():
 
     out = engine.mcp_relay("https://app.example.com", "key123", "create_campaign", {},
                             approved=True, opener=lambda req, timeout=20: FakeResp())
-    assert out["ok"] is True
+    assert out["ok"] is False
+    assert "somente leitura" in out["error"]
 
 
 def test_byok_call_uses_the_same_anthropic_shape_already_used_in_app_core():

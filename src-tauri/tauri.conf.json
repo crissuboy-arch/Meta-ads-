@@ -35,9 +35,6 @@
       "icons/icon.ico",
       "icons/icon.icns"
     ],
-    "resources": [
-      "../local_engine/*.py",
-      "../local_engine/requirements.txt"
-    ]
+    "resources": {"runtime/": "runtime/"}
   }
 }

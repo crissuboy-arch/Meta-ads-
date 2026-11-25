@@ -83,7 +83,7 @@ def test_budget_cap_blocks_expensive_campaign(monkeypatch):
     mcp_call = _register(_fake_sb_req)
     out = mcp_call("test@example.com", "create_campaign",
                     {"ad_account_id": "999", "name": "Oferta cara",
-                     "objective": "OUTCOME_SALES", "daily_budget": 200})
+                     "objective": "OUTCOME_SALES", "daily_budget": 200}, human_request=True)
     assert out["isError"] is True
     assert "MAX_DAILY_BUDGET_CENTS" in out["content"][0]["text"]
 
