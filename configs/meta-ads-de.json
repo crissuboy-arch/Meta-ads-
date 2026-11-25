@@ -1,12 +1,12 @@
 {
   "app_id": "meta-ads",
   "branding": {
-    "app_name": "Ofensiva Tráfego IA",
+    "app_name": "OFENSIVA CRIATIVA TRÁFEGO IA",
     "short_name": "Expert PRO",
-    "logo_text": "Ofensiva Tráfego IA",
-    "tagline": "Ofensiva Tráfego IA",
-    "company": "Ofensiva Tráfego IA",
-    "copyright": "Ofensiva Tráfego IA",
+    "logo_text": "OFENSIVA CRIATIVA TRÁFEGO IA",
+    "tagline": "Marketing Digital sem Filtros.",
+    "company": "OFENSIVA CRIATIVA TRÁFEGO IA",
+    "copyright": "OFENSIVA CRIATIVA TRÁFEGO IA",
     "support_email": "support@metaadsexpert.pro",
     "site": "https://metaadsexpert.pro",
     "plan_name": "Professionell",
@@ -15,14 +15,14 @@
     "assistant_name": "Meta Ads AI"
   },
   "colors": {
-    "primary": "#FF8A1F",
-    "secondary": "#E56F0A",
-    "accent": "#FFB547",
-    "gold": "#FFC857",
-    "bg_deep": "#0E0C0A",
-    "bg": "#0E0C0A",
-    "bg_mid": "#120F0B",
-    "bg_light": "#17130F"
+    "primary": "#1044AC",
+    "secondary": "#0C3588",
+    "accent": "#93B4FF",
+    "gold": "#D6B46A",
+    "bg_deep": "#0B1120",
+    "bg": "#0B1120",
+    "bg_mid": "#0E1727",
+    "bg_light": "#172235"
   },
   "models": {
     "default": "meta/llama-3.1-70b-instruct",
