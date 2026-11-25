@@ -76,3 +76,17 @@ Limitações:
 - Os binários continuam sem assinatura de código, conforme a base existente.
 
 Screenshots: ver docs/redesign/screenshots e o relatório visual entregue.
+
+Evidências finais no GitHub Actions (25/11/2026):
+- Testes existentes aprovados no código e4f0791:
+  https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45613734841
+- 29 verificações de interface e validação do frontend aprovadas no CI:
+  https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45613734878
+- Builds Windows (NSIS) e macOS (APP/DMG) aprovados, sem release:
+  https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45612431151
+  O build usa 6009398; src-tauri e o workflow desktop permanecem idênticos
+  na revisão final da interface.
+- Artefatos redesign-desktop-Windows e redesign-desktop-macOS disponíveis
+  nessa execução até 09/12/2026, sujeitos à retenção do GitHub Actions.
+- Revisão visual: https://github.com/crissuboy-arch/Meta-ads-/pull/13 (draft).
+- Main remota confirmada em f73713f, sem merge ou release de produção.
