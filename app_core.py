@@ -1090,6 +1090,7 @@ _PROV_DEFAULT_MODELS = {
     ("gemini", "text"): "gemini-2.0-flash",
     ("openai", "text"): "gpt-4o-mini",
     ("openrouter", "text"): "google/gemini-2.0-flash-001",
+    ("anthropic", "text"): "claude-sonnet-4-5",
     ("gemini", "image"): "gemini-2.0-flash-preview-image-generation",
     ("openai", "image"): "dall-e-3",
     ("openrouter", "image"): "",
@@ -1127,6 +1128,18 @@ def _prov_text(provider, key, model, prompt):
         cands = d.get("candidates") or []
         parts = ((cands[0].get("content") or {}).get("parts") or []) if cands else []
         txt = "".join(p.get("text", "") for p in parts).strip()
+        if not txt:
+            raise RuntimeError("empty_response")
+        return txt
+    if provider == "anthropic":
+        d = _prov_post(
+            "https://api.anthropic.com/v1/messages",
+            {"x-api-key": key, "anthropic-version": "2023-06-01",
+             "Content-Type": "application/json"},
+            {"model": model, "max_tokens": 1500,
+             "messages": [{"role": "user", "content": prompt}]}, 60)
+        parts = d.get("content") or []
+        txt = "".join(p.get("text", "") for p in parts if p.get("type") == "text").strip()
         if not txt:
             raise RuntimeError("empty_response")
         return txt
@@ -2711,7 +2724,7 @@ def create_app():
         return {"ok": True}
 
     # ============ Provedores de IA (redesign-v2) ============
-    _PROV_VALID = {"gemini", "openai", "openrouter"}
+    _PROV_VALID = {"gemini", "openai", "openrouter", "anthropic"}
 
     def _prov_mask(row):
         return {"id": row.get("id"), "provider": row.get("provider"),
@@ -2721,7 +2734,9 @@ def create_app():
                 "has_key": bool(row.get("key_enc")),
                 "active": bool(row.get("active")),
                 "last_test_ok": row.get("last_test_ok"),
-                "last_test_at": row.get("last_test_at")}
+                "last_test_at": row.get("last_test_at"),
+                "calls_count": row.get("calls_count") or 0,
+                "last_used_at": row.get("last_used_at")}
 
     def _prov_rows(email):
         try:
@@ -2851,8 +2866,20 @@ def create_app():
         for r in rows:
             cred = _prov_decrypt_row(r)
             if cred:
-                chain.append((r.get("provider"), cred))
+                chain.append((r.get("provider"), cred, r.get("id")))
         return chain
+
+    def _prov_mark_used(row_id):
+        try:
+            _sb_req("PATCH", "ai_providers", params={"id": f"eq.{row_id}"},
+                    payload={"last_used_at": "now()"})
+            rows = _sb_req("GET", "ai_providers",
+                           params={"id": f"eq.{row_id}", "select": "calls_count"}) or []
+            count = (rows[0].get("calls_count") or 0) + 1 if rows else 1
+            _sb_req("PATCH", "ai_providers", params={"id": f"eq.{row_id}"},
+                    payload={"calls_count": count})
+        except Exception:
+            pass
 
     @app.post("/api/providers/generate")
     async def providers_generate(request: Request):
@@ -2870,12 +2897,14 @@ def create_app():
         if not chain:
             raise HTTPException(400, "no_provider")
         last_err = "no_provider"
-        for provider, cred in chain:
+        for provider, cred, row_id in chain:
             try:
                 if kind == "text":
                     txt = _prov_text(provider, cred["key"], cred["model"], prompt)
+                    _prov_mark_used(row_id)
                     return {"ok": True, "provider": provider, "text": txt}
                 img = _prov_image(provider, cred["key"], cred["model"], prompt)
+                _prov_mark_used(row_id)
                 return {"ok": True, "provider": provider, **img}
             except Exception as exc:
                 last_err = str(exc)[:160]
