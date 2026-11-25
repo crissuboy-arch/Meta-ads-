@@ -1,0 +1,128 @@
+CONSOLIDAÇÃO DO PRODUTO EXISTENTE — AUDITORIA DE 25/11/2026
+
+ALVO ÚNICO DA ATUALIZAÇÃO
+Repositório: crissuboy-arch/Meta-ads-
+Produção: https://meta-ads-unmc.vercel.app
+Projeto Vercel: meta-ads-unmc (prj_N2CV7AqnvJ43aN1CPYDA8CABy1mM)
+Supabase existente: Meta ads (wsdtiwdnbmijxiqlhasp), ACTIVE_HEALTHY.
+PR: https://github.com/crissuboy-arch/Meta-ads-/pull/13, mantido em rascunho.
+Main e deployment de produção continuam em f73713f.
+Nenhum projeto, banco, migração, credencial ou configuração foi criado/alterado.
+
+1. TRABALHO DO CLAUDE PRESERVADO
+f73713f é ancestral da branch redesign/premium-ofensiva-criativa.
+As fases A–H estão no histórico da branch:
+A Central de IA: 73b0252
+B Métricas Meta: d9ced12
+C Gestor/Mentor: 1b59f35
+D Financeiro: fe1a584
+E Assistente de campanha: c41e590
+F Segurança: 7b32303
+G/H PWA, instalador e CI: 1ef07cc; consolidação em 933b7f9.
+
+Auditoria automatizada: python scripts/audit_consolidation.py
+- 186 arquivos protegidos conferidos; nenhum foi modificado.
+- Inclui backend Python, carregador de configuração, integrações, MCP,
+  comandos/especialistas, Supabase, vercel.json e testes preexistentes.
+- Nenhum arquivo da base removido.
+- Nenhum ID literal nem função nomeada anterior da interface removido.
+- Configurações meta-ads nos seis idiomas: conteúdo funcional idêntico,
+  exceto identidade visual/cores.
+- Configuração Tauri: apenas nome/título mudaram; identificador, URLs,
+  alvos de instalador e demais configurações permanecem iguais.
+- Merge simulado por git merge-tree, sem conflitos ou alteração da main.
+
+2. POR QUE A PRÉVIA NÃO MOSTROU OS DADOS EXISTENTES
+A prévia local foi iniciada com META_ADS_DATA_DIR apontando para
+work/preview-data, fora do repositório, e sem as variáveis reais da Vercel.
+O backend original usa armazenamento local como fallback quando Supabase
+não está configurado. Além disso, o cookie de sessão da produção pertence
+ao domínio meta-ads-unmc.vercel.app, não a 127.0.0.1.
+
+As variáveis SUPABASE_URL, SUPABASE_SERVICE_KEY, META_APP_ID, META_APP_SECRET,
+APP_ADMIN_EMAILS e OPENROUTER_API_KEY foram encontradas no inventário do
+projeto existente com alvo production; não foram lidas em texto claro nem
+copiadas. Não há equivalentes de conexão Supabase/Meta definidos para preview.
+Variáveis do tipo sensitive omitem o valor na API: a ausência do campo value
+na resposta NÃO significa que o segredo esteja vazio.
+
+Portanto, tratava-se de uma execução isolada para avaliação visual, não de
+outro produto. A orientação anterior de criar conta local não é requisito
+da atualização. Não há necessidade de recadastrar contas em produção.
+O cadastro local de avaliação não será migrado para o produto.
+
+Na publicação aprovada no MESMO projeto/domínio, o backend original usará
+as mesmas variáveis de produção e as mesmas tabelas. Não se deve trocar
+segredos de sessão nem migrar/resetar cadastros. O login e o cookie mantêm
+os contratos originais; eventual sessão expirada requer apenas login normal.
+
+3. VALIDAÇÃO REAL, SOMENTE LEITURA
+O banco e a sessão de produção existentes foram examinados em modo de
+leitura. As contagens e os estados individuais foram entregues no relatório
+local da proprietária; não são reproduzidos no repositório.
+
+Foi confirmada a persistência dos utilizadores, conexão e contas Meta,
+métricas, configurações de Pixel/CAPI, armazenamento de notificações e schema
+das fases A–H. O painel original respondeu ao Meta ao vivo na sessão já
+autenticada, e o acesso ao conector Claude aparece ativo. Nenhuma nova conta
+foi criada nessa sessão e nenhum conector foi regenerado.
+
+Há pendências preexistentes de CAPI/qualidade e não há comprovação suficiente
+para afirmar que Cakto/pagamentos tenham sido validados com uma transação
+real. Os handlers e URLs estão preservados e cobertos por testes isolados.
+Não foi efetuada compra nem envio de evento à Meta durante esta auditoria.
+
+O rótulo Plano Profissional vem do branding; a implementação de acesso
+APP_ADMIN_EMAILS/app_buyers permanece intacta e o acesso da sessão existente
+foi conferido. Não se introduziu gateway ou sistema de licenciamento.
+
+Consulte o relatório local CONSOLIDACAO-PRODUTO-EXISTENTE.txt para os
+resultados detalhados. Credenciais, URLs privadas de webhook e dados de
+clientes não foram exportados para este repositório.
+
+4. GITHUB: INDICAÇÃO 3/4
+Commit investigado: ed11c1f4c6dd0b0b14bf4bfd6a29ffb0f8899476.
+As quatro check runs atuais estão concluídas com success:
+- pytest (push): https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45628237189
+- pytest (PR): https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45628247116
+- browser (PR): https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45628247113
+- Vercel Preview Comments: success.
+Os dois status Vercel preexistentes também terminaram com success.
+Histórico dos 12 workflows consultados na branch: todos success, sem failure.
+O job browser foi o último a terminar, às 13:54:44 UTC; pytest terminou
+às 13:54:14. O histórico é compatível com uma indicação temporária de
+verificação pendente; não há evidência de uma verificação reprovada nesse
+commit. Não é possível atribuir uma falha que não aparece no histórico.
+Build aprovado não valida credenciais de runtime das prévias.
+
+5. TESTES
+Suíte executada novamente: 69 passed (51 anteriores + 18 checkout/tracking).
+Frontend: seis unidades JavaScript válidas, IDs HTML únicos e ícones válidos.
+Navegador: 29 verificações aprovadas no CI, em seis resoluções.
+Builds desktop Windows NSIS e macOS APP/DMG aprovados:
+https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45612431151
+Os arquivos desktop não mudaram desde o commit compilado.
+
+6. MERGE SEGURO — PREPARADO, NÃO EXECUTADO
+Antes da autorização: manter PR em rascunho e main em f73713f.
+Checkpoint existente: checkpoint/pre-redesign-f73713f.
+Após autorização explícita de publicação:
+1. Atualizar referências e repetir ancestry/audit e checks da revisão exata.
+2. Confirmar que main não avançou; caso avance, reaplicar a comparação e testes.
+3. Mesclar o PR aprovado na main, sem reset/force push e sem tocar no banco.
+4. Aguardar deploy automático no projeto EXISTENTE meta-ads-unmc.
+5. Validar o domínio meta-ads-unmc.vercel.app na mesma sessão: login, Meta,
+   métricas, tracking, acesso profissional e webhooks, sem novo cadastro.
+6. Se houver regressão, restaurar o deployment anterior do mesmo projeto;
+   não reverter nem apagar dados do Supabase.
+
+ATENÇÃO AO EFEITO DO MERGE
+O repositório já estava ligado a dois projetos Vercel (meta-ads e
+meta-ads-unmc) antes do redesign. Não criei nenhum deles. Um push na main
+dispara os fluxos automáticos preexistentes de ambos. Não se deve mesclar
+agora para depois pedir autorização: o merge já pode iniciar a publicação.
+Esta auditoria não desconectou, recriou ou reconfigurou nenhum projeto.
+
+O motor local empacotado, autenticação nativa ChatGPT/Codex/Claude e nove
+agentes funcionais continuam sendo evolução futura DESTE MESMO produto,
+conforme o modelo de instalador definido; não estão implementados neste merge.

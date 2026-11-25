@@ -1,0 +1,41 @@
+name: Redesign desktop build (no release)
+
+on:
+  push:
+    branches: [redesign/premium-ofensiva-criativa]
+    paths:
+      - 'src-tauri/**'
+      - '.github/workflows/redesign-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version '^2.0.0' --locked
+      - name: Generate official icons
+        run: cargo tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+      - name: Build Windows installer
+        if: runner.os == 'Windows'
+        run: cargo tauri build --bundles nsis
+      - name: Build macOS application and installer
+        if: runner.os == 'macOS'
+        run: cargo tauri build --bundles app,dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redesign-desktop-${{ runner.os }}
+          path: src-tauri/target/release/bundle/
+          retention-days: 14

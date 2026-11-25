@@ -1,0 +1,55 @@
+REVISÃO LOCAL ANTES DA APROVAÇÃO VISUAL — 25/11/2026
+
+Aplicação completa: http://127.0.0.1:8812/
+Servidor vinculado apenas ao computador local (127.0.0.1).
+Dados de avaliação separados da produção em work/preview-data, fora do repo.
+Crie uma conta pelo formulário existente para navegar pela aplicação.
+Não há credenciais de produção neste checkout. Uma chave sentinela sem valor
+real permite inicializar o backend existente; ela não autentica nenhum provedor
+de IA. Não é necessário conectar contas reais para avaliar o visual.
+
+O backend Python atual pode ser executado localmente para revisar a aplicação.
+Isso não implementa o futuro motor local de agentes no instalador.
+
+PRESERVAÇÃO CONFERIDA
+- Suíte executada: 69 testes aprovados (51 anteriores + 18 verificações
+  adicionais de checkout/rastreamento); frontend também validado.
+- app_core.py, ads_connect.py, finance.py, athena_integration.py, server.py,
+  api/, config.py, mcp/, supabase/ e vercel.json continuam iguais a f73713f.
+- Todos os IDs literais originais da interface foram mantidos.
+- Cakto: notificações de compra aprovada por Pix/cartão/boleto, checkout
+  pendente, valor/moeda/UTMs, deduplicação e validação de secret/assinatura.
+- Pixel: configuração, eventos e token restrito ao servidor.
+- CAPI: transporte, Purchase/InitiateCheckout/AddPaymentInfo, valor/moeda,
+  event_id e hash dos dados de cliente, verificados com transporte simulado.
+- Hotmart: concessão e revogação do acesso por eventos de pagamento.
+- Meta Ads: métricas, wizard, permissões, tokens e limites cobertos pela suíte
+  anterior, preservada e executada novamente.
+
+LIMITES REAIS
+- Não foi efetuada compra real, cobrança, envio de evento Meta ou conexão OAuth
+  com contas de produção. Testes adicionais usam dados temporários e mocks.
+- O aplicativo processa notificações de pagamento; este redesign não cria um
+  gateway de cobrança ou um novo sistema de licenciamento.
+- Na implementação Cakto existente, refund/chargeback/expiração/recusa/abandono
+  são ignorados para o rastreamento. Não se introduziu estorno automático.
+- A deduplicação Pixel+CAPI exige o mesmo event_id no site e no servidor,
+  conforme a limitação já documentada em docs/PIX-CAKTO.md.
+- Serviços externos não conseguem entregar webhooks em 127.0.0.1 diretamente.
+  Validação externa integral exige endpoint acessível, configurações e
+  credenciais válidas. Nada disso foi alterado nesta revisão visual.
+- Agentes e runtimes ainda não implementados mantêm os avisos de pendência.
+
+PRÓXIMA ETAPA, SOMENTE APÓS APROVAÇÃO VISUAL
+1. Consolidar o redesign aprovado, preservando as integrações existentes.
+2. Implementar o motor local dentro do aplicativo instalável Windows/macOS.
+3. Integrar autenticação nativa ChatGPT/Codex e Claude pelos mecanismos
+   oficiais aplicáveis, com credenciais no ambiente individual do comprador.
+4. Integrar funcionalmente os nove agentes e a coordenação entre eles.
+5. Manter os dois modos definidos: Local sem exigir VPS; Servidor 24h opcional
+   em infraestrutura do comprador, com instalação guiada futura.
+6. Preservar a simplicidade de uso inspirada no Carrossell e a organização de
+   conexões/agentes inspirada no OpenBot, com identidade própria e observância
+   das condições de integração/licença na etapa de implementação.
+
+Não houve merge, release, publicação em produção ou mudança de credenciais.

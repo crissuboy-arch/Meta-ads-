@@ -1,0 +1,58 @@
+name: Redesign interface validation
+
+on:
+  push:
+    branches: [redesign/premium-ofensiva-criativa]
+    paths:
+      - 'static/**'
+      - 'configs/**'
+      - 'scripts/**'
+      - '.github/workflows/redesign-ui.yml'
+  pull_request:
+    paths:
+      - 'static/**'
+      - 'configs/**'
+      - 'scripts/**'
+      - '.github/workflows/redesign-ui.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    env:
+      NVIDIA_API_KEY: local-ui-validation-only
+      META_ADS_DATA_DIR: ${{ github.workspace }}/work/validation-data
+      REDESIGN_OUTPUT_DIR: ${{ github.workspace }}/work/ui-validation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt playwright
+          python -m playwright install --with-deps chromium
+      - name: Validate source-served frontend
+        run: python scripts/check_frontend.py
+      - name: Start isolated local app
+        run: |
+          python server.py > /tmp/ofensiva-validation.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:8812/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/ofensiva-validation.log
+          exit 1
+      - name: Check browser user flows
+        run: python scripts/verify_redesign.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: redesign-browser-evidence
+          path: work/ui-validation/
+          retention-days: 14

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Ofensiva Tráfego IA",
+  "productName": "OFENSIVA CRIATIVA TRÁFEGO IA",
   "version": "1.0.0",
   "identifier": "com.ofensivatrafegoia.app",
   "build": {
@@ -9,7 +9,7 @@
   "app": {
     "windows": [
       {
-        "title": "Ofensiva Tráfego IA",
+        "title": "OFENSIVA CRIATIVA TRÁFEGO IA",
         "url": "https://meta-ads-unmc.vercel.app",
         "width": 1280,
         "height": 800,
@@ -23,7 +23,12 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi", "dmg", "app"],
+    "targets": [
+      "nsis",
+      "msi",
+      "dmg",
+      "app"
+    ],
     "icon": [
       "icons/icon.png",
       "icons/icon.ico",

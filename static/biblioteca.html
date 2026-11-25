@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ad Library</title>
 <style>
-:root{--bg:#0E0C0A;--band:#14110D;--card:#1A150F;--line:#2E2519;--line2:#42341F;--fg:#F4EDE0;--muted:#BDAE93;--dim:#8F836F;--accent:#FF8A1F;--accent-ink:#1A0E00;--gold:#FFC857;--tint:#2A1C0C;
+:root{--bg:#0B1120;--band:#0E1727;--card:#172235;--line:#28364B;--line2:#35465F;--fg:#F1F5F9;--muted:#93A4BC;--dim:#93A4BC;--accent:#1044AC;--accent-ink:#F1F5F9;--gold:#D6B46A;--tint:#152C50;
 --display:"Bricolage Grotesque","Segoe UI",system-ui,-apple-system,sans-serif;--body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);margin:0}
@@ -29,19 +29,19 @@ body.embedded{overflow:hidden}
 .art b{font:800 clamp(22px,3.4vw,28px)/1.08 var(--display);letter-spacing:-.02em}
 .art small{display:block;margin-top:10px;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;opacity:.75}
 .art.photo{background-size:cover;background-position:center;color:#fff;align-content:end;place-items:end start;text-align:left}
-.art.photo ol{margin:10px 0 0;padding-left:20px;font:600 14px/1.5 var(--body);color:#F4EDE0;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+.art.photo ol{margin:10px 0 0;padding-left:20px;font:600 14px/1.5 var(--body);color:#F1F5F9;text-shadow:0 2px 10px rgba(0,0,0,.7)}
 .art.photo b{text-shadow:0 2px 12px rgba(0,0,0,.6)}
-.v-q{background:linear-gradient(160deg,#2A1C0C,#0E0C0A);color:var(--gold)}
-.v-split{background:linear-gradient(90deg,#1F1913 50%,#2A1C0C 50%);color:var(--fg)}
+.v-q{background:linear-gradient(160deg,#152C50,#0B1120);color:var(--gold)}
+.v-split{background:linear-gradient(90deg,#1B2940 50%,#152C50 50%);color:var(--fg)}
 .v-split::after{content:"";position:absolute;inset:0 auto 0 50%;width:2px;background:var(--accent)}
-.v-quote{background:#F4EDE0;color:#1A0E00}
-.v-num{background:linear-gradient(135deg,var(--accent),var(--gold));color:#1A0E00}
+.v-quote{background:#F1F5F9;color:#F1F5F9}
+.v-num{background:linear-gradient(135deg,var(--accent),var(--gold));color:#F1F5F9}
 .v-list{background:var(--band);color:var(--fg);text-align:left;justify-items:start}
 .v-list ol{margin:12px 0 0;padding-left:20px;font:600 15px/1.6 var(--body);color:var(--muted)}
-.v-offer{background:#1A0E00;color:var(--fg);border:2px dashed var(--accent)}
+.v-offer{background:#F1F5F9;color:var(--fg);border:2px dashed var(--accent)}
 .v-offer b{color:var(--gold)}
-.v-ugc{background:linear-gradient(180deg,#3A2F20,#14110D);color:var(--fg)}
-.v-cmp{background:linear-gradient(90deg,#14110D 50%,#2A1C0C 50%);color:var(--fg)}
+.v-ugc{background:linear-gradient(180deg,#35465F,#0E1727);color:var(--fg)}
+.v-cmp{background:linear-gradient(90deg,#0E1727 50%,#152C50 50%);color:var(--fg)}
 .cta{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--band);border-top:1px solid var(--line)}
 .cta strong{font:700 13px var(--body);color:var(--muted);min-width:0}
 .cta span{font:700 12px var(--body);background:var(--line2);padding:6px 10px;border-radius:6px;white-space:nowrap}
@@ -50,6 +50,8 @@ body.embedded{overflow:hidden}
 .act button{font:600 12px var(--body);padding:6px 10px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--fg);cursor:pointer}
 button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .note{margin-top:28px;font-size:13px;color:var(--dim);max-width:70ch}
+
+:root{--display:"Segoe UI",system-ui,sans-serif;--body:"Segoe UI",system-ui,sans-serif}
 </style>
 </head>
 <body>
