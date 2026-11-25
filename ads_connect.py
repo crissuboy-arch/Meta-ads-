@@ -941,10 +941,21 @@ def register(app, d):
     d["mcp"]["tools"] = [{"name": n, "title": n.replace("_", " ").title(), "description": desc, "inputSchema": sch}
                          for n, desc, sch, _ in tools]
 
+    # _WRITE_TOOLS/write_actions_enabled ficam acima do mcp_call porque o
+    # proprio mcp_call precisa checar a trava - e o unico dispatcher usado
+    # tanto pelo wizard web quanto pelo conector MCP remoto (/mcp/{key}),
+    # entao a checagem tem que valer para os dois, nao so para o wizard.
+    _WRITE_TOOLS = {"create_campaign", "create_adset", "create_ad", "set_status"}
+
+    def write_actions_enabled():
+        return os.getenv("WRITE_ACTIONS_ENABLED", "").strip().lower() in ("1", "true", "yes", "on")
+
     def mcp_call(email, name, args):
         h = handlers.get(name)
         if not h:
             return None
+        if name in _WRITE_TOOLS and not write_actions_enabled():
+            return {"content": [{"type": "text", "text": "write_actions_disabled"}], "isError": True}
         try:
             need_supabase()
             token, _row = get_token(email)
@@ -965,10 +976,6 @@ def register(app, d):
     # Assistente de campanha (Fase E): mesma tela web, mesmos handlers do
     # MCP acima (sempre cria PAUSADO) - nao duplica logica nenhuma.
     # ================================================================
-    _WRITE_TOOLS = {"create_campaign", "create_adset", "create_ad", "set_status"}
-
-    def write_actions_enabled():
-        return os.getenv("WRITE_ACTIONS_ENABLED", "").strip().lower() in ("1", "true", "yes", "on")
 
     @app.get("/api/ads/wizard/meta")
     def ads_wizard_meta():
