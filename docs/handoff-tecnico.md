@@ -1,6 +1,6 @@
 # Handoff técnico — consolidação das Fases A–H
 
-Versão de referência estável para a próxima etapa (redesign visual pelo Codex).
+**Entrega definitiva de referência para o Codex aplicar o redesign visual.**
 **Não é uma release comercial** — a release comercial fica para depois dessa
 revisão e do redesign.
 
@@ -45,16 +45,16 @@ dois deploys do commit final (`933b7f9`) terminaram com `state: success`.
 | Instalador desktop (Tauri) | Build real no GitHub Actions (Windows + macOS), não só config escrita |
 | CI (`ci.yml`) | Rodou de verdade no Actions, conclusion `success` |
 
-## O que NÃO foi verificado nesta rodada (peço atenção)
+## Supabase — migrações aplicadas e confirmadas ✅
 
-- **Supabase:** não tenho credenciais nem conexão configurada neste ambiente
-  para rodar as migrações `006_ai_providers_anthropic.sql` e
-  `007_ads_insights_reach.sql` contra o projeto real, nem para confirmar
-  qual projeto Supabase é o "correto" ou tirar um backup antes. **Isso
-  precisa ser feito por você** (SQL Editor do Supabase), antes de usar os
-  recursos de Anthropic (Fase A) e de CPA/CPC/CPM/frequência (Fase B) em
-  produção — sem a migração, essas duas fases ficam com erro em produção
-  mesmo com o código já mesclado.
+Projeto: **Meta ads** (`wsdtiwdnbmijxiqlhasp`, status `ACTIVE_HEALTHY`).
+Confirmado via consulta SQL real (2026-11-25): `ai_providers.calls_count`
+(integer), `ai_providers.last_used_at` (timestamptz), `ads_insights.reach`
+(bigint), e a constraint `ai_providers_provider_check` liberando `gemini`,
+`openai`, `openrouter`, `anthropic`. Nenhuma ação adicional necessária
+aqui — Fases A e B já funcionam em produção com o schema correto.
+
+## O que NÃO foi verificado nesta rodada (peço atenção)
 - **"Sign in with ChatGPT" (SIWC) para usar o plano ChatGPT Plus de cada
   cliente dentro do app:** pesquisei a documentação oficial atual
   (developers.openai.com/siwc e os termos de uso). Existe de fato uma
