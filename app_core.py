@@ -32,6 +32,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from openai import OpenAI
 
 import athena_integration
+import finance
 
 try:
     import requests as _requests
@@ -2071,6 +2072,28 @@ def create_app():
     @app.get("/api/configs")
     def available_configs():
         return JSONResponse(list_configs())
+
+    @app.post("/api/finance/calc")
+    async def finance_calc(request: Request):
+        """Calculadora de break-even: sem estado, sem Supabase, sem auth."""
+        body = await request.json()
+        try:
+            price = float(body.get("price"))
+        except (TypeError, ValueError):
+            raise HTTPException(400, "invalid_price")
+        try:
+            out = finance.calc_breakeven(
+                price,
+                gateway_fee_pct=float(body.get("gateway_fee_pct") or 0),
+                gateway_fee_fixed=float(body.get("gateway_fee_fixed") or 0),
+                other_costs=float(body.get("other_costs") or 0),
+                target_margin_pct=float(body.get("target_margin_pct") or 0),
+                ad_spend=(float(body["ad_spend"]) if body.get("ad_spend") not in (None, "") else None),
+                purchases=(float(body["purchases"]) if body.get("purchases") not in (None, "") else None),
+            )
+        except ValueError as exc:
+            raise HTTPException(400, str(exc))
+        return out
 
     @app.post("/api/chat")
     async def chat(request: Request):
