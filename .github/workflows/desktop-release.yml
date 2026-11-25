@@ -1,0 +1,55 @@
+name: Build desktop installers (Tauri)
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0.0" --locked
+
+      - name: Gerar icones a partir do source (icon-source.png -> .ico/.icns/.png)
+        run: cargo tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+
+      - name: Determina a tag desta execucao (tag real, ou dev-build p/ execucao manual)
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=dev-build" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Builds NAO assinados (uso pessoal): Windows mostra aviso de "editor
+      # desconhecido", macOS pede liberacao em Preferencias do Sistema na
+      # primeira execucao. Sem certificado de assinatura de codigo.
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ steps.tag.outputs.name }}
+          releaseName: "Ofensiva Tráfego IA ${{ steps.tag.outputs.name }}"
+          releaseBody: "Instalador desktop (Windows/macOS), sem assinatura de código - uso pessoal. Ver manual de instalação no repositório."
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: false
