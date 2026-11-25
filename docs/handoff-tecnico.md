@@ -154,3 +154,7 @@ manual ("Run workflow").
 Redesign visual pelo Codex, com a logo oficial e referências de interface
 fornecidas separadamente. Nenhum módulo novo deve ser adicionado fora desse
 escopo nesta próxima etapa.
+
+Depois do redesign, ver `modelo-produto-local-servidor.md` (mesma pasta) para
+o plano do Modo Local e Modo Servidor 24h do produto — ainda não implementado,
+só planejado, para não atrasar esta entrega.
