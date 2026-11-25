@@ -846,6 +846,32 @@ def _cakto_verify(headers, raw, body):
     return (hmac.compare_digest(got.encode(), secret.encode()), "bad_secret")
 
 
+def _hotmart_tracking_verify(headers, body):
+    """Confere o webhook de RASTREAMENTO de vendas da Hotmart. Ate aqui so
+    o webhook de ACESSO (/api/webhooks/hotmart) verificava HOTMART_HOTTOK -
+    este aceitava qualquer payload com o formato certo, sem autenticidade
+    nenhuma. Mesma politica do _cakto_verify: so exige quando a variavel
+    esta configurada, para nao quebrar contas que ainda nao a definiram."""
+    expected = os.getenv("HOTMART_HOTTOK", "")
+    is_hotmart_shaped = (isinstance(body, dict)
+                          and isinstance(body.get("data"), dict)
+                          and isinstance(body["data"].get("purchase"), dict))
+    if not expected or not is_hotmart_shaped:
+        return True, "ok"
+    got = headers.get("x-hotmart-hottok") or str((body or {}).get("hottok") or "")
+    return (hmac.compare_digest(got.encode(), expected.encode()), "invalid_hottok")
+
+
+def _stable_sale_event_id(platform, txn_id, status):
+    """Mesmo espirito do event_id da Cakto (platform-id-status). Sem isso,
+    Hotmart/Stripe/Kiwify/generic caiam sempre no uuid aleatorio de
+    tracking_sales_webhook, o que (1) nunca deduplicava reenvio de webhook
+    (comum - os provedores reenviam em timeout) e (2) reenviava Purchase
+    duplicado pro Meta a cada reenvio."""
+    clean = _trk_clean(txn_id, 120) if txn_id else ""
+    return f"{platform}-{clean}-{status}" if clean else None
+
+
 def _trk_extract_sale(body):
     """Best-effort normalization of checkout webhooks (Hotmart, Kiwify,
     Stripe, generic). Returns only non-PII fields plus the raw PII values
@@ -867,20 +893,24 @@ def _trk_extract_sale(body):
             "utm_content": utms.get("utm_content", ""),
             "_pii": {"fbp": utms.get("fbp"), "fbc": utms.get("fbc")}}
     if purchase:  # Hotmart v2
+        status = _trk_status(purchase.get("status") or body.get("event"))
         base.update(platform="hotmart", amount=_trk_amount(price.get("value")),
                     currency=_trk_clean(price.get("currency_code"), 3).upper() or "BRL",
                     method=_trk_method(payment.get("type")),
-                    status=_trk_status(purchase.get("status") or body.get("event")))
+                    status=status,
+                    event_id=_stable_sale_event_id("hotmart", purchase.get("transaction"), status))
         base["_pii"].update(email=buyer.get("email"), name=buyer.get("name"),
                             phone=buyer.get("checkout_phone") or buyer.get("phone"))
         return base
     if obj and (body.get("type") or "").startswith("checkout.session"):  # Stripe
         cents = obj.get("amount_total")
+        status = "paid" if obj.get("payment_status") == "paid" else "pending"
         base.update(platform="stripe",
                     amount=(round(cents / 100, 2) if isinstance(cents, (int, float)) else _trk_amount(cents)),
                     currency=_trk_clean(obj.get("currency"), 3).upper() or "USD",
                     method=_trk_method(" ".join(obj.get("payment_method_types") or [])),
-                    status="paid" if obj.get("payment_status") == "paid" else "pending")
+                    status=status,
+                    event_id=_stable_sale_event_id("stripe", obj.get("id"), status))
         base["_pii"].update(email=cust.get("email"), name=cust.get("name"), phone=cust.get("phone"))
         return base
     if _is_cakto(body) and not purchase:  # Cakto (Pix, boleto, cartão)
@@ -911,19 +941,24 @@ def _trk_extract_sale(body):
                          "email": ccust.get("email"), "name": ccust.get("name"),
                          "phone": ccust.get("phone")}}
     if body.get("order_status") or body.get("payment_method"):  # Kiwify-like
+        status = _trk_status(body.get("order_status") or body.get("status"))
         base.update(platform="kiwify",
                     amount=_trk_amount(body.get("order_amount") or body.get("amount") or body.get("value")),
                     currency=_trk_clean(body.get("currency"), 3).upper() or "BRL",
                     method=_trk_method(body.get("payment_method")),
-                    status=_trk_status(body.get("order_status") or body.get("status")))
+                    status=status,
+                    event_id=_stable_sale_event_id("kiwify", body.get("order_id") or body.get("id"), status))
         base["_pii"].update(email=body.get("email"), name=body.get("name"), phone=body.get("phone"))
         return base
     # Generic flat payload
+    status = _trk_status(body.get("status") or body.get("event"))
     base.update(platform="generic",
                 amount=_trk_amount(body.get("amount") or body.get("value") or body.get("price")),
                 currency=_trk_clean(body.get("currency"), 3).upper() or "BRL",
                 method=_trk_method(body.get("method") or body.get("payment_method")),
-                status=_trk_status(body.get("status") or body.get("event")))
+                status=status,
+                event_id=_stable_sale_event_id(
+                    "generic", body.get("id") or body.get("order_id") or body.get("transaction_id"), status))
     base["_pii"].update(email=body.get("email"), name=body.get("name"), phone=body.get("phone"))
     return base
 
@@ -2415,6 +2450,9 @@ def create_app():
         ok_origin, why = _cakto_verify(request.headers, raw, body)
         if not ok_origin:
             raise HTTPException(401, why)
+        ok_hotmart, why_hotmart = _hotmart_tracking_verify(request.headers, body)
+        if not ok_hotmart:
+            raise HTTPException(401, why_hotmart)
         if isinstance(body, dict) and body.get("event") == "checkout_abandonment":
             return {"ok": True, "ignored": True}  # formato diferente, sem venda
         sale = _trk_extract_sale(body)

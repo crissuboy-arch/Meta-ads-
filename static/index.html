@@ -2186,12 +2186,14 @@ function trkRenderScript(){
   const extra=trkSelectedEvents().filter(function(e){return e!=='PageView'});
   const lines=extra.map(function(e){return "  fbq('track', '"+e+"', {}, {eventID: maepId('"+e.toLowerCase()+"')});"});
   let s='<!-- Meta Pixel - OFENSIVA CRIATIVA TRÁFEGO IA -->\n<script>\n'+
-    "  function maepId(p){return (p||'ev')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,10)}\n"+
+    "  function maepId(p){if(p==='purchase'&&window.OFENSIVA_SALE_PLATFORM&&window.OFENSIVA_SALE_ID){return window.OFENSIVA_SALE_PLATFORM+'-'+window.OFENSIVA_SALE_ID+'-paid'}return (p||'ev')+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,10)}\n"+
     "  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');\n"+
     "  fbq('init', '"+px+"');\n"+
     "  fbq('track', 'PageView', {}, {eventID: maepId('pageview')});\n"+
     '</scr'+'ipt>\n<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='+px+'&ev=PageView&noscript=1"/></noscript>';
-  if(lines.length)s+='\n\n<!-- '+(UI.trk_script_events_comment||'')+' -->\n<script>\n'+lines.join('\n')+'\n</scr'+'ipt>';
+  if(lines.length)s+='\n\n<!-- '+(UI.trk_script_events_comment||'')+' -->\n'
+    +'<!-- Deduplicacao com o servidor (opcional, avancado): se a sua pagina de agradecimento souber o ID real da venda e a plataforma de pagamento (cakto, hotmart, stripe ou kiwify), defina window.OFENSIVA_SALE_PLATFORM e window.OFENSIVA_SALE_ID ANTES deste script para o evento de Purchase usar o MESMO identificador que o servidor usa no CAPI. Sem isso, a deduplicacao automatica entre Pixel e servidor nao e garantida - ver docs/PENDENCIAS-ANTERIORES-CAPI-PAGAMENTOS.txt. -->\n'
+    +'<script>\n'+lines.join('\n')+'\n</scr'+'ipt>';
   pre.textContent=s;
 }
 function trkRenderWebhook(){const el=document.getElementById('trkWebhookUrl');if(!el)return;el.textContent=location.origin+'/api/webhooks/sales/'+trkKey()}
