@@ -66,9 +66,22 @@ validade: somente uma configuração tinha resultado positivo armazenado.
 - Navegador isolado: 29 verificações de regressão aprovadas. O teste
   adicional de ponte nativa simulada validou os nove botões e sua seleção
   de módulo/provedor/contexto. Isso não equivale a nove chamadas pagas reais.
-- Claude e Codex responderam por execução real antes do ajuste final stdin;
-  Claude também respondeu após stdin. Um teste Codex com limite de 35 s
-  expirou: não se deve converter esse resultado em conexão aprovada.
+- Claude e Codex responderam **OK pelo runtime efetivamente instalado 1.0.1**,
+  via HTTP autenticado e adaptadores oficiais, após as correções de stdin.
+  Aquele teste Codex de 35 s que expirou foi superado pela validação completa
+  com o limite operacional, sem troca de conta ou credencial.
+- CI do código `dae11df`: testes e navegador aprovados, builds Windows/macOS
+  aprovados, incluindo teste Rust da inicialização do runtime empacotado.
+  Execuções: `45774041603`, `45774041683`, `45774041690`.
+- Windows 1.0.1 foi instalado realmente, saiu com código zero, abriu o login
+  no domínio oficial e contém Python e todas as configurações. A assinatura
+  Authenticode do instalador é `NotSigned`.
+- Linux descartável: instalação e reinstalação preservaram o `.env` e os
+  nove arquivos de agentes, sem cópia aninhada. O teste final do processo
+  confirmou inicialização, reinício, token 0600, ausência do token no stdout
+  de serviço e rejeição HTTP 403 sem autenticação. O sandbox foi encerrado.
+- O teste adicional de transporte MCP stdio roda no CI com o SDK instalado;
+  o SDK não está instalado no Python de desenvolvimento deste Windows.
 - Build CI do commit `4ed6d97`: Windows e macOS aprovados no run
   https://github.com/crissuboy-arch/Meta-ads-/actions/runs/45688581175 .
   O CI da versão candidata inclui teste Rust que inicia o runtime real,
