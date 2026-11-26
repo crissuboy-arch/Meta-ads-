@@ -2,7 +2,7 @@ name: Redesign interface validation
 
 on:
   push:
-    branches: [redesign/premium-ofensiva-criativa]
+    branches: [redesign/premium-ofensiva-criativa, 'fix/finalizacao-funcional-validada']
     paths:
       - 'static/**'
       - 'configs/**'
@@ -24,6 +24,7 @@ jobs:
     env:
       NVIDIA_API_KEY: local-ui-validation-only
       META_ADS_DATA_DIR: ${{ github.workspace }}/work/validation-data
+      REDESIGN_TEST_URL: http://127.0.0.1:8812
       REDESIGN_OUTPUT_DIR: ${{ github.workspace }}/work/ui-validation
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +50,9 @@ jobs:
           cat /tmp/ofensiva-validation.log
           exit 1
       - name: Check browser user flows
-        run: python scripts/verify_redesign.py
+        run: |
+          python scripts/verify_redesign.py
+          python scripts/verify_local_chat.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

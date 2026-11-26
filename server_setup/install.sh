@@ -22,6 +22,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 SERVICE_USER="${OFENSIVA_SERVICE_USER:-ofensiva}"
+if [[ ! "$SERVICE_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+    echo "Usuario de servico invalido" >&2
+    exit 1
+fi
 INSTALL_DIR="/home/${SERVICE_USER}/ofensiva-trafego-ia"
 
 log() { echo "[ofensiva-modo-servidor] $*"; }
@@ -33,7 +37,7 @@ fi
 
 log "1/7 - Dependencias do sistema (idempotente)"
 apt-get update -qq
-apt-get install -y -qq python3 python3-venv curl git >/dev/null
+DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-venv curl git nodejs npm systemd >/dev/null
 
 log "2/7 - Usuario de servico dedicado"
 if ! id -u "$SERVICE_USER" >/dev/null 2>&1; then
@@ -44,25 +48,34 @@ else
 fi
 
 log "3/7 - CLIs oficiais de IA (claude, codex)"
+if [ "${OFENSIVA_SKIP_CLI_INSTALL:-0}" != "1" ]; then
 su - "$SERVICE_USER" -c '
-set -e
+set -euo pipefail
+export PATH="$HOME/.local/bin:$PATH"
 if ! command -v claude >/dev/null 2>&1; then
     curl -fsSL https://claude.ai/install.sh | bash
 else
     echo "claude ja instalado."
 fi
 if ! command -v codex >/dev/null 2>&1; then
-    curl -fsSL https://chatgpt.com/codex/install.sh | sh
+    npm install --global --prefix "$HOME/.local" @openai/codex
 else
     echo "codex ja instalado."
 fi
 '
+else
+    log "Instalacao das CLIs omitida explicitamente; autenticação/inferencia ainda pendentes."
+fi
 
 log "4/7 - Copiando o MCP e o motor local para $INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
-cp -r "$REPO_DIR/mcp" "$INSTALL_DIR/mcp"
-cp -r "$REPO_DIR/local_engine" "$INSTALL_DIR/local_engine"
-cp -r "$REPO_DIR/configs" "$INSTALL_DIR/configs"
+for component in mcp local_engine configs server_setup; do
+    mkdir -p "$INSTALL_DIR/$component"
+    # Copy code only. Never import the developer's .env, proposals, or virtualenv.
+    tar -C "$REPO_DIR/$component" --exclude='.env' --exclude='.venv' \
+        --exclude='__pycache__' --exclude='proposals.local.json' -cf - . \
+        | tar -C "$INSTALL_DIR/$component" -xf -
+done
 if [ ! -f "$INSTALL_DIR/mcp/.env" ]; then
     cp "$INSTALL_DIR/mcp/.env.example" "$INSTALL_DIR/mcp/.env"
     log "mcp/.env criado vazio de proposito - preencha pessoalmente (ver docs/motor-local.md)."
@@ -82,13 +95,57 @@ fi
 log "6/7 - Publicando os 9 agentes como subagentes do Claude Code"
 su - "$SERVICE_USER" -c "
 mkdir -p ~/.claude/agents
-python3 '$SCRIPT_DIR/export_agents.py' '$INSTALL_DIR/configs/meta-ads-pt.json' ~/.claude/agents
+python3 '$INSTALL_DIR/server_setup/export_agents.py' '$INSTALL_DIR/configs/meta-ads-pt.json' ~/.claude/agents
 "
 
 log "7/7 - Registrando o servidor MCP no Claude Code"
 su - "$SERVICE_USER" -c "
-claude mcp add --scope user ofensiva-trafego-ia -- '$INSTALL_DIR/mcp-venv/bin/python' '$INSTALL_DIR/mcp/server.py' || true
+export PATH=\"\$HOME/.local/bin:\$PATH\"
+if command -v claude >/dev/null 2>&1; then
+    if ! claude mcp get ofensiva-trafego-ia >/dev/null 2>&1; then
+        claude mcp add --scope user ofensiva-trafego-ia -- '$INSTALL_DIR/mcp-venv/bin/python' '$INSTALL_DIR/mcp/server.py'
+    fi
+else
+    echo 'CLI Claude ausente: registro MCP pendente.'
+fi
 "
+
+log "Configurando o servico local (loopback, sem porta publica)"
+cat > /etc/systemd/system/ofensiva-local-engine.service <<SERVICE
+[Unit]
+Description=Ofensiva Criativa - motor privado de IA
+After=network-online.target
+[Service]
+User=$SERVICE_USER
+Group=$SERVICE_USER
+WorkingDirectory=$INSTALL_DIR
+Environment=HOME=/home/$SERVICE_USER
+Environment=PATH=/home/$SERVICE_USER/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=LOCAL_ENGINE_PORT=8819
+Environment=LOCAL_ENGINE_TOKEN_FILE=/run/ofensiva-local-engine/session.json
+RuntimeDirectory=ofensiva-local-engine
+RuntimeDirectoryMode=0700
+ExecStart=$INSTALL_DIR/mcp-venv/bin/python -m local_engine.server
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target
+SERVICE
+if [ -d /run/systemd/system ]; then
+    if [ "${OFENSIVA_SKIP_SERVICE_START:-0}" = "1" ]; then
+        log "Servico preparado; inicio omitido explicitamente para validacao isolada."
+    else
+        systemctl daemon-reload
+        systemctl enable ofensiva-local-engine.service
+        systemctl restart ofensiva-local-engine.service
+        systemctl is-active --quiet ofensiva-local-engine.service
+    fi
+else
+    log "Unit systemd criada, mas este ambiente nao iniciou systemd. Servico 24h NAO validado/ativo."
+fi
 
 cat <<EOF
 

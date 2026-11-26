@@ -2920,6 +2920,7 @@ document.querySelector('.app').addEventListener('click',async e=>{
   const btn=e.target.closest('[data-agent-chat]');if(!btn||busy)return;
   const id=btn.dataset.agentChat,p=P[id];if(!p)return;
   currentModule=id;currentSystemPrompt=p;syncUTMPanel();
+  premiumChat(true);
   await sendChat(btn.dataset.agentLabel||id);
 });
 // Capture only new navigation IDs. All original IDs continue through their existing handlers.

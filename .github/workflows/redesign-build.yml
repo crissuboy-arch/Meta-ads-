@@ -36,15 +36,17 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
       - name: Install Tauri CLI
-        run: cargo install tauri-cli --version '^2.0.0' --locked
+        run: npm install --global @tauri-apps/cli@2
       - name: Generate official icons
-        run: cargo tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+        run: tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+      - name: Test native bridge against bundled engine
+        run: cargo test --release --manifest-path src-tauri/Cargo.toml
       - name: Build Windows installer
         if: runner.os == 'Windows'
-        run: cargo tauri build --bundles nsis
+        run: tauri build --bundles nsis
       - name: Build macOS application and installer
         if: runner.os == 'macOS'
-        run: cargo tauri build --bundles app,dmg
+        run: tauri build --bundles app,dmg
       - uses: actions/upload-artifact@v4
         with:
           name: redesign-desktop-${{ runner.os }}

@@ -23,7 +23,16 @@ class Handler(BaseHTTPRequestHandler):
     def _authorize(self):
         token = getattr(self.server, "auth_token", "")
         if self.headers.get("Origin") or not token or not hmac.compare_digest(
-                self.headers.get("Authorization", ""), "Bearer " + token):
+                self.headers.get("Authorization", "").encode(), ("Bearer " + token).encode()):
+            # Drain only bounded request bodies so Windows can receive the 403
+            # instead of resetting a socket that still has unread bytes.
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                if 0 < length <= 1048576:
+                    self.connection.settimeout(2)
+                    self.rfile.read(length)
+            except (ValueError, OSError):
+                pass
             self._json(403, {"ok": False, "error": "local_engine_access_denied"})
             return False
         return True
@@ -107,8 +116,16 @@ def main():
     server.auth_token = secrets.token_urlsafe(32)
     # Imprime a porta real escolhida (util quando port=0) para o processo
     # pai (Tauri/Rust) saber onde falar com o motor.
-    print("LOCAL_ENGINE_READY=" + json.dumps({"port": server.server_address[1],
-                                              "token": server.auth_token}), flush=True)
+    ready = {"port": server.server_address[1], "token": server.auth_token}
+    token_file = os.environ.get("LOCAL_ENGINE_TOKEN_FILE")
+    if token_file:
+        # Systemd RuntimeDirectory is private to the service user. Never log its token.
+        descriptor = os.open(token_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as file:
+            json.dump(ready, file)
+        print("LOCAL_ENGINE_SERVICE_READY", flush=True)
+    else:
+        print("LOCAL_ENGINE_READY=" + json.dumps(ready), flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

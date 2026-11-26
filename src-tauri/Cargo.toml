@@ -1,6 +1,6 @@
 [package]
 name = "ofensiva-trafego-ia"
-version = "1.0.0"
+version = "1.0.1"
 description = "Casca desktop (Tauri) para o app web Ofensiva Tráfego IA"
 edition = "2021"
 

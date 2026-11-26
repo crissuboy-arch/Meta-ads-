@@ -41,15 +41,15 @@ def test_run_cli_inference_runs_real_pipeline_with_mocked_subprocess():
         stderr = ""
 
     def fake_run(cmd, **kw):
-        calls.append(cmd)
+        calls.append((cmd,kw))
         return FakeProc()
 
     out = engine.run_cli_inference("claude", "sistema", "ola",
                                     runner=fake_run, which=lambda n: "/usr/bin/claude")
     assert out == {"ok": True, "text": "OK"}
-    assert calls[0][0] == "/usr/bin/claude"
-    assert "--strict-mcp-config" in calls[0]
-    assert "sistema" in calls[0][2] and "ola" in calls[0][2]
+    assert calls[0][0][0] == "/usr/bin/claude"
+    assert "--strict-mcp-config" in calls[0][0]
+    assert "sistema" in calls[0][1]['input'] and "ola" in calls[0][1]['input']
 
 
 def test_run_cli_inference_surfaces_cli_error():

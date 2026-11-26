@@ -7,6 +7,9 @@ use std::time::Duration;
 use tauri::{Manager, State};
 
 struct Engine { child: Child, port: u16, token: String }
+impl Drop for Engine {
+    fn drop(&mut self) { let _ = self.child.kill(); let _ = self.child.wait(); }
+}
 struct LocalEngineState(Mutex<Option<Engine>>);
 const PROVIDERS: [&str; 3] = ["claude", "codex", "opencode"];
 
@@ -38,12 +41,16 @@ fn open_provider_terminal(provider: String) -> Result<(), String> {
 }
 
 fn start_engine(app: &tauri::AppHandle, state: &LocalEngineState) -> Result<u16, String> {
+    let resources = app.path().resource_dir().map_err(|e| e.to_string())?;
+    start_engine_at(&resources, state)
+}
+
+fn start_engine_at(resources: &std::path::Path, state: &LocalEngineState) -> Result<u16, String> {
     let mut guard = state.0.lock().map_err(|e| e.to_string())?;
     if let Some(engine) = guard.as_mut() {
         if matches!(engine.child.try_wait(), Ok(None)) { return Ok(engine.port); }
         *guard = None;
     }
-    let resources = app.path().resource_dir().map_err(|e| e.to_string())?;
     let binary = resources.join("runtime").join("local-engine").join(if cfg!(windows) {"local-engine.exe"} else {"local-engine"});
     let mut command = if binary.is_file() {
         Command::new(binary)
@@ -107,7 +114,7 @@ async fn local_chat(app: tauri::AppHandle, payload: serde_json::Value) -> Result
         let state = app.state::<LocalEngineState>();
         let port = start_engine(&app, &state)?;
         let token = state.0.lock().map_err(|e| e.to_string())?.as_ref().ok_or("Motor indisponivel")?.token.clone();
-        let client = reqwest::blocking::Client::builder().no_proxy().timeout(Duration::from_secs(75)).build().map_err(|e| e.to_string())?;
+        let client = reqwest::blocking::Client::builder().no_proxy().timeout(Duration::from_secs(190)).build().map_err(|e| e.to_string())?;
         let response = client.post(format!("http://127.0.0.1:{port}/chat")).bearer_auth(token).json(&payload).send().map_err(|e| e.to_string())?;
         response.json::<serde_json::Value>().map_err(|e| e.to_string())
     }).await.map_err(|e| e.to_string())?
@@ -118,4 +125,27 @@ fn main() {
         .invoke_handler(tauri::generate_handler![detect_providers, open_provider_terminal, start_local_engine, stop_local_engine, local_engine_port, local_chat])
         .build(tauri::generate_context!()).expect("Erro ao iniciar Ofensiva");
     app.run(|handle, event| { if let tauri::RunEvent::Exit = event { let _ = stop_engine(&handle.state::<LocalEngineState>()); } });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn native_bridge_starts_bundled_runtime_and_authenticates_requests() {
+        let resources = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let binary = resources.join("runtime/local-engine").join(if cfg!(windows) {"local-engine.exe"} else {"local-engine"});
+        assert!(binary.is_file(), "Build the frozen runtime before running this integration test");
+        let state = LocalEngineState(Mutex::new(None));
+        let port = start_engine_at(resources, &state).expect("native startup of actual bundled Python");
+        let token = state.0.lock().unwrap().as_ref().unwrap().token.clone();
+        let client = reqwest::blocking::Client::builder().no_proxy().timeout(Duration::from_secs(10)).build().unwrap();
+        let url = format!("http://127.0.0.1:{port}");
+        assert_eq!(client.get(format!("{url}/health")).send().unwrap().status().as_u16(), 403);
+        let agents: serde_json::Value = client.get(format!("{url}/agents")).bearer_auth(&token).send().unwrap().json().unwrap();
+        assert!(agents["agents"].as_array().unwrap().len() >= 9);
+        assert_eq!(start_engine_at(resources, &state).unwrap(), port);
+        stop_engine(&state).unwrap();
+        assert!(state.0.lock().unwrap().is_none());
+    }
 }

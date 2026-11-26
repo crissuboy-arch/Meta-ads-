@@ -131,7 +131,7 @@ CLI_EXEC = {
 }
 
 
-def run_cli_inference(provider, system_prompt, user_text, timeout=60,
+def run_cli_inference(provider, system_prompt, user_text, timeout=180,
                        runner=subprocess.run, which=shutil.which):
     """Usa a CLI oficial ja autenticada pelo PROPRIO usuario como motor de
     inferencia - nenhuma chave de API, nenhum login armazenado aqui."""
@@ -140,19 +140,39 @@ def run_cli_inference(provider, system_prompt, user_text, timeout=60,
     executable = which(provider)
     if not executable:
         return {"ok": False, "error": f"{provider} nao esta instalado/no PATH"}
+    if provider == "claude" and os.name == "nt" and executable.lower().endswith((".cmd", ".bat")):
+        # Official npm shim points to this native binary. Launch it directly
+        # so timeout/cancellation cannot leave a batch-file child running.
+        from pathlib import Path
+        native = Path(executable).parent / "node_modules/@anthropic-ai/claude-code/bin/claude.exe"
+        if native.is_file():
+            executable = str(native)
     full_prompt = f"{system_prompt}\n\n{user_text}" if system_prompt else user_text
-    cmd = CLI_EXEC[provider](full_prompt)
+    cmd = CLI_EXEC[provider]("-" if provider == "codex" else full_prompt)
     cmd[0] = executable
     # The chat is advice-only. Provider CLIs must not invoke tools or MCP
     # inherited from the user's unrelated projects/configuration.
     if provider == "claude":
+        del cmd[2]  # Prompt comes through stdin: no Windows command-line size limit.
         cmd += ["--tools", "", "--strict-mcp-config"]
     elif provider == "codex":
         cmd[1:1] = ["-c", "mcp_servers={}"]
         cmd[cmd.index("exec") + 1:cmd.index("exec") + 1] = ["--sandbox", "read-only"]
+        from pathlib import Path
+        import tomllib
+        config = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex"))) / "config.toml"
+        try:
+            configured = tomllib.loads(config.read_text(encoding="utf-8")) if config.exists() else {}
+            for name in configured.get("mcp_servers", {}):
+                cmd[1:1] = ["-c", "mcp_servers." + json.dumps(name) + ".enabled=false"]
+        except (OSError, ValueError):
+            return {"ok": False, "error": "Nao foi possivel isolar a configuracao MCP do Codex"}
     try:
+        stdin = {"input": full_prompt} if provider in ("claude", "codex") else {}
+        if os.name == "nt":
+            stdin["creationflags"] = subprocess.CREATE_NO_WINDOW
         proc = runner(cmd, capture_output=True, text=True, timeout=timeout,
-                      encoding="utf-8", errors="replace")
+                      encoding="utf-8", errors="replace", **stdin)
     except Exception as exc:
         return {"ok": False, "error": f"falha ao executar {provider}: {exc}"}
     if proc.returncode != 0:
