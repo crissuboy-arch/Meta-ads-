@@ -1353,7 +1353,13 @@ def _buyer_is_active(email):
         return (_buyers_load().get(email) or {}).get("status") == "active"
     try:
         rows = _sb_req("GET", "app_buyers", params={"email": f"eq.{email}", "select": "status"})
-        return bool(rows) and rows[0].get("status") == "active"
+        if rows and rows[0].get("status") == "active":
+            return True
+        if os.getenv("HUBLA_LIVE_ACCESS_ENABLED", "false").lower() != "true":
+            return False
+        hubla_rows = _sb_req("GET", "hubla_entitlements", params={
+            "email": f"eq.{email}", "status": "eq.paid", "select": "invoice_id", "limit": "1"})
+        return bool(hubla_rows)
     except Exception as exc:
         print(f"[buyers] read error: {_scrub_secrets(str(exc))[:200]}", file=sys.stderr)
         return False
@@ -1972,6 +1978,9 @@ def create_app():
     @app.delete("/mcp/{key}")
     async def mcp_no_stream(key: str):
         return Response(status_code=405, headers={"Allow": "POST"})
+
+    import hubla_access
+    hubla_access.register(app, _sb_req)
 
     @app.post("/api/webhooks/hotmart")
     async def hotmart_access_webhook(request: Request):
