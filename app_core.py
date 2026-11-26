@@ -74,7 +74,7 @@ API_PROVIDERS = {
         "label": "OpenRouter",
         "base_url": "https://openrouter.ai/api/v1",
         "key_env": "OPENROUTER_API_KEY",
-        "headers": {"X-Title": "Ofensiva Tráfego IA"},
+        "headers": {"X-Title": "Ofensiva Trafego IA"},
     },
     "agnes": {
         "label": "Agnes AI (free)",
