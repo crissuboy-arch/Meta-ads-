@@ -15,12 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mcp.server.fastmcp import FastMCP  # noqa: E402
 
 import meta_api  # noqa: E402
-from approvals import (  # noqa: E402
-    approve_proposal,
-    list_proposals,
-    propose_action,
-    reject_proposal,
-)
+import approvals  # noqa: E402
 
 mcp = FastMCP("meta-ads-pro")
 
@@ -63,26 +58,29 @@ def propose_action(action: str, params: dict) -> dict:
       headline, description.
     create_ad params: adset_id, name, creative_id. Ads start PAUSED.
     """
-    return propose_action(action, params)
+    return approvals.propose_action(action, params)
 
 
 @mcp.tool()
 def approve_proposal(proposal_id: str) -> dict:
     """Execute a pending proposal. Call ONLY after the human explicitly
     approved it in chat. One-shot: a decided proposal never runs twice."""
-    return approve_proposal(proposal_id)
+    # A model cannot attest that a human approved its own tool call.
+    # Keep the tool contract, but execute only from the independent terminal.
+    return {"status": "human_approval_required", "proposal_id": proposal_id,
+            "next_step": "Execute pessoalmente: python mcp/approve.py " + proposal_id}
 
 
 @mcp.tool()
 def reject_proposal(proposal_id: str, reason: str = "") -> dict:
     """Discard a pending proposal without executing it."""
-    return reject_proposal(proposal_id, reason)
+    return approvals.reject_proposal(proposal_id, reason)
 
 
 @mcp.tool()
 def list_proposals(status: str = "", limit: int = 20) -> list[dict]:
     """Audit log of proposals: pending|approved|executed|rejected|failed."""
-    return list_proposals(status, limit)
+    return approvals.list_proposals(status, limit)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,4 @@
+# O motor local usa so a biblioteca padrao do Python (http.server,
+# urllib) de proposito - zero dependencias para esta primeira versao, ja
+# que o Python instalado precisa ser o do sistema do comprador (ver
+# docs/motor-local.md). Nada a instalar aqui ainda.

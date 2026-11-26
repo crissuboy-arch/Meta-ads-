@@ -78,16 +78,18 @@ def _fake_sb_req(method, table, params=None, payload=None):
 
 
 def test_budget_cap_blocks_expensive_campaign(monkeypatch):
+    monkeypatch.setenv("WRITE_ACTIONS_ENABLED", "true")
     monkeypatch.setenv("MAX_DAILY_BUDGET_CENTS", "5000")  # R$50,00/dia
     mcp_call = _register(_fake_sb_req)
     out = mcp_call("test@example.com", "create_campaign",
                     {"ad_account_id": "999", "name": "Oferta cara",
-                     "objective": "OUTCOME_SALES", "daily_budget": 200})
+                     "objective": "OUTCOME_SALES", "daily_budget": 200}, human_request=True)
     assert out["isError"] is True
     assert "MAX_DAILY_BUDGET_CENTS" in out["content"][0]["text"]
 
 
 def test_budget_within_cap_is_not_rejected_by_cap(monkeypatch):
+    monkeypatch.setenv("WRITE_ACTIONS_ENABLED", "true")
     monkeypatch.setenv("MAX_DAILY_BUDGET_CENTS", "5000")
     mcp_call = _register(_fake_sb_req)
     out = mcp_call("test@example.com", "create_campaign",
@@ -100,6 +102,7 @@ def test_budget_within_cap_is_not_rejected_by_cap(monkeypatch):
 
 
 def test_no_cap_set_does_not_block_anything(monkeypatch):
+    monkeypatch.setenv("WRITE_ACTIONS_ENABLED", "true")
     monkeypatch.delenv("MAX_DAILY_BUDGET_CENTS", raising=False)
     mcp_call = _register(_fake_sb_req)
     out = mcp_call("test@example.com", "create_campaign",
@@ -107,6 +110,36 @@ def test_no_cap_set_does_not_block_anything(monkeypatch):
                      "objective": "OUTCOME_SALES", "daily_budget": 100000})
     if out.get("isError"):
         assert "MAX_DAILY_BUDGET_CENTS" not in out["content"][0]["text"]
+
+
+def test_write_actions_disabled_blocks_mcp_connector_by_default(monkeypatch):
+    """O conector MCP remoto (/mcp/{key}) e o wizard web compartilham o mesmo
+    dispatcher (mcp_call). Antes desta correcao, so o wizard checava
+    WRITE_ACTIONS_ENABLED - um cliente MCP conectado direto (ex.: Claude de
+    um comprador) podia criar campanha/adset/ad ou mudar status mesmo com a
+    trava desligada, e so o teto de orcamento ainda protegia esse caminho.
+    """
+    monkeypatch.delenv("WRITE_ACTIONS_ENABLED", raising=False)
+    mcp_call = _register(_fake_sb_req)
+    for name, args in [
+        ("create_campaign", {"ad_account_id": "999", "name": "x",
+                              "objective": "OUTCOME_SALES", "daily_budget": 10}),
+        ("create_adset", {"ad_account_id": "999", "campaign_id": "1", "name": "x",
+                           "daily_budget": 10}),
+        ("create_ad", {"ad_account_id": "999", "adset_id": "1", "name": "x",
+                        "creative_id": "1"}),
+        ("set_status", {"object_id": "1", "status": "ACTIVE", "user_confirmed": True}),
+    ]:
+        out = mcp_call("test@example.com", name, args)
+        assert out["isError"] is True
+        assert out["content"][0]["text"] == "write_actions_disabled"
+
+
+def test_write_actions_disabled_does_not_block_read_tools(monkeypatch):
+    monkeypatch.delenv("WRITE_ACTIONS_ENABLED", raising=False)
+    mcp_call = _register(_fake_sb_req)
+    out = mcp_call("test@example.com", "list_ad_accounts", {})
+    assert out.get("content", [{}])[0].get("text") != "write_actions_disabled"
 
 
 def test_providers_endpoint_never_leaks_full_key(monkeypatch):

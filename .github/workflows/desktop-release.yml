@@ -17,6 +17,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Bundle local Python engine and agents
+        run: |
+          python -m pip install 'pyinstaller>=6,<7'
+          python scripts/build_local_engine.py
+          python scripts/smoke_local_bundle.py
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -25,10 +33,10 @@ jobs:
           workspaces: "./src-tauri -> target"
 
       - name: Install Tauri CLI
-        run: cargo install tauri-cli --version "^2.0.0" --locked
+        run: npm install --global @tauri-apps/cli@2
 
       - name: Gerar icones a partir do source (icon-source.png -> .ico/.icns/.png)
-        run: cargo tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+        run: tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
 
       - name: Determina a tag desta execucao (tag real, ou dev-build p/ execucao manual)
         id: tag

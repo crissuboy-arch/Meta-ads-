@@ -117,6 +117,7 @@ def test_wizard_blocks_create_campaign_when_write_disabled(monkeypatch):
     client = TestClient(app)
     r = client.post("/api/ads/wizard/call", json={
         "tool": "create_campaign",
+        "human_confirmed": True,
         "args": {"ad_account_id": "999", "name": "Teste", "objective": "OUTCOME_SALES"},
     })
     assert r.status_code == 403
@@ -140,6 +141,7 @@ def test_wizard_creates_paused_campaign_when_write_enabled(monkeypatch):
     r = client.post("/api/ads/wizard/call", json={
         "tool": "create_campaign",
         "args": {"ad_account_id": "999", "name": "Oferta nova", "objective": "OUTCOME_SALES"},
+        "human_confirmed": True,
     })
     assert r.status_code == 200
     body = r.json()
@@ -157,5 +159,5 @@ def test_wizard_rejects_activate_without_explicit_confirmation(monkeypatch):
     r = client.post("/api/ads/wizard/call", json={
         "tool": "set_status", "args": {"object_id": "123", "status": "ACTIVE"},
     })
-    assert r.status_code == 400
-    assert "confirma" in r.json()["detail"].lower()
+    assert r.status_code == 403
+    assert "human_approval_required" in r.json()["detail"]

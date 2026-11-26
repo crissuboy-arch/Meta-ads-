@@ -2,9 +2,12 @@ name: Redesign desktop build (no release)
 
 on:
   push:
-    branches: [redesign/premium-ofensiva-criativa]
+    branches: [redesign/premium-ofensiva-criativa, finalizacao-funcional, 'fix/finalizacao-funcional-validada']
     paths:
       - 'src-tauri/**'
+      - 'local_engine/**'
+      - 'configs/**'
+      - 'scripts/build_local_engine.py'
       - '.github/workflows/redesign-build.yml'
   workflow_dispatch:
 
@@ -20,20 +23,30 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Bundle local Python engine and agents
+        run: |
+          python -m pip install 'pyinstaller>=6,<7'
+          python scripts/build_local_engine.py
+          python scripts/smoke_local_bundle.py
       - uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
       - name: Install Tauri CLI
-        run: cargo install tauri-cli --version '^2.0.0' --locked
+        run: npm install --global @tauri-apps/cli@2
       - name: Generate official icons
-        run: cargo tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+        run: tauri icon src-tauri/icons/icon-source.png -o src-tauri/icons
+      - name: Test native bridge against bundled engine
+        run: cargo test --release --manifest-path src-tauri/Cargo.toml
       - name: Build Windows installer
         if: runner.os == 'Windows'
-        run: cargo tauri build --bundles nsis
+        run: tauri build --bundles nsis
       - name: Build macOS application and installer
         if: runner.os == 'macOS'
-        run: cargo tauri build --bundles app,dmg
+        run: tauri build --bundles app,dmg
       - uses: actions/upload-artifact@v4
         with:
           name: redesign-desktop-${{ runner.os }}

@@ -1,16 +1,17 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "OFENSIVA CRIATIVA TRÁFEGO IA",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "identifier": "com.ofensivatrafegoia.app",
   "build": {
-    "frontendDist": "https://meta-ads-unmc.vercel.app"
+    "frontendDist": "https://app.ofensivacriativa.com"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "OFENSIVA CRIATIVA TRÁFEGO IA",
-        "url": "https://meta-ads-unmc.vercel.app",
+        "url": "https://app.ofensivacriativa.com",
         "width": 1280,
         "height": 800,
         "minWidth": 960,
@@ -33,6 +34,7 @@
       "icons/icon.png",
       "icons/icon.ico",
       "icons/icon.icns"
-    ]
+    ],
+    "resources": {"runtime/": "runtime/"}
   }
 }
