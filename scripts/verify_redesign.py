@@ -58,7 +58,7 @@ with sync_playwright() as p:
         # An async completion must not navigate back to the dashboard.
         page.wait_for_timeout(300)
         assert not page.locator('#premiumOverview').is_visible(),nav
-        if nav=='agents':assert page.locator('.agent-card').count()==9
+        if nav=='agents':assert page.locator('[data-agent-chat]').count()==9
         if nav=='provedores':assert page.locator('[data-p="key"]').count()==4
         if nav in captures:page.screenshot(path=str(OUT/(captures[nav]+'.png')))
         checks.append('Navigation: '+nav)
