@@ -820,13 +820,14 @@ def register(app, d):
         if level not in ("account", "campaign", "adset", "ad"):
             raise ToolError("level inválido.")
         params = {"level": level, "limit": 200,
-                  "fields": "campaign_name,adset_name,ad_name,spend,impressions,reach,clicks,ctr,cpm,cpc,actions,cost_per_action_type"}
+                  "fields": "campaign_id,campaign_name,adset_name,ad_name,spend,impressions,reach,clicks,ctr,cpm,cpc,actions,action_values,cost_per_action_type"}
         if a.get("since") and a.get("until"):
             params["time_range"] = json.dumps({"since": a["since"], "until": a["until"]})
         else:
             params["date_preset"] = a.get("date_preset") or "last_7d"
         d = gcall("GET", f"/act_{row['account_id']}/insights", token, params=params)
-        return {"currency": row["currency"], "rows": d.get("data", [])}
+        return {"currency": row["currency"], "rows": d.get("data", []),
+                "incomplete": bool(d.get("paging", {}).get("next"))}
 
     def t_create_campaign(email, token, a):
         need(a, "ad_account_id", "name", "objective")
