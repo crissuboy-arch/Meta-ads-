@@ -29,3 +29,6 @@ manifest=json.loads((ROOT/'static/manifest.json').read_text(encoding='utf-8'))
 for icon in manifest['icons']:
     assert (ROOT/'static'/icon['src'].lstrip('/')).read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
 print(f'Frontend validated: {count} JavaScript units, unique HTML IDs, manifest and official PNG icons.')
+tracking_test=ROOT/'scripts/test_tracking_insights.cjs'
+if tracking_test.exists():
+    subprocess.run(['node','--test',str(tracking_test)],check=True)
